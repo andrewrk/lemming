@@ -32,14 +32,8 @@ class LevelEditor(Game):
         self.selected_tile = 0
 
     def update(self, dt):
-        if self.mode == LevelEditor.Mode.PLAYTEST:
-            super(LevelEditor, self).update(dt)
-
-    def on_draw(self):
-        self.window.clear()
-
         if self.mode == LevelEditor.Mode.NORMAL:
-            # draw tiles
+            # prepare sprites for drawing
             start = self.absPt(Vec2d(0, 0)) / (tiles.width, tiles.height)
             end = self.absPt(Vec2d(self.window.width, self.window.height)) / Game.tile_size
             start.floor()
@@ -47,10 +41,17 @@ class LevelEditor(Game):
             it = Vec2d(0, 0)
             for it.y in range(start.y, end.y):
                 for it.x in range(start.x, end.x):
-                    rel = self.relPt(it * Game.tile_size).floored()
-                    tile = self.level.getTile(it)
-                    if tile.id != 0:
-                        self.level.getTile(it).image.blit(*rel)
+                    sq = self.level.getSquare(it)
+                    if sq is not None and sq.sprite is not None:
+                        self.updateSpritePos(sq.sprite, it * Game.tile_size)
+        elif self.mode == LevelEditor.Mode.PLAYTEST:
+            super(LevelEditor, self).update(dt)
+
+    def on_draw(self):
+        if self.mode == LevelEditor.Mode.NORMAL:
+            self.window.clear()
+
+            self.batch.draw()
 
             if self.grid_on:
                 # draw grid
@@ -70,7 +71,10 @@ class LevelEditor(Game):
             if self.selected_tile is not None:
                 tiles.info[self.selected_tile].image.blit(0, self.window.height - tiles.height)
 
+            self.fps_display.draw()
         elif self.mode == LevelEditor.Mode.CHOOSE_TILE:
+            self.window.clear()
+
             palette = self.getTilePalette()
             for pos, tile in palette:
                 tile.image.blit(pos.x, pos.y)

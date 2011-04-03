@@ -1,4 +1,3 @@
- * use sprites in the level editor too
  * physics
    - jumping
    - exploding and control going to the one behind you

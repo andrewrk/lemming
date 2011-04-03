@@ -22,12 +22,17 @@ class Level(object):
         self.group = group
 
     def getSquare(self, pos):
-        assert not self.sparse
         floored_pos = pos.floored()
-        try:
-            return self.squares[self.getIndex(*floored_pos)]
-        except IndexError:
-            return None
+        if self.sparse:
+            try:
+                return self.squares[tuple(floored_pos)]
+            except KeyError:
+                return None
+        else:
+            try:
+                return self.squares[self.getIndex(*floored_pos)]
+            except IndexError:
+                return None
 
     def getTile(self, pos):
         floored_pos = pos.floored()
