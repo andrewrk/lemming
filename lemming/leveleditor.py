@@ -27,7 +27,7 @@ class LevelEditor(Game):
         self.mode = LevelEditor.Mode.NORMAL
         self.left_mouse_down = False
         self.right_mouse_down = False
-        self.selected_tile = tiles.info.iteritems().next()[0]
+        self.selected_tile = 0
 
         self.level_filename = None
 
@@ -49,8 +49,8 @@ class LevelEditor(Game):
                 for it.x in range(start.x, end.x):
                     rel = self.relPt(it * Game.tile_size).floored()
                     tile = self.getTile(it)
-                    if tile['id'] != 0:
-                        self.getTile(it)['image'].blit(*rel)
+                    if tile.id != 0:
+                        self.getTile(it).image.blit(*rel)
 
             if self.grid_on:
                 # draw grid
@@ -68,7 +68,7 @@ class LevelEditor(Game):
 
             # draw selected tile
             if self.selected_tile is not None:
-                tiles.info[self.selected_tile]['image'].blit(0, self.window.height - tiles.height)
+                tiles.info[self.selected_tile].image.blit(0, self.window.height - tiles.height)
 
         elif self.mode == LevelEditor.Mode.CHOOSE_TILE:
             palette = self.getTilePalette()
@@ -154,7 +154,7 @@ class LevelEditor(Game):
                 palette = self.getTilePalette()
                 for pos, tile in palette:
                     if x >= pos.x and x <= pos.x + tiles.width and y >= pos.y and y <= pos.y + tiles.height:
-                        self.selected_tile = tile['id']
+                        self.selected_tile = tile.id
                         print("Selected {0}".format(tile['name']))
                         break
         elif button & pyglet.window.mouse.RIGHT:

@@ -2,6 +2,15 @@ from __future__ import division, print_function, unicode_literals
 range = xrange
 unzip = lambda l:apply(zip,l)
 
+class obj(object):
+    def __init__(self, d=None):
+        if d is None:
+            d = {}
+        self._attrs = d
+
+    def __getattr__(self, name):
+        return self._attrs[name]
+
 # the variables that we export:
 info = {}
 width = 16
@@ -36,4 +45,4 @@ for full_line in lines:
     for i, part in enumerate(parts):
         parts[i] = type_str_to_func[header_types[i]](part)
 
-    info[parts[0]] = dict(zip(header_names, parts))
+    info[parts[0]] = obj(dict(zip(header_names, parts)))

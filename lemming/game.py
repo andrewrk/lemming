@@ -38,7 +38,7 @@ class Game(object):
     def loadImages(self):
         tileset = pyglet.image.load('tiles', file=data.load("tiles.bmp"))
         for tile in tiles.info.values():
-            tile['image'] = tileset.get_region(tile['x']*tiles.width, tile['y']*tiles.height, tiles.width, tiles.height)
+            tile.image = tileset.get_region(tile.x*tiles.width, tile.y*tiles.height, tiles.width, tiles.height)
         self.lem_img = pyglet.image.load('lem', file=data.load("lem.png"))
 
     def loadConfig(self):
@@ -135,8 +135,8 @@ class Game(object):
             for it.x in range(start.x, end.x):
                 rel = self.relPt(it * Game.tile_size).floored()
                 tile = self.getTile(it)
-                if tile['id'] != 0:
-                    self.getTile(it)['image'].blit(*rel)
+                if tile.id != 0:
+                    self.getTile(it).image.blit(*rel)
 
         # draw character
         for lemming in self.lemmings:
