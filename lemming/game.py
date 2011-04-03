@@ -150,7 +150,7 @@ class Game(object):
         return (abs_pt - self.scroll) * self.zoom
 
     def _createWindow(self):
-        self.window = pyglet.window.Window(width=1152, height=648, vsync=False)
+        self.window = pyglet.window.Window(width=853, height=480, vsync=False)
         self.window.set_handler('on_draw', self.on_draw)
         self.window.set_handler('on_key_press', self.on_key_press)
         self.window.set_handler('on_key_release', self.on_key_release)
