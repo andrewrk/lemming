@@ -52,8 +52,7 @@ class Level(object):
             self.squares[tuple(floored_pos)] = Square()
 
     def getIndex(self, x, y):
-        assert not self.sparse
-        return (y+self.offset.y)*self.width + (x+self.offset.x)
+        return y*self.width + x
 
     def toQuickLookup(self):
         assert self.sparse
@@ -70,15 +69,16 @@ class Level(object):
             if y > max_pos.y:
                 max_pos.y = y
         
-        self.offset = -min_pos
         self.width = (max_pos.x - min_pos.x) + 1
         self.height = (max_pos.y - min_pos.y) + 1
 
         new_squares = [Square()] * (self.width*self.height)
 
+        self.start -= min_pos * (tiles.width, tiles.height)
+
         self.sparse = False
         for (x, y), sq in self.squares.iteritems():
-            new_squares[self.getIndex(x,y)] = sq
+            new_squares[self.getIndex(x-min_pos.x,y-min_pos.y)] = sq
         self.squares = new_squares
 
 

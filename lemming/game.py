@@ -137,10 +137,7 @@ class Game(object):
 
     def on_draw(self):
         self.window.clear()
-
-        # draw tiles
         self.batch.draw()
-
         self.fps_display.draw()
 
     def absPt(self, rel_pt):

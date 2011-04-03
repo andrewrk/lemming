@@ -1,5 +1,17 @@
+ * use sprites in the level editor too
+ * physics
+   - jumping
+   - exploding and control going to the one behind you
+   - land mines
+   - +1 coin
+   - +infinite coin
+   - spikes
+   - belly flop
+   - heart attack
+   - a bad guy you can kill by exploding
+   - gun thing shooting bullets
+   - a machine you have to stop by jumping in the gears
+   - fire
 
-
-TODO
-====
-
+ * parallax scrolling background
+ * character animation
