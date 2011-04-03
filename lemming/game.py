@@ -4,10 +4,10 @@ range = xrange
 import tiles
 import data
 from vec2d import Vec2d
+from level import Level
 
 import pyglet
 import sys
-import pickle
 
 class Game(object):
     class Control:
@@ -29,6 +29,7 @@ class Game(object):
         def __init__(self, sprite, frame=None):
             self.sprite = sprite
             self.frame = frame
+
 
     target_fps = 60
     tile_size = (tiles.width, tiles.height)
@@ -54,10 +55,7 @@ class Game(object):
         self.clearLevel()
 
     def clearLevel(self):
-        self.level = {
-            'start': {'x': 0, 'y': 0},
-            'tiles': {}, # (x, y) to {'tile'}
-        }
+        self.level = Level()
         self.scroll = Vec2d(0, 0)
         self.zoom = 1
         self.lemmings = [None] * Game.lemming_count
@@ -65,7 +63,6 @@ class Game(object):
 
     def start(self):
         # resets variables based on level and begins the game
-        start_pos = Vec2d(self.level['start']['x'], self.level['start']['y'])
         # generate data for each lemming
         for i in range(len(self.lemmings)):
             sprite = pyglet.sprite.Sprite(self.lem_img)
@@ -74,13 +71,13 @@ class Game(object):
             self.lemmings[i] = Game.Lemming(sprite, None)
 
         # generate frames for trails
-        self.head_frame = Game.LemmingFrame(Vec2d(start_pos), Vec2d(0, 0), None)
+        self.head_frame = Game.LemmingFrame(Vec2d(self.level.start), Vec2d(0, 0), None)
         lemming_index = len(self.lemmings) - 1
         self.lemmings[lemming_index].frame = self.head_frame
         lemming_index -= 1
         lemming_frame_count = 1
         while Game.target_fps * Game.lemming_response_time * (len(self.lemmings)-1) > lemming_frame_count:
-            self.head_frame = Game.LemmingFrame(Vec2d(start_pos), Vec2d(0, 0), self.head_frame)
+            self.head_frame = Game.LemmingFrame(Vec2d(self.level.start), Vec2d(0, 0), self.head_frame)
             lemming_frame_count += 1
             if int((len(self.lemmings) - 1 - lemming_index) * Game.target_fps * Game.lemming_response_time) == lemming_frame_count:
                 self.lemmings[lemming_index].frame = self.head_frame
@@ -134,49 +131,19 @@ class Game(object):
         for it.y in range(start.y, end.y):
             for it.x in range(start.x, end.x):
                 rel = self.relPt(it * Game.tile_size).floored()
-                tile = self.getTile(it)
+                tile = self.level.getTile(it)
                 if tile.id != 0:
-                    self.getTile(it).image.blit(*rel)
+                    self.level.getTile(it).image.blit(*rel)
 
         # draw character
         for lemming in self.lemmings:
             lemming.sprite.draw()
-
-    def getTile(self, pos):
-        level_tiles = self.level['tiles']
-        try:
-            tile_id = level_tiles[tuple(pos.floored())]['tile']
-        except KeyError:
-            return tiles.info[0]
-        return tiles.info[tile_id]
-
-    def setTile(self, pos, tile_id):
-        try:
-            self.level['tiles'][tuple(pos.floored())]['tile'] = tile_id
-        except KeyError:
-            self.level['tiles'][tuple(pos.floored())] = {'tile': tile_id}
 
     def absPt(self, rel_pt):
         return rel_pt / self.zoom + self.scroll
 
     def relPt(self, abs_pt):
         return (abs_pt - self.scroll) * self.zoom
-
-    def loadLevel(self, filename):
-        pickle_error = False
-        try:
-            fd = open(filename, 'rb')
-            self.level = pickle.load(fd)
-            fd.close()
-        except pickle.UnpicklingError:
-            pickle_error = True
-        except IOError:
-            pickle_error = True
-            
-        if pickle_error:
-            print("Error loading level")
-            self.clearLevel()
-            return
 
     def _createWindow(self):
         self.window = pyglet.window.Window(width=1152, height=648, vsync=False)

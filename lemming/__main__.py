@@ -15,8 +15,7 @@ def main():
     if options_dict['level'] is not None:
         # load level from disk and go into level editor mode
         level_filename = options_dict['level']
-        level_editor = LevelEditor()
-        level_editor.loadLevel(level_filename)
+        level_editor = LevelEditor(level_filename)
         level_editor.execute()
     else:
         game = Game()

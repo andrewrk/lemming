@@ -2,8 +2,8 @@ from __future__ import division, print_function, unicode_literals
 range = xrange
 
 import pyglet
-import pickle
 import tempfile
+from level import Level
 
 from game import Game
 import tiles
@@ -16,8 +16,9 @@ class LevelEditor(Game):
         PLAYTEST = 2
 
     
-    def __init__(self):
+    def __init__(self, level_filename=None):
         super(LevelEditor, self).__init__()
+        self.level_filename = level_filename
 
     def clearLevel(self):
         super(LevelEditor, self).clearLevel()
@@ -28,8 +29,6 @@ class LevelEditor(Game):
         self.left_mouse_down = False
         self.right_mouse_down = False
         self.selected_tile = 0
-
-        self.level_filename = None
 
     def update(self, dt):
         if self.mode == LevelEditor.Mode.PLAYTEST:
@@ -48,9 +47,9 @@ class LevelEditor(Game):
             for it.y in range(start.y, end.y):
                 for it.x in range(start.x, end.x):
                     rel = self.relPt(it * Game.tile_size).floored()
-                    tile = self.getTile(it)
+                    tile = self.level.getTile(it)
                     if tile.id != 0:
-                        self.getTile(it).image.blit(*rel)
+                        self.level.getTile(it).image.blit(*rel)
 
             if self.grid_on:
                 # draw grid
@@ -73,7 +72,7 @@ class LevelEditor(Game):
         elif self.mode == LevelEditor.Mode.CHOOSE_TILE:
             palette = self.getTilePalette()
             for pos, tile in palette:
-                tile['image'].blit(pos.x, pos.y)
+                tile.image.blit(pos.x, pos.y)
         elif self.mode == LevelEditor.Mode.PLAYTEST:
             super(LevelEditor, self).on_draw()
 
@@ -109,19 +108,18 @@ class LevelEditor(Game):
             elif symbol == pyglet.window.key.SPACE:
                 self.mode = LevelEditor.Mode.CHOOSE_TILE
             elif symbol == pyglet.window.key.S:
-                self.saveLevel(self.level_filename)
-            elif symbol == pyglet.window.key.T:
-                start_pt = self.absPt(self.mouse_pos)
-                print("setting start to {0}".format(start_pt))
-                self.level['start']['x'] = start_pt.x
-                self.level['start']['y'] = start_pt.y
+                if modifiers & pyglet.window.key.MOD_CTRL:
+                    self.level.save(self.level_filename)
+                else:
+                    self.level.start = self.absPt(self.mouse_pos)
+                    print("setting start to {0}".format(self.level.start))
             elif symbol == pyglet.window.key.F5:
                 self.playTest()
         elif self.mode == LevelEditor.Mode.PLAYTEST:
             if symbol == pyglet.window.key.F5:
                 # stop playtest
                 self.clearLevel()
-                self.loadLevel(self.tmp_filename)
+                self.level = Level.load(self.tmp_filename)
             else:
                 super(LevelEditor, self).on_key_press(symbol, modifiers)
 
@@ -133,12 +131,13 @@ class LevelEditor(Game):
             super(LevelEditor, self).on_key_release(symbol, modifiers)
 
     def handle_mouse(self, pt):
-        tile_pos = self.absPt(pt) / Game.tile_size
-        self.mouse_pos = pt
-        if self.left_mouse_down:
-            self.setTile(tile_pos, self.selected_tile)
-        elif self.right_mouse_down:
-            self.setTile(tile_pos, 0)
+        if self.mode == LevelEditor.Mode.NORMAL:
+            tile_pos = self.absPt(pt) / Game.tile_size
+            self.mouse_pos = pt
+            if self.left_mouse_down:
+                self.level.setTile(tile_pos, self.selected_tile)
+            elif self.right_mouse_down:
+                self.level.setTile(tile_pos, 0)
 
     def on_mouse_motion(self, x, y, dx, dy):
         self.handle_mouse(Vec2d(x, y))
@@ -150,12 +149,12 @@ class LevelEditor(Game):
         if button & pyglet.window.mouse.LEFT:
             self.left_mouse_down = True
 
-            if self.mode == Game.Mode.CHOOSE_TILE:
+            if self.mode == LevelEditor.Mode.CHOOSE_TILE:
                 palette = self.getTilePalette()
                 for pos, tile in palette:
                     if x >= pos.x and x <= pos.x + tiles.width and y >= pos.y and y <= pos.y + tiles.height:
                         self.selected_tile = tile.id
-                        print("Selected {0}".format(tile['name']))
+                        print("Selected {0}".format(tile.name))
                         break
         elif button & pyglet.window.mouse.RIGHT:
             self.right_mouse_down = True
@@ -167,24 +166,14 @@ class LevelEditor(Game):
         elif button & pyglet.window.mouse.RIGHT:
             self.right_mouse_down = False
 
-    def loadLevel(self, filename):
-        super(LevelEditor, self).loadLevel(filename)
-        self.level_filename = filename
-
-    def saveLevel(self, filename):
-        print("saving to {0}".format(filename))
-        fd = open(filename, 'wb')
-        pickle.dump(self.level, fd)
-        fd.close()
-    
     def playTest(self):
         # save to temporary file
         self.tmp_filename = tempfile.mktemp()
-        self.saveLevel(self.tmp_filename)
+        self.level.save(self.tmp_filename)
 
         # reset state
         super(LevelEditor, self).clearLevel()
-        super(LevelEditor, self).loadLevel(self.tmp_filename)
+        self.level = Level.load(self.tmp_filename)
 
         # start game
         self.mode = LevelEditor.Mode.PLAYTEST
@@ -196,3 +185,6 @@ class LevelEditor(Game):
         self.window.set_handler('on_mouse_press', self.on_mouse_press)
         self.window.set_handler('on_mouse_release', self.on_mouse_release)
         self.window.set_handler('on_mouse_drag', self.on_mouse_drag)
+
+
+        self.level = Level.load(self.level_filename)
