@@ -1,6 +1,4 @@
  * physics
-   - friction
-   - jumping
    - exploding and control going to the one behind you
    - land mines
    - +1 coin

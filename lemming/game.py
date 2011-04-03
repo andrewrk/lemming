@@ -110,6 +110,8 @@ class Game(object):
         self.head_frame.pos = new_pos
         self.updateSpritePos(first.sprite, self.head_frame.pos)
 
+        on_ground = self.tileAt(Vec2d(self.head_frame.pos.x + tiles.width / 2, self.head_frame.pos.y-1)).solid
+
         # scroll the level
         self.scroll = Vec2d(self.head_frame.pos)
         if self.scroll.x < 0:
@@ -122,8 +124,9 @@ class Game(object):
             self.head_frame.vel.x -= acceleration * dt
         if self.control_state[Game.Control.MoveRight]:
             self.head_frame.vel.x += acceleration * dt
-
-        on_ground = self.tileAt(Vec2d(self.head_frame.pos.x + tiles.width / 2, self.head_frame.pos.y-1)).solid
+        if self.control_state[Game.Control.Jump] and on_ground:
+            jump_velocity = 400
+            self.head_frame.vel.y = jump_velocity
 
         # gravity
         gravity_accel = 800
