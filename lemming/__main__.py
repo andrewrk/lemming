@@ -1,4 +1,7 @@
+from __future__ import division, print_function, unicode_literals
+range = xrange
+
+import game
 
 def main():
-    """ your app starts here
-    """
+    game.Game().start()

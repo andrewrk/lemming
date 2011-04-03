@@ -8,6 +8,8 @@ Note that pyglet users should probably just add the data directory to the
 pyglet.resource search path.
 '''
 
+from __future__ import division, print_function, unicode_literals
+range = xrange
 import os
 
 data_py = os.path.abspath(os.path.dirname(__file__))

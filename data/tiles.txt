@@ -1,0 +1,8 @@
+id:int  name:str        x:int   y:int   solid:bool  spike:bool
+
+0       Grass           0       0       1           0           
+1       PlusOne         1       0       0           0
+2       PlusForever     2       0       0           0
+3       Bullet          3       0       0           0
+4       Dirt            0       1       1           0
+5       Spike           1       1       1           1
