@@ -39,11 +39,12 @@ class LevelEditor(Game):
             start.floor()
             end.floor()
             it = Vec2d(0, 0)
-            for it.y in range(start.y, end.y):
-                for it.x in range(start.x, end.x):
+            for it.y in range(start.y-5, end.y+5):
+                for it.x in range(start.x-5, end.x+5):
                     sq = self.level.getSquare(it)
                     if sq is not None and sq.sprite is not None:
                         self.updateSpritePos(sq.sprite, it * Game.tile_size)
+                        sq.sprite.scale = self.zoom
         elif self.mode == LevelEditor.Mode.PLAYTEST:
             super(LevelEditor, self).update(dt)
 

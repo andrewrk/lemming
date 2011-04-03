@@ -88,6 +88,7 @@ class Game(object):
                 self.lemmings[lemming_index].frame = self.head_frame
                 lemming_index -= 1
 
+
     def update(self, dt):
         first = self.lemmings[0]
         self.head_frame = Game.LemmingFrame(Vec2d(first.frame.pos), Vec2d(first.frame.vel), self.head_frame)
@@ -97,27 +98,66 @@ class Game(object):
             self.updateSpritePos(lemming.sprite, lemming.frame.pos)
         self.lemmings[-1].frame.next_node = None
 
-        self.head_frame.pos += self.head_frame.vel * dt
+        # collision with solid blocks
+        new_pos = self.head_frame.pos + self.head_frame.vel * dt
+        block_there = (Vec2d(new_pos.x + tiles.width / 2, new_pos.y) / Game.tile_size).floored()
+        tile_there = self.level.getTile(block_there)
+        if tile_there.solid:
+            new_pos.y = (block_there.y+1)*tiles.height
+            self.head_frame.vel.y = 0
+
+        # apply velocity to position
+        self.head_frame.pos = new_pos
         self.updateSpritePos(first.sprite, self.head_frame.pos)
 
+        # scroll the level
+        self.scroll = Vec2d(self.head_frame.pos)
+        if self.scroll.x < 0:
+            self.scroll.x = 0
+        self.scroll -= Vec2d(self.window.width, self.window.height) / 2
+
         # apply input to physics
-        acceleration = 200
+        acceleration = 400
         if self.control_state[Game.Control.MoveLeft]:
             self.head_frame.vel.x -= acceleration * dt
         if self.control_state[Game.Control.MoveRight]:
             self.head_frame.vel.x += acceleration * dt
 
+        on_ground = self.tileAt(Vec2d(self.head_frame.pos.x + tiles.width / 2, self.head_frame.pos.y-1)).solid
+
+        # gravity
+        gravity_accel = 800
+        if not on_ground:
+            self.head_frame.vel.y -= gravity_accel * dt
+
+        def sign(n):
+            if n > 0:
+                return 1
+            elif n < 0:
+                return -1
+            else:
+                return 0
+        # friction
+        friction_accel = 50
+        if on_ground:
+            if abs(self.head_frame.vel.x) < abs(friction_accel * dt):
+                self.head_frame.vel.x = 0
+            else:
+                self.head_frame.vel.x += friction_accel * dt * -sign(self.head_frame.vel.x)
+
         # prepare sprites for drawing
-        start = self.absPt(Vec2d(0, 0)) / (tiles.width, tiles.height)
+        start = self.absPt(Vec2d(0, 0)) / Game.tile_size
         end = self.absPt(Vec2d(self.window.width, self.window.height)) / Game.tile_size
         start.floor()
         end.floor()
         it = Vec2d(0, 0)
-        for it.y in range(start.y, end.y):
-            for it.x in range(start.x, end.x):
+        for it.y in range(start.y-5, end.y+5):
+            for it.x in range(start.x-5, end.x+5):
                 sq = self.level.getSquare(it)
                 if sq is not None and sq.sprite is not None:
-                    self.updateSpritePos(sq.sprite, it * Game.tile_size)
+                    pos = it * Game.tile_size
+                    self.updateSpritePos(sq.sprite, pos)
+                    sq.sprite.scale = self.zoom
 
     def updateSpritePos(self, sprite, abs_pos):
         pt = self.relPt(abs_pos)
@@ -145,6 +185,9 @@ class Game(object):
 
     def relPt(self, abs_pt):
         return (abs_pt - self.scroll) * self.zoom
+
+    def tileAt(self, abs_pt):
+        return self.level.getTile((abs_pt / Game.tile_size).floored())
 
     def _createWindow(self):
         self.window = pyglet.window.Window(width=853, height=480, vsync=False)
