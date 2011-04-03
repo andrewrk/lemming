@@ -42,6 +42,11 @@ class Game(object):
             tile.image = tileset.get_region(tile.x*tiles.width, tile.y*tiles.height, tiles.width, tiles.height)
         self.lem_img = pyglet.image.load('lem', file=data.load("lem.png"))
 
+        self.batch = pyglet.graphics.Batch()
+        self.group_bg = pyglet.graphics.OrderedGroup(0)
+        self.group_char = pyglet.graphics.OrderedGroup(1)
+        self.group_fg = pyglet.graphics.OrderedGroup(2)
+
     def loadConfig(self):
         self.controls = {
             pyglet.window.key.LEFT: Game.Control.MoveLeft,
@@ -55,7 +60,7 @@ class Game(object):
         self.clearLevel()
 
     def clearLevel(self):
-        self.level = Level()
+        self.level = Level(self.batch, self.group_bg)
         self.scroll = Vec2d(0, 0)
         self.zoom = 1
         self.lemmings = [None] * Game.lemming_count
@@ -65,7 +70,7 @@ class Game(object):
         # resets variables based on level and begins the game
         # generate data for each lemming
         for i in range(len(self.lemmings)):
-            sprite = pyglet.sprite.Sprite(self.lem_img)
+            sprite = pyglet.sprite.Sprite(self.lem_img, batch=self.batch, group=self.group_char)
             if i > 0:
                 sprite.opacity = 128
             self.lemmings[i] = Game.Lemming(sprite, None)
@@ -102,10 +107,21 @@ class Game(object):
         if self.control_state[Game.Control.MoveRight]:
             self.head_frame.vel.x += acceleration * dt
 
+        # prepare sprites for drawing
+        start = self.absPt(Vec2d(0, 0)) / (tiles.width, tiles.height)
+        end = self.absPt(Vec2d(self.window.width, self.window.height)) / Game.tile_size
+        start.floor()
+        end.floor()
+        it = Vec2d(0, 0)
+        for it.y in range(start.y, end.y):
+            for it.x in range(start.x, end.x):
+                sq = self.level.getSquare(it)
+                if sq is not None and sq.sprite is not None:
+                    self.updateSpritePos(sq.sprite, it * Game.tile_size)
+
     def updateSpritePos(self, sprite, abs_pos):
         pt = self.relPt(abs_pos)
-        sprite.x = pt.x
-        sprite.y = pt.y
+        sprite.set_position(*pt)
 
     def on_key_press(self, symbol, modifiers):
         try:
@@ -123,21 +139,9 @@ class Game(object):
         self.window.clear()
 
         # draw tiles
-        start = self.absPt(Vec2d(0, 0)) / (tiles.width, tiles.height)
-        end = self.absPt(Vec2d(self.window.width, self.window.height)) / Game.tile_size
-        start.floor()
-        end.floor()
-        it = Vec2d(0, 0)
-        for it.y in range(start.y, end.y):
-            for it.x in range(start.x, end.x):
-                rel = self.relPt(it * Game.tile_size).floored()
-                tile = self.level.getTile(it)
-                if tile.id != 0:
-                    self.level.getTile(it).image.blit(*rel)
+        self.batch.draw()
 
-        # draw character
-        for lemming in self.lemmings:
-            lemming.sprite.draw()
+        self.fps_display.draw()
 
     def absPt(self, rel_pt):
         return rel_pt / self.zoom + self.scroll
@@ -152,6 +156,7 @@ class Game(object):
         self.window.set_handler('on_key_release', self.on_key_release)
 
         pyglet.clock.schedule_interval(self.update, 1/Game.target_fps)
+        self.fps_display = pyglet.clock.ClockDisplay()
 
     def execute(self):
         self._createWindow()

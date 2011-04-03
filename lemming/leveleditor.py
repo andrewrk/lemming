@@ -4,6 +4,7 @@ range = xrange
 import pyglet
 import tempfile
 from level import Level
+import os
 
 from game import Game
 import tiles
@@ -119,7 +120,10 @@ class LevelEditor(Game):
             if symbol == pyglet.window.key.F5:
                 # stop playtest
                 self.clearLevel()
-                self.level = Level.load(self.tmp_filename)
+                self.level = Level.load(self.tmp_filename, self.batch, self.group_bg)
+
+                os.remove(self.tmp_filename)
+                self.tmp_filename = None
             else:
                 super(LevelEditor, self).on_key_press(symbol, modifiers)
 
@@ -173,7 +177,8 @@ class LevelEditor(Game):
 
         # reset state
         super(LevelEditor, self).clearLevel()
-        self.level = Level.load(self.tmp_filename)
+        self.level = Level.load(self.tmp_filename, self.batch, self.group_bg)
+        self.level.toQuickLookup()
 
         # start game
         self.mode = LevelEditor.Mode.PLAYTEST
@@ -187,4 +192,4 @@ class LevelEditor(Game):
         self.window.set_handler('on_mouse_drag', self.on_mouse_drag)
 
 
-        self.level = Level.load(self.level_filename)
+        self.level = Level.load(self.level_filename, self.batch, self.group_bg)
