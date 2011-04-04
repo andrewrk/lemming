@@ -8,6 +8,7 @@ from level import Level
 
 import pyglet
 import sys
+import itertools
 
 def sign(n):
     if n > 0:
@@ -36,12 +37,22 @@ class Game(object):
             if self.next_node is not None:
                 self.next_node.prev_node = self
 
-    class Lemming(object):
-        def __init__(self, sprite, frame=None):
+    class PhysicsObject(object):
+        def __init__(self, pos, vel, sprite, life=None):
+            self.pos = pos
+            self.vel = vel
             self.sprite = sprite
-            self.frame = frame
+            self.life = life
             self.gone = False
 
+    class Lemming(PhysicsObject):
+        def __init__(self, sprite, frame=None):
+            if frame is not None:
+                super(Game.Lemming, self).__init__(frame.pos, frame.vel, sprite)
+            else:
+                super(Game.Lemming, self).__init__(None, None, sprite)
+            self.frame = frame
+            self.gone = False
 
     target_fps = 60
     tile_size = Vec2d(tiles.width, tiles.height)
@@ -49,13 +60,16 @@ class Game(object):
     lemming_response_time = 0.20
 
     def loadImages(self):
-        tileset = pyglet.image.load('tiles', file=data.load("tiles.png"))
+        tileset = pyglet.image.load(data.filepath("tiles.png"))
         for tile in tiles.info.values():
             tile.image = tileset.get_region(tile.x*tiles.width, tile.y*tiles.height, tiles.width, tiles.height)
-        self.lem_img = pyglet.image.load('lem', file=data.load("lem.png"))
+        self.lem_img = pyglet.image.load(data.filepath("lem.png"))
 
-        self.img_bg = pyglet.image.load('img_bg', file=data.load("background.png"))
-        self.img_bg_hill = pyglet.image.load('img_bg_hill', file=data.load("hill.png"))
+        self.img_bg = pyglet.image.load(data.filepath("background.png"))
+        self.img_bg_hill = pyglet.image.load(data.filepath("hill.png"))
+
+        #self.animation_explosion = pyglet.image.load_animation(data.filepath("explosion2.gif"))
+        self.animation_explosion = pyglet.image.load(data.filepath("explosion.png"))
 
         self.batch = pyglet.graphics.Batch()
         self.group_bg2 = pyglet.graphics.OrderedGroup(0)
@@ -91,6 +105,7 @@ class Game(object):
         self.zoom = 1
         self.lemmings = [None] * Game.lemming_count
         self.control_state = [False] * (len(dir(Game.Control)) - 2)
+        self.physical_objects = []
 
     def start(self):
         self.control_lemming = 0
@@ -98,6 +113,8 @@ class Game(object):
         self.bellyflop_queued = False
         self.freeze_queued = False
         self.plus_ones_queued = 0
+
+        self.physical_objects = []
 
         # resets variables based on level and begins the game
         # generate data for each lemming
@@ -121,14 +138,23 @@ class Game(object):
                 lemming_index -= 1
 
     def detatchHeadLemming(self):
+        self.lemmings[self.control_lemming].sprite.delete()
         self.control_lemming += 1
         self.lemmings[self.control_lemming].sprite.opacity = 255
         self.head_frame = self.lemmings[self.control_lemming].frame
+        self.head_frame.prev_node = None
 
     def update(self, dt):
         # detach head lemming from the rest
         if self.explode_queued:
             self.explode_queued = False
+
+            old_head_lemming = self.lemmings[self.control_lemming]
+            self.physical_objects.append(Game.PhysicsObject(old_head_lemming.frame.pos,
+                old_head_lemming.frame.vel, pyglet.sprite.Sprite(self.animation_explosion, batch=self.batch, group=self.group_fg),
+                1))
+                #self.animation_explosion.get_duration()))
+
             self.detatchHeadLemming()
 
         # add more lemmings
@@ -145,27 +171,36 @@ class Game(object):
             self.updateSpritePos(lemming.sprite, lemming.frame.pos)
         self.lemmings[-1].frame.next_node = None
 
-        for lemming in self.lemmings[:self.control_lemming+1]:
-            if lemming.gone:
+        # physics
+        char.pos = char.frame.pos
+        char.vel = char.frame.vel
+        for obj in itertools.chain(self.physical_objects, [char]):
+            if obj.gone:
                 continue
 
-            frame = lemming.frame
+            if obj.life is not None:
+                obj.life -= dt
+                if obj.life <= 0:
+                    obj.gone = True
+                    obj.sprite.visible = False
+                    continue
+
             # collision with solid blocks
-            new_pos = frame.pos + frame.vel * dt
+            new_pos = obj.pos + obj.vel * dt
             block_there = (Vec2d(new_pos.x + tiles.width / 2, new_pos.y) / Game.tile_size).floored()
             tile_there = self.level.getTile(block_there)
             if tile_there.solid:
                 new_pos.y = (block_there.y+1)*tiles.height
-                frame.vel.y = 0
+                obj.vel.y = 0
 
             # apply velocity to position
-            frame.pos = new_pos
+            obj.pos = new_pos
 
-            on_ground = self.tileAt(Vec2d(frame.pos.x + tiles.width / 2, frame.pos.y-1)).solid
+            on_ground = self.tileAt(Vec2d(obj.pos.x + tiles.width / 2, obj.pos.y-1)).solid
 
-            if lemming == char:
+            if obj == char:
                 # item pickups
-                feet_block = ((frame.pos + Game.tile_size / 2) / Game.tile_size).floored()
+                feet_block = ((obj.pos + Game.tile_size / 2) / Game.tile_size).floored()
                 head_block = feet_block + Vec2d(0, 1)
                 feet_tile = self.level.getTile(feet_block)
                 head_tile = self.level.getTile(head_block)
@@ -180,7 +215,7 @@ class Game(object):
 
 
                 # scroll the level
-                desired_scroll = Vec2d(frame.pos)
+                desired_scroll = Vec2d(obj.pos)
                 if desired_scroll.x < 0:
                     desired_scroll.x = 0
                 desired_scroll -= Vec2d(self.window.width, self.window.height) / 2
@@ -193,33 +228,41 @@ class Game(object):
                 acceleration = 500
                 max_speed = 200
                 if self.control_state[Game.Control.MoveLeft]:
-                    if frame.vel.x - acceleration * dt < -max_speed:
-                        frame.vel.x = -max_speed
+                    if obj.vel.x - acceleration * dt < -max_speed:
+                        obj.vel.x = -max_speed
                     else:
-                        frame.vel.x -= acceleration * dt
+                        obj.vel.x -= acceleration * dt
                 if self.control_state[Game.Control.MoveRight]:
-                    if frame.vel.x + acceleration * dt > max_speed:
-                        frame.vel.x = max_speed
+                    if obj.vel.x + acceleration * dt > max_speed:
+                        obj.vel.x = max_speed
                     else:
-                        frame.vel.x += acceleration * dt
+                        obj.vel.x += acceleration * dt
                 if self.control_state[Game.Control.Jump] and on_ground:
                     jump_velocity = 350
-                    frame.vel.y = jump_velocity
+                    obj.vel.y = jump_velocity
 
             # gravity
             gravity_accel = 800
             if not on_ground:
-                frame.vel.y -= gravity_accel * dt
+                obj.vel.y -= gravity_accel * dt
 
             # friction
             friction_accel = 150
             if on_ground:
-                if abs(frame.vel.x) < abs(friction_accel * dt):
-                    frame.vel.x = 0
+                if abs(obj.vel.x) < abs(friction_accel * dt):
+                    obj.vel.x = 0
                 else:
-                    frame.vel.x += friction_accel * dt * -sign(frame.vel.x)
+                    obj.vel.x += friction_accel * dt * -sign(obj.vel.x)
+
+        char.frame.pos = char.pos
+        char.frame.vel = char.vel
 
         # prepare sprites for drawing
+        # physical objects
+        for obj in self.physical_objects:
+            self.updateSpritePos(obj.sprite, obj.pos)
+
+        # tiles
         start = self.absPt(Vec2d(0, 0)) / Game.tile_size
         end = self.absPt(Vec2d(self.window.width, self.window.height)) / Game.tile_size
         start.floor()
@@ -249,7 +292,7 @@ class Game(object):
         self.sprite_hill_right.set_position(close_bgpos.x + self.sprite_hill_right.width, close_bgpos.y)
 
         # lemmings
-        for lemming in self.lemmings:
+        for lemming in self.lemmings[self.control_lemming:]:
             self.updateSpritePos(lemming.sprite, lemming.frame.pos)
 
     def updateSpritePos(self, sprite, abs_pos):
@@ -290,6 +333,10 @@ class Game(object):
     def tileAt(self, abs_pt):
         return self.level.getTile((abs_pt / Game.tile_size).floored())
 
+    def garbage_collect(self, dt):
+        if self.physical_objects is not None:
+            self.physical_objects = filter(lambda obj: not obj.gone, self.physical_objects)
+
     def _createWindow(self):
         self.window = pyglet.window.Window(width=853, height=480, vsync=False)
         self.window.set_handler('on_draw', self.on_draw)
@@ -297,6 +344,7 @@ class Game(object):
         self.window.set_handler('on_key_release', self.on_key_release)
 
         pyglet.clock.schedule_interval(self.update, 1/Game.target_fps)
+        pyglet.clock.schedule_interval(self.garbage_collect, 10)
         self.fps_display = pyglet.clock.ClockDisplay()
 
     def execute(self):

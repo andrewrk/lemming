@@ -1,6 +1,5 @@
  * physics
    - +1 coin
-   - exploding
    - land mines
    - +infinite coin
    - spikes
