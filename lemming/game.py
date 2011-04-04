@@ -302,10 +302,20 @@ class Game(object):
         start.floor()
         end.floor()
         it = Vec2d(0, 0)
-        for it.y in range(start.y-5, end.y+5):
-            for it.x in range(start.x-5, end.x+5):
-                sq = self.level.getSquare(it)
-                if sq is not None and sq.sprite is not None:
+        start -= 5
+        end += 5
+        if start.x < 0:
+            start.x = 0
+        if start.y < 0:
+            start.y = 0
+        if end.x > self.level.width:
+            end.x = self.level.width
+        if end.y > self.level.height:
+            end.y = self.level.height
+        for it.y in range(start.y, end.y):
+            for it.x in range(start.x, end.x):
+                sq = self.level.squares[it.y*self.level.width + it.x]
+                if sq.sprite is not None:
                     pos = it * Game.tile_size
                     self.updateSpritePos(sq.sprite, pos)
                     sq.sprite.scale = self.zoom
