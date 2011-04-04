@@ -175,7 +175,7 @@ class Game(object):
             self.lemmings[-1] = last_lem
             last_lem.sprite.opacity = 128
             node = last_lem.frame
-            for i in range(Game.target_fps * Game.lemming_response_time):
+            for i in range(int(Game.target_fps * Game.lemming_response_time)):
                 node = Game.LemmingFrame(Vec2d(old_last_frame.pos), Vec2d(old_last_frame.vel), node)
             old_last_frame.next_node = node
             node.prev_node = old_last_frame
@@ -226,9 +226,13 @@ class Game(object):
                     if head_tile.id == tiles.enum.PlusOne:
                         self.plus_ones_queued += 1
                         self.level.setTile(head_block, tiles.enum.Air)
+                    elif head_tile.id == tiles.enum.PlusForever:
+                        self.plus_ones_queued += self.control_lemming
                     elif feet_tile.id == tiles.enum.PlusOne:
                         self.plus_ones_queued += 1
                         self.level.setTile(feet_block, tiles.enum.Air)
+                    elif feet_tile.id == tiles.enum.PlusForever:
+                        self.plus_ones_queued += self.control_lemming
 
 
                 # scroll the level
