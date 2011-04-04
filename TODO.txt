@@ -1,7 +1,7 @@
  * physics
-   - exploding and control going to the one behind you
-   - land mines
    - +1 coin
+   - exploding
+   - land mines
    - +infinite coin
    - spikes
    - belly flop
@@ -10,5 +10,6 @@
    - gun thing shooting bullets
    - a machine you have to stop by jumping in the gears
    - fire
+ * game over
 
  * character animation
