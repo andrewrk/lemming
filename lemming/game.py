@@ -221,19 +221,18 @@ class Game(object):
                 head_block = feet_block + Vec2d(0, 1)
                 feet_tile = self.level.getTile(feet_block)
                 head_tile = self.level.getTile(head_block)
-                # +1
-                if self.control_lemming > 0:
-                    if head_tile.id == tiles.enum.PlusOne:
-                        self.plus_ones_queued += 1
-                        self.level.setTile(head_block, tiles.enum.Air)
-                    elif head_tile.id == tiles.enum.PlusForever:
-                        self.plus_ones_queued += self.control_lemming
-                    elif feet_tile.id == tiles.enum.PlusOne:
-                        self.plus_ones_queued += 1
-                        self.level.setTile(feet_block, tiles.enum.Air)
-                    elif feet_tile.id == tiles.enum.PlusForever:
-                        self.plus_ones_queued += self.control_lemming
-
+                for block, tile in ((feet_block, feet_tile), (head_block, head_tile)):
+                    # +1
+                    if self.control_lemming - self.plus_ones_queued > 0:
+                        if tile.id == tiles.enum.PlusOne:
+                            self.plus_ones_queued += 1
+                            self.level.setTile(block, tiles.enum.Air)
+                        elif tile.id == tiles.enum.PlusForever:
+                            self.plus_ones_queued = self.control_lemming
+                    # land mine
+                    if tile.mine:
+                        self.level.setTile(block, tiles.enum.Air)
+                        self.explode_queued = True
 
                 # scroll the level
                 desired_scroll = Vec2d(obj.pos)
