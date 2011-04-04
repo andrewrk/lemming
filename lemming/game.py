@@ -130,7 +130,7 @@ class Game(object):
 
         # apply input to physics
         acceleration = 500
-        max_speed = 180
+        max_speed = 200
         if self.control_state[Game.Control.MoveLeft]:
             if self.head_frame.vel.x - acceleration * dt < -max_speed:
                 self.head_frame.vel.x = -max_speed
@@ -158,7 +158,7 @@ class Game(object):
             else:
                 return 0
         # friction
-        friction_accel = 50
+        friction_accel = 150
         if on_ground:
             if abs(self.head_frame.vel.x) < abs(friction_accel * dt):
                 self.head_frame.vel.x = 0

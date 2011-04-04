@@ -29,26 +29,16 @@ class Level(object):
             except KeyError:
                 return None
         else:
-            index = self.getIndex(*floored_pos)
-            if index >= 0 and index < len(self.squares):
-                return self.squares[index]
+            if floored_pos.x >= 0 and floored_pos.y >= 0 and floored_pos.x < self.width and floored_pos.y < self.height:
+                return self.squares[self.getIndex(*floored_pos)]
             else:
                 return None
 
     def getTile(self, pos):
-        floored_pos = pos.floored()
-        if self.sparse:
-            try:
-                tile_id = self.squares[tuple(floored_pos)].tile
-            except KeyError:
-                return tiles.info[0]
-            return tiles.info[tile_id]
-        else:
-            index = self.getIndex(*floored_pos)
-            if index >= 0 and index < len(self.squares):
-                return tiles.info[self.squares[index].tile]
-            else:
-                return tiles.info[0]
+        sq = self.getSquare(pos)
+        if sq is None:
+            return tiles.info[0]
+        return tiles.info[sq.tile]
 
     def setTile(self, pos, tile_id):
         assert self.sparse

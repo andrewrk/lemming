@@ -5,7 +5,7 @@
    - +infinite coin
    - spikes
    - belly flop
-   - heart attack
+   - freeze
    - a bad guy you can kill by exploding
    - gun thing shooting bullets
    - a machine you have to stop by jumping in the gears
