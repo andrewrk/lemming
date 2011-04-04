@@ -1,3 +1,6 @@
+ * optimize by using textures
+ * use pyglet resources to load images
+
  * physics
    - impassable walls
    - freeze death

@@ -3,7 +3,9 @@ range = xrange
 
 from optparse import OptionParser
 from game import Game
-from leveleditor import LevelEditor
+
+# set up the pyglet path
+import data
 
 def main():
     parser = OptionParser("see --help for options")
@@ -11,7 +13,6 @@ def main():
     parser.add_option('-n', '--novbo', action='store_true', help='Disable the use of VBOs (buggy/slow on some drivers)', default=False)
 
     options, args = parser.parse_args()
-    options_dict = vars(options)
 
     if options.novbo:
         # monkey-patch pyglet (thanks muave http://code.google.com/p/bamboo-warrior/source/browse/trunk/run_game.py)
@@ -22,13 +23,10 @@ def main():
                 return attribute, usage, False
         vertexdomain.create_attribute_usage = create_attribute_usage
     
-    if options_dict['level'] is not None:
-        # load level from disk and go into level editor mode
-        level_filename = options_dict['level']
-        level_editor = LevelEditor(level_filename)
-        level_editor.execute()
-    else:
+    if options.level:
         game = Game()
+        game.load(options.level)
         game.execute()
-
+    else:
+        print("must supply a level for now with -l")
 

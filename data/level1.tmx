@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="100" height="100" tilewidth="16" tileheight="16">
+ <properties>
+  <property name="StartPoint" value="2,60"/>
+ </properties>
+ <tileset firstgid="1" source="tiles.tsx"/>
+ <layer name="Tile Layer 1" width="100" height="100">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3PywkAIAxEQS9++q/YEkTFiDgD7xjYpAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwE9a8N2Oeriy2OldM0XKGhbp9q8vBAAAAAAAAAAAAAAAAACwqgOxVDUNQJwAAA==
+  </data>
+ </layer>
+</map>
