@@ -41,12 +41,15 @@ class Level(object):
         return tiles.info[sq.tile]
 
     def setTile(self, pos, tile_id):
-        assert self.sparse
         floored_pos = pos.floored()
-        try:
-            self.squares[tuple(floored_pos)] = Square(tile=tile_id, batch=self.batch, group=self.group)
-        except KeyError:
-            self.squares[tuple(floored_pos)] = Square()
+        if self.sparse:
+            try:
+                self.squares[tuple(floored_pos)] = Square(tile=tile_id, batch=self.batch, group=self.group)
+            except KeyError:
+                self.squares[tuple(floored_pos)] = Square()
+        else:
+            assert floored_pos.x >= 0 and floored_pos.y >= 0 and floored_pos.x < self.width and floored_pos.y < self.height
+            self.squares[self.getIndex(*floored_pos)] = Square(tile=tile_id, batch=self.batch, group=self.group)
 
     def getIndex(self, x, y):
         return y*self.width + x

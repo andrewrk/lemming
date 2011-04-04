@@ -44,7 +44,7 @@ class Game(object):
 
 
     target_fps = 60
-    tile_size = (tiles.width, tiles.height)
+    tile_size = Vec2d(tiles.width, tiles.height)
     lemming_count = 9
     lemming_response_time = 0.20
 
@@ -97,6 +97,7 @@ class Game(object):
         self.explode_queued = False # true when the user presses the button until an update happens
         self.bellyflop_queued = False
         self.freeze_queued = False
+        self.plus_ones_queued = 0
 
         # resets variables based on level and begins the game
         # generate data for each lemming
@@ -130,6 +131,10 @@ class Game(object):
             self.explode_queued = False
             self.detatchHeadLemming()
 
+        # add more lemmings
+        while self.plus_ones_queued > 0 and self.control_lemming > 0:
+            self.plus_ones_queued -= 1
+            print('add 1 lemming')
 
         # lemming trails
         char = self.lemmings[self.control_lemming]
@@ -155,11 +160,25 @@ class Game(object):
 
             # apply velocity to position
             frame.pos = new_pos
-            self.updateSpritePos(lemming.sprite, frame.pos)
 
             on_ground = self.tileAt(Vec2d(frame.pos.x + tiles.width / 2, frame.pos.y-1)).solid
 
             if lemming == char:
+                # item pickups
+                feet_block = ((frame.pos + Game.tile_size / 2) / Game.tile_size).floored()
+                head_block = feet_block + Vec2d(0, 1)
+                feet_tile = self.level.getTile(feet_block)
+                head_tile = self.level.getTile(head_block)
+                # +1
+                if self.control_lemming > 0:
+                    if head_tile.id == tiles.enum.PlusOne:
+                        self.plus_ones_queued += 1
+                        self.level.setTile(head_block, tiles.enum.Air)
+                    elif feet_tile.id == tiles.enum.PlusOne:
+                        self.plus_ones_queued += 1
+                        self.level.setTile(feet_block, tiles.enum.Air)
+
+
                 # scroll the level
                 desired_scroll = Vec2d(frame.pos)
                 if desired_scroll.x < 0:
@@ -169,7 +188,6 @@ class Game(object):
                 ydist1 = desired_scroll.y - self.scroll.y
                 self.scroll.x += xdist1 * Game.target_fps * 0.15 * dt
                 self.scroll.y += ydist1 * Game.target_fps * 0.15 * dt
-
 
                 # apply input to physics
                 acceleration = 500
@@ -229,6 +247,10 @@ class Game(object):
             close_bgpos.y = 0
         self.sprite_hill_left.set_position(*close_bgpos)
         self.sprite_hill_right.set_position(close_bgpos.x + self.sprite_hill_right.width, close_bgpos.y)
+
+        # lemmings
+        for lemming in self.lemmings:
+            self.updateSpritePos(lemming.sprite, lemming.frame.pos)
 
     def updateSpritePos(self, sprite, abs_pos):
         pt = self.relPt(abs_pos)
