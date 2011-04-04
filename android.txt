@@ -1,4 +1,4 @@
 title=lemming
-author=yourgameauthor
+author=superjoe
 api=1
 orientation=landscape

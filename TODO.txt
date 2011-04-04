@@ -1,10 +1,16 @@
  * physics
+   - impassable walls
    - freeze death
    - a bad guy you can kill by exploding
    - gun thing shooting bullets
    - a machine you have to stop by jumping in the gears
    - fire
  * game over
+
+ more ways to die:
+    trap which kills you but helps the next guy
+    a trap that will kill you but only once
+    cannonball
 
  * character animation
  * belly flop death
