@@ -125,7 +125,7 @@ class LevelEditor(Game):
             if symbol == pyglet.window.key.F5:
                 # stop playtest
                 self.clearLevel()
-                self.level = Level.load(self.tmp_filename, self.batch, self.group_bg)
+                self.level = Level.load(self.tmp_filename, self.batch, self.group_level)
 
                 os.remove(self.tmp_filename)
                 self.tmp_filename = None
@@ -182,7 +182,7 @@ class LevelEditor(Game):
 
         # reset state
         super(LevelEditor, self).clearLevel()
-        self.level = Level.load(self.tmp_filename, self.batch, self.group_bg)
+        self.level = Level.load(self.tmp_filename, self.batch, self.group_level)
         self.level.toQuickLookup()
 
         # start game
@@ -197,4 +197,4 @@ class LevelEditor(Game):
         self.window.set_handler('on_mouse_drag', self.on_mouse_drag)
 
 
-        self.level = Level.load(self.level_filename, self.batch, self.group_bg)
+        self.level = Level.load(self.level_filename, self.batch, self.group_level)

@@ -11,5 +11,4 @@
    - a machine you have to stop by jumping in the gears
    - fire
 
- * parallax scrolling background
  * character animation

@@ -29,9 +29,10 @@ class Level(object):
             except KeyError:
                 return None
         else:
-            try:
-                return self.squares[self.getIndex(*floored_pos)]
-            except IndexError:
+            index = self.getIndex(*floored_pos)
+            if index >= 0 and index < len(self.squares):
+                return self.squares[index]
+            else:
                 return None
 
     def getTile(self, pos):
@@ -43,9 +44,10 @@ class Level(object):
                 return tiles.info[0]
             return tiles.info[tile_id]
         else:
-            try:
-                return tiles.info[self.squares[self.getIndex(*floored_pos)].tile]
-            except IndexError:
+            index = self.getIndex(*floored_pos)
+            if index >= 0 and index < len(self.squares):
+                return tiles.info[self.squares[index].tile]
+            else:
                 return tiles.info[0]
 
     def setTile(self, pos, tile_id):

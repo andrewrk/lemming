@@ -37,15 +37,25 @@ class Game(object):
     lemming_response_time = 0.10
 
     def loadImages(self):
-        tileset = pyglet.image.load('tiles', file=data.load("tiles.bmp"))
+        tileset = pyglet.image.load('tiles', file=data.load("tiles.png"))
         for tile in tiles.info.values():
             tile.image = tileset.get_region(tile.x*tiles.width, tile.y*tiles.height, tiles.width, tiles.height)
         self.lem_img = pyglet.image.load('lem', file=data.load("lem.png"))
 
+        self.img_bg = pyglet.image.load('img_bg', file=data.load("background.png"))
+        self.img_bg_hill = pyglet.image.load('img_bg_hill', file=data.load("hill.png"))
+
         self.batch = pyglet.graphics.Batch()
-        self.group_bg = pyglet.graphics.OrderedGroup(0)
-        self.group_char = pyglet.graphics.OrderedGroup(1)
-        self.group_fg = pyglet.graphics.OrderedGroup(2)
+        self.group_bg2 = pyglet.graphics.OrderedGroup(0)
+        self.group_bg1 = pyglet.graphics.OrderedGroup(1)
+        self.group_level = pyglet.graphics.OrderedGroup(2)
+        self.group_char = pyglet.graphics.OrderedGroup(3)
+        self.group_fg = pyglet.graphics.OrderedGroup(4)
+
+        self.sprite_bg_left = pyglet.sprite.Sprite(self.img_bg, batch=self.batch, group=self.group_bg2)
+        self.sprite_bg_right = pyglet.sprite.Sprite(self.img_bg, batch=self.batch, group=self.group_bg2)
+        self.sprite_hill_left = pyglet.sprite.Sprite(self.img_bg_hill, batch=self.batch, group=self.group_bg1)
+        self.sprite_hill_right = pyglet.sprite.Sprite(self.img_bg_hill, batch=self.batch, group=self.group_bg1)
 
     def loadConfig(self):
         self.controls = {
@@ -60,7 +70,7 @@ class Game(object):
         self.clearLevel()
 
     def clearLevel(self):
-        self.level = Level(self.batch, self.group_bg)
+        self.level = Level(self.batch, self.group_level)
         self.scroll = Vec2d(0, 0)
         self.zoom = 1
         self.lemmings = [None] * Game.lemming_count
@@ -161,6 +171,21 @@ class Game(object):
                     pos = it * Game.tile_size
                     self.updateSpritePos(sq.sprite, pos)
                     sq.sprite.scale = self.zoom
+
+        # background sprites
+        far_bgpos = Vec2d(-((self.scroll.x * 0.25) % self.sprite_bg_left.width), -(self.scroll.y * 0.10))
+        if far_bgpos.y > 0:
+            far_bgpos.y = 0
+        if far_bgpos.y + self.sprite_bg_left.height < self.window.height:
+            far_bgpos.y = self.window.height - self.sprite_bg_left.height
+        self.sprite_bg_left.set_position(*far_bgpos)
+        self.sprite_bg_right.set_position(far_bgpos.x + self.sprite_bg_right.width, far_bgpos.y)
+
+        close_bgpos = Vec2d(-((self.scroll.x * 0.5) % self.sprite_hill_left.width), -(self.scroll.y * 0.20))
+        if close_bgpos.y > 0:
+            close_bgpos.y = 0
+        self.sprite_hill_left.set_position(*close_bgpos)
+        self.sprite_hill_right.set_position(close_bgpos.x + self.sprite_hill_right.width, close_bgpos.y)
 
     def updateSpritePos(self, sprite, abs_pos):
         pt = self.relPt(abs_pos)
