@@ -125,24 +125,29 @@ class Game(object):
             self.lemmings[i] = Game.Lemming(sprite, None)
 
         # generate frames for trails
-        self.head_frame = Game.LemmingFrame(Vec2d(self.level.start), Vec2d(0, 0), None)
+        head_frame = Game.LemmingFrame(Vec2d(self.level.start), Vec2d(0, 0), None)
         lemming_index = len(self.lemmings) - 1
-        self.lemmings[lemming_index].frame = self.head_frame
+        self.lemmings[lemming_index].frame = head_frame
         lemming_index -= 1
         lemming_frame_count = 1
         while Game.target_fps * Game.lemming_response_time * (len(self.lemmings)-1) > lemming_frame_count:
-            self.head_frame = Game.LemmingFrame(Vec2d(self.level.start), Vec2d(0, 0), self.head_frame)
+            head_frame = Game.LemmingFrame(Vec2d(self.level.start), Vec2d(0, 0), head_frame)
             lemming_frame_count += 1
             if int((len(self.lemmings) - 1 - lemming_index) * Game.target_fps * Game.lemming_response_time) == lemming_frame_count:
-                self.lemmings[lemming_index].frame = self.head_frame
+                self.lemmings[lemming_index].frame = head_frame
                 lemming_index -= 1
 
     def detatchHeadLemming(self):
-        self.lemmings[self.control_lemming].sprite.delete()
+        head_lemming = self.lemmings[self.control_lemming]
+
+        head_lemming.sprite.delete()
+        head_lemming.sprite = None
+
         self.control_lemming += 1
-        self.lemmings[self.control_lemming].sprite.opacity = 255
-        self.head_frame = self.lemmings[self.control_lemming].frame
-        self.head_frame.prev_node = None
+        head_lemming = self.lemmings[self.control_lemming]
+
+        head_lemming.sprite.opacity = 255
+        head_lemming.frame.prev_node = None
 
     def update(self, dt):
         # detach head lemming from the rest
@@ -160,15 +165,27 @@ class Game(object):
         # add more lemmings
         while self.plus_ones_queued > 0 and self.control_lemming > 0:
             self.plus_ones_queued -= 1
-            print('add 1 lemming')
+            self.control_lemming -= 1
+            for i in range(self.control_lemming, len(self.lemmings)-1):
+                self.lemmings[i] = self.lemmings[i+1]
+            # add the missing frames
+            old_last_frame = self.lemmings[-2].frame
+            last_lem = Game.Lemming(pyglet.sprite.Sprite(self.lem_img, batch=self.batch, group=self.group_char),
+                Game.LemmingFrame(Vec2d(old_last_frame.pos), Vec2d(old_last_frame.vel), None))
+            self.lemmings[-1] = last_lem
+            last_lem.sprite.opacity = 128
+            node = last_lem.frame
+            for i in range(Game.target_fps * Game.lemming_response_time):
+                node = Game.LemmingFrame(Vec2d(old_last_frame.pos), Vec2d(old_last_frame.vel), node)
+            old_last_frame.next_node = node
+            node.prev_node = old_last_frame
 
         # lemming trails
         char = self.lemmings[self.control_lemming]
-        self.head_frame = Game.LemmingFrame(Vec2d(char.frame.pos), Vec2d(char.frame.vel), self.head_frame)
+        char.frame = Game.LemmingFrame(Vec2d(char.frame.pos), Vec2d(char.frame.vel), char.frame)
 
-        for lemming in self.lemmings[self.control_lemming:]:
+        for lemming in self.lemmings[self.control_lemming+1:]:
             lemming.frame = lemming.frame.prev_node
-            self.updateSpritePos(lemming.sprite, lemming.frame.pos)
         self.lemmings[-1].frame.next_node = None
 
         # physics

@@ -127,7 +127,8 @@ class LevelEditor(Game):
                 self.clearLevel()
                 self.level = Level.load(self.tmp_filename, self.batch, self.group_level)
 
-                os.remove(self.tmp_filename)
+                # we don't remove the temp file so that we have some kind of rudimentary undo/backup system.
+                #os.remove(self.tmp_filename)
                 self.tmp_filename = None
             else:
                 super(LevelEditor, self).on_key_press(symbol, modifiers)

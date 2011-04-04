@@ -1,7 +1,6 @@
  * physics
-   - +1 coin
-   - land mines
    - +infinite coin
+   - land mines
    - spikes
    - belly flop
    - freeze
@@ -12,3 +11,4 @@
  * game over
 
  * character animation
+ * keyboard display
