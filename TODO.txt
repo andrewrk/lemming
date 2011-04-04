@@ -1,8 +1,5 @@
  * physics
-   - land mines
-   - spikes
-   - belly flop
-   - freeze
+   - freeze death
    - a bad guy you can kill by exploding
    - gun thing shooting bullets
    - a machine you have to stop by jumping in the gears
@@ -10,6 +7,7 @@
  * game over
 
  * character animation
+ * belly flop death
  * keyboard display
  * sound effects
  * bg music

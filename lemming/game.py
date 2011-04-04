@@ -113,6 +113,7 @@ class Game(object):
         self.bellyflop_queued = False
         self.freeze_queued = False
         self.plus_ones_queued = 0
+        self.spike_death_queued = False
 
         self.physical_objects = []
 
@@ -160,6 +161,9 @@ class Game(object):
                 1))
                 #self.animation_explosion.get_duration()))
 
+            self.detatchHeadLemming()
+        elif self.spike_death_queued:
+            self.spike_death_queued = False
             self.detatchHeadLemming()
 
         # add more lemmings
@@ -213,7 +217,9 @@ class Game(object):
             # apply velocity to position
             obj.pos = new_pos
 
-            on_ground = self.tileAt(Vec2d(obj.pos.x + tiles.width / 2, obj.pos.y-1)).solid
+            block_at_feet = (Vec2d(obj.pos.x + tiles.width / 2, obj.pos.y-1) / Game.tile_size).floored()
+            tile_at_feet = self.level.getTile(block_at_feet)
+            on_ground = tile_at_feet.solid
 
             if obj == char:
                 # item pickups
@@ -233,6 +239,14 @@ class Game(object):
                     if tile.mine:
                         self.level.setTile(block, tiles.enum.Air)
                         self.explode_queued = True
+
+                # spikes
+                if tile_at_feet.spike:
+                    self.spike_death_queued = True
+                    self.level.setTile(block_at_feet, tiles.enum.Grass)
+                    self.level.setTile(block_at_feet+Vec2d(1,0), tiles.enum.Grass)
+                    self.level.setTile(block_at_feet+Vec2d(-1,0), tiles.enum.Grass)
+
 
                 # scroll the level
                 desired_scroll = Vec2d(obj.pos)
