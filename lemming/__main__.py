@@ -4,9 +4,6 @@ range = xrange
 from optparse import OptionParser
 from game import Game
 
-# set up the pyglet path
-import data
-
 def main():
     parser = OptionParser("see --help for options")
     parser.add_option("-l", "--level", dest="level", help="level")

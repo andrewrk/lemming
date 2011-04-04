@@ -2,13 +2,20 @@ from __future__ import division, print_function, unicode_literals
 range = xrange
 
 from tiles import TileSet
-import data
 from vec2d import Vec2d
 import tiledtmxloader
 
 import pyglet
 import sys
 import itertools
+
+import os
+
+# add data folder to pyglet resource path
+_this_py = os.path.abspath(os.path.dirname(__file__))
+_data_dir = os.path.normpath(os.path.join(_this_py, '..', 'data'))
+pyglet.resource.path = [_data_dir]
+pyglet.resource.reindex()
 
 def sign(n):
     if n > 0:
@@ -65,13 +72,13 @@ class Game(object):
         return val
 
     def loadImages(self):
-        self.lem_img = pyglet.image.load(data.filepath("lem.png"))
+        self.lem_img = pyglet.resource.image("lem.png")
 
-        self.img_bg = pyglet.image.load(data.filepath("background.png"))
-        self.img_bg_hill = pyglet.image.load(data.filepath("hill.png"))
+        self.img_bg = pyglet.resource.image("background.png")
+        self.img_bg_hill = pyglet.resource.image("hill.png")
 
-        #self.animation_explosion = pyglet.image.load_animation(data.filepath("explosion2.gif"))
-        self.animation_explosion = pyglet.image.load(data.filepath("explosion.png"))
+        #self.animation_explosion = pyglet.resource.animation("explosion2.gif")
+        self.animation_explosion = pyglet.resource.image("explosion.png")
 
         self.batch_bg2 = pyglet.graphics.Batch()
         self.batch_bg1 = pyglet.graphics.Batch()
