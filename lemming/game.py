@@ -34,7 +34,7 @@ class Game(object):
     target_fps = 60
     tile_size = (tiles.width, tiles.height)
     lemming_count = 9
-    lemming_response_time = 0.10
+    lemming_response_time = 0.20
 
     def loadImages(self):
         tileset = pyglet.image.load('tiles', file=data.load("tiles.png"))
@@ -129,13 +129,20 @@ class Game(object):
         self.scroll -= Vec2d(self.window.width, self.window.height) / 2
 
         # apply input to physics
-        acceleration = 400
+        acceleration = 500
+        max_speed = 180
         if self.control_state[Game.Control.MoveLeft]:
-            self.head_frame.vel.x -= acceleration * dt
+            if self.head_frame.vel.x - acceleration * dt < -max_speed:
+                self.head_frame.vel.x = -max_speed
+            else:
+                self.head_frame.vel.x -= acceleration * dt
         if self.control_state[Game.Control.MoveRight]:
-            self.head_frame.vel.x += acceleration * dt
+            if self.head_frame.vel.x + acceleration * dt > max_speed:
+                self.head_frame.vel.x = max_speed
+            else:
+                self.head_frame.vel.x += acceleration * dt
         if self.control_state[Game.Control.Jump] and on_ground:
-            jump_velocity = 400
+            jump_velocity = 350
             self.head_frame.vel.y = jump_velocity
 
         # gravity
