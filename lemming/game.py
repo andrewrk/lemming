@@ -312,8 +312,8 @@ class Game(object):
 
 
                 # scroll the level
-                normal_scroll_accel = 400
-                slow_scroll_accel = 400
+                normal_scroll_accel = 1200
+                slow_scroll_accel = 1200
                 desired_scroll = self.getDesiredScroll(Vec2d(obj.pos))
                 scroll_diff = desired_scroll - self.scroll
 
@@ -515,7 +515,7 @@ class Game(object):
                     
         self.layer_group = []
 
-        for layer in self.level.layers:
+        for layer_index, layer in enumerate(self.level.layers):
             group = pyglet.graphics.OrderedGroup(self.getNextGroupNum())
             self.layer_group.append(group)
             for xtile in range(layer.width):
@@ -529,7 +529,7 @@ class Game(object):
                     if image_id:
                         # o_x and o_y are offsets. They are not helpful here.
                         o_x, o_y, image_file = self.level.indexed_tiles[image_id]
-                        self.sprites[0][xtile][ytile] = pyglet.sprite.Sprite(image_file,
+                        self.sprites[layer_index][xtile][ytile] = pyglet.sprite.Sprite(image_file,
                             x=self.level.tilewidth * xtile,
                             y=self.level.tileheight * ytile,
                             batch=self.batch_level, group=group)

@@ -2,7 +2,6 @@ Day 3:
  * create more tiles and make level 1
  * implement level 1 in the game engine
  * belly flop death
- * game over
 
 Day 4:
 
@@ -13,6 +12,7 @@ Day 6:
  * bg music
  * HUD
  * menu system and title screen
+ * game over
 
 Day 7:
  * make sure it works on windows and mac

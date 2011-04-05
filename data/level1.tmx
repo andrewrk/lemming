@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" width="200" height="50" tilewidth="16" tileheight="16">
+<map version="1.0" orientation="orthogonal" width="200" height="70" tilewidth="16" tileheight="16">
  <tileset firstgid="1" name="default" tilewidth="16" tileheight="16">
   <image source="tiles.png" width="64" height="80"/>
   <tile id="0">
@@ -115,33 +115,50 @@
    </properties>
   </tile>
  </tileset>
- <layer name="Main" width="200" height="50">
+ <layer name="Main" width="200" height="70">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+2ci2oCQQxFRWi1SKH//7VFhkIR42jM5mYz58AB0YWdkFyWfbiHAwB8GAIA+QB4BPkAsCEfADbkA/44b7TtniEfPTgFGbW/r3cLKgL56IHVx1eN3F+H7JCPHlTMhyc7z5iZL/LRg73lQ5EvD+SjB6vlY8vanqkT9gX5IB9QB/Wskw+ojHrWyQdURj3r5AMqo5518gGVUc86+YDKqGfdo+eeCfkAD+pZVwvwCPV8qv1xCmugnk+1305hDdTzqfY665c7kg9YCU8+AFaBfADYkA8AG/IBYOO5fgWwClY+ot6HEflfR4BsVNePP28EqIgqHxHHoD29JwZyOBqfvajvQ77rShnxvrNQ9a5Da7+vfv//t3vbbFmfer6rHIsiz4m2PnfLsFuNXtSzXcnbcyKv6joinKFeX3Q9XerEHGeo1xddT5c6MccZ6vVF19OlTsxxhnp90fV0qRNznKFeX3Q9XerEHGGg7gPWFAbqPmBNYaDuA9YUBuo+YE1hoO4D1hQG6j5gTWfP0Kifp8pS3QdEREREREREtP0F9STfRkCcAAA=
+   H4sIAAAAAAAAA+2di0rEMBBFfeAbwf//WpGCStlp0mkyd5KcAwfUFZxJcu1u0+3e3fXho5EAETwZ9oJ8wEiQDwAb8gFgQz4AbMgHgM2o+fiq9NkQoIZR8/FZqZUbL6+Vj5HJORg1H1bdtb4MIOhZNR8jCHpGzcfV1+/vNwTYQz7IB9isko/H3ffkA2pYJR97yAfUQD7IB9iQD/IBNrPmo7Sv7snH0d4gzMms+fBYs2f31n5IfiF/+SAff9bu21nXdJVk/3w8yMf5fLB/vg7MDYAN+QCwIR8ANuQDwIZ8ANhY+ah9/2pLPOf/1XsG1t+/N37ec//kKmfGUj3uUVw9B6l+z5z6PX6W1jG4x5gpxl+5jxqJ+hz/1ed16nrP9qKuqdX4X/nfOVJ21PNRmp/S/Q3U9ZIPn1eOcZH5Us9HaX5Kx351vWfXmromT80Z+4h47p6hT+/8ZK2/1Iu6plbjr64zYm1l7HP0+ku9qGtqNf7qOiPW1lGfAEeo1zr5gMyo1zr5gMyo1zr5gMyo1zr5gMyo1zr5gMyo17pH73VC5APOol7ragGOUK9PtbXXt/e83h3yol6fams/n2kvrIF6far9Weu37oFDPmAlPPkAWAXyAWBDPgBsyAeAjef8FcAqWPnIcp8MACWq88f7e/8DZESVjxbHoJHuEwMxPBhfe1HvQ151pYx471mouteh9XfP/vz/Y7d+p2d/6vWd5VjU8jVR79duEc7Woxf12s6k93PT9qr7aGEJdX2t+5mlT4yxhLq+1v3M0ifGWEJdX+t+ZukTYyyhrq91P7P0iTGWUNfXup9Z+sQYYUM9D5hT2FDPA+YUNtTzgDmFDfU8YE5hQz0PmFPYUM8D5rR0DY36eqoo1fOAiIiIiIiIiLbfVrOFG8DaAAA=
   </data>
  </layer>
- <layer name="Ladders" width="200" height="50">
+ <layer name="Ladders" width="200" height="70">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3TMQ0AMAzAsAIYf7xDkHurZCPIkxkAAAAAAAAAAAAAAAAAYJvzOgA+5g9o/oDmD2j+gOYPaP6A5g9o/oDmD2j+gOYPaP6A5g9o/oDmD2j+gOYPaP6A5g9o/oDmD2j+gOYPaP6A5g9o/gAAAABgswuYhJ0/QJwAAA==
+   H4sIAAAAAAAAA+3aMQ0AIBAEQQTgXy8KtiOBT2YUXLPdrQUAAAAAAAD37NcD4GP6gKYPaPqApg9o+oCmD2j6gKYPaPqApg9o+oCmD2j6gKYPaPqApg9o+gAAAAAAAAAAAGAi/zdo+oCmD2j6gKYPaPqApg9o+oCmD2j6gKYPaPqApg9o+oCmD2j6gKYPaPqApg9o+oCmD2j6gKYPaPqApg9o+oCmDwAAAAAmO/QOsF3A2gAA
   </data>
  </layer>
- <objectgroup name="Object Layer 1" width="200" height="50">
-  <object name="house label" type="Text" x="21" y="362" width="64" height="53">
+ <objectgroup name="Object Layer 1" width="200" height="70">
+  <object name="house label" type="Text" x="21" y="682" width="64" height="53">
    <properties>
     <property name="text" value="Lem's House"/>
    </properties>
   </object>
-  <object name="helper text - dying" type="Text" x="911" y="347" width="118" height="69">
+  <object name="helper text - dying" type="Text" x="911" y="667" width="118" height="69">
    <properties>
     <property name="text" value="Press '1' in the air to do a Belly Flop. You can sacrifice the leader's life to save the rest of the pack."/>
    </properties>
   </object>
-  <object name="helper text - land mines" type="Text" x="1908" y="364" width="133" height="74">
+  <object name="helper text - land mines" type="Text" x="1908" y="684" width="133" height="74">
    <properties>
     <property name="text" value="Watch out for those land mines!"/>
    </properties>
   </object>
-  <object name="Start Point" type="StartPoint" x="130" y="409" width="79" height="14"/>
+  <object name="Start Point" type="StartPoint" x="144" y="768" width="80" height="16"/>
+  <object name="Monster" type="Agent" x="1685" y="360" width="52" height="42"/>
+  <object name="bridge" type="Bridge" x="1296" y="320" width="80" height="80">
+   <properties>
+    <property name="button_id" value="0"/>
+   </properties>
+  </object>
+  <object type="Button" gid="14" x="704" y="96">
+   <properties>
+    <property name="button_id" value="0"/>
+   </properties>
+  </object>
+  <object name="winnar" type="Victory" x="0" y="304" width="160" height="96"/>
+  <object name="winnar sign" type="Decoration" x="48" y="368" width="80" height="32">
+   <properties>
+    <property name="img" value="winnar.png"/>
+   </properties>
+  </object>
  </objectgroup>
- <objectgroup name="PlayerLayer" width="200" height="50" visible="0"/>
+ <objectgroup name="PlayerLayer" width="200" height="70" visible="0"/>
 </map>
