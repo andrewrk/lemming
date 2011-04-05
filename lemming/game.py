@@ -477,9 +477,6 @@ class Game(object):
 
         Game.tile_size = Vec2d(self.level.tilewidth, self.level.tileheight)
 
-        self.start_point = Vec2d(map(float, self.level.properties['StartPoint'].split(','))) * Game.tile_size
-        self.start_point.y = self.level.height * self.level.tileheight - self.start_point.y
-
         # load tiles into sprites
         self.next_group_num = 0
         self.group_bg2 = pyglet.graphics.OrderedGroup(self.getNextGroupNum())
@@ -494,13 +491,10 @@ class Game(object):
                     self.sprites[i][x].append(None)
                     
         self.layer_group = []
-        had_player_layer = False
+
         for layer in self.level.layers:
             group = pyglet.graphics.OrderedGroup(self.getNextGroupNum())
             self.layer_group.append(group)
-            if layer.name == 'PlayerLayer':
-                self.group_char = group
-                had_player_layer = True
             for xtile in range(layer.width):
                 layer.content2D[xtile].reverse()
             for ytile in range(layer.height):
@@ -516,6 +510,25 @@ class Game(object):
                             x=self.level.tilewidth * xtile,
                             y=self.level.tileheight * ytile,
                             batch=self.batch_level, group=group)
+
+        had_player_layer = False
+        had_start_point = False
+        def translate_y(y):
+            return self.level.height * self.level.tileheight - y
+        for obj_group in self.level.object_groups:
+            group = pyglet.graphics.OrderedGroup(self.getNextGroupNum())
+            self.layer_group.append(group)
+            if layer.name == 'PlayerLayer':
+                self.group_char = group
+                had_player_layer = True
+
+            for obj in obj_group.objects:
+                if obj.type == 'StartPoint':
+                    self.start_point = Vec2d(obj.x, translate_y(obj.y))
+                    had_start_point = True
+
+        if not had_start_point:
+            assert False, "Level missing start point."
 
         if not had_player_layer:
             print("Level was missing PlayerLayer")

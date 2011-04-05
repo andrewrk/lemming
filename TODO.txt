@@ -1,7 +1,9 @@
 Day 3:
+ * lock camera to map
+ * animation offsets
+ * flip x for running backwards
  * create more tiles and make level 1
  * implement level 1 in the game engine
- * character animation
  * belly flop death
  * game over
 

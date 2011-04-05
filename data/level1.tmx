@@ -1,12 +1,147 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="200" height="50" tilewidth="16" tileheight="16">
- <properties>
-  <property name="StartPoint" value="1,23"/>
- </properties>
- <tileset firstgid="1" source="tiles.tsx"/>
- <layer name="Tile Layer 1" width="200" height="50">
+ <tileset firstgid="1" name="default" tilewidth="16" tileheight="16">
+  <image source="tiles.png" width="64" height="80"/>
+  <tile id="0">
+   <properties>
+    <property name="name" value="DirtRampRight"/>
+    <property name="ramp" value="1"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="name" value="PlusOne"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="name" value="PlusForever"/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="name" value="Bullet"/>
+   </properties>
+  </tile>
+  <tile id="4">
+   <properties>
+    <property name="name" value="Dirt"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="5">
+   <properties>
+    <property name="name" value="Spike"/>
+    <property name="solid" value="1"/>
+    <property name="spike" value="1"/>
+   </properties>
+  </tile>
+  <tile id="6">
+   <properties>
+    <property name="name" value="Grass"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="7">
+   <properties>
+    <property name="mine" value="1"/>
+    <property name="name" value="LandMine"/>
+   </properties>
+  </tile>
+  <tile id="8">
+   <properties>
+    <property name="name" value="DirtRampLeft"/>
+    <property name="ramp" value="-1"/>
+   </properties>
+  </tile>
+  <tile id="9">
+   <properties>
+    <property name="breakable" value="1"/>
+    <property name="name" value="WeakStone"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="10">
+   <properties>
+    <property name="name" value="Stone"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="11">
+   <properties>
+    <property name="ladder" value="1"/>
+    <property name="name" value="Ladder"/>
+   </properties>
+  </tile>
+  <tile id="12">
+   <properties>
+    <property name="name" value="Brick"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="13">
+   <properties>
+    <property name="name" value="Button"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="14">
+   <properties>
+    <property name="name" value="ButtonPressed"/>
+   </properties>
+  </tile>
+  <tile id="15">
+   <properties>
+    <property name="name" value="BrickTop"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="16">
+   <properties>
+    <property name="name" value="DeadBodyLeft"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="17">
+   <properties>
+    <property name="name" value="DeadBodyMiddle"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="18">
+   <properties>
+    <property name="name" value="DeadBodyRight"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer name="Main" width="200" height="50">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3a0WrDMBAEQBNo0///4r4aU9VVImkldQb2JbbJHdxhh/g4AAAAAAAAAAAAAAAAAAAAAAAAYJxn58DKPjrn8xJYSe/9cA9iZb33o0X+m6/B172r9L21n5+P/XRO6VjPvtOzP+oedM71me/V9P7tNiJ30vWlnzXSsy/Z3EnX17qfWul+ZO55StfXup9a6X5k7nlK19e6n1rpfmTueUrX17qfWul+ZO55StfXuh+4Mk9QZj+gzH78zSNdABH2w+xTZj+gzH5A2W/7kX5favawv/R/EiuH/aVnbOWwv/SMrRz2l56xlcP+0jO2cgAAAEb5Boai2X5AnAAA
+   H4sIAAAAAAAAA+3c22oDMQyE4VDoiVLI+z9t6N0S1lajtTW29H8wUHqg1lZDyfF2A/DeCAD6AfTQD6CNfgBt9AMeX+oDBKEf+DyJ52eO+Z5y0nj0A56/f2tvjsnQHfqBWf3wdOc/iewX/YDH1X4o+jVyTqBH3Q9PRs4J9Kh3nX5gZepdpx9YmXrX6QdWpt51+oGVqXedfmBl6l2nH1iZetc98TxmQj/god51dYAe9X6qc3cGNaj3U51fZ1CDej/V+dv1n5PQD1Ti6QdQBf0A2ugH0EY/gDbP/VdAFa1+XHl98KzXOgLRVPcffzwFWJGqHyP+B+30PjGI8db42Ev9OOTVVOqI9z0LVe912Pq9r37++LWz75k5n3q/V/lfNPI20ezbbhHJNqOXerdXyvNtIm/Uc4yIRX2+0fNkmZPExKI+3+h5ssxJYmJRn2/0PFnmJDGxqM83ep4sc5KYWNTnGz3Pq3Mivxn7lA3Xpy76YeP61EU/bFyfuuiHjetTF/2wcX3qoh82rk9dvX5Yz6FRP58qKvSjLuXjEbsH+al3bOcgP/WO7Rzkp96xnYP81Du2cx6lvhl1QJwAAA==
   </data>
  </layer>
+ <layer name="Ladders" width="200" height="50">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3TMQ0AMAzAsAIYf7xDkHurZCPIkxkAAAAAAAAAAAAAAAAAYJvzOgA+5g9o/oDmD2j+gOYPaP6A5g9o/oDmD2j+gOYPaP6A5g9o/oDmD2j+gOYPaP6A5g9o/oDmD2j+gOYPaP6A5g9o/gAAAABgswuYhJ0/QJwAAA==
+  </data>
+ </layer>
+ <objectgroup name="Object Layer 1" width="200" height="50">
+  <object name="house label" type="Text" x="21" y="362" width="64" height="53">
+   <properties>
+    <property name="text" value="Lem's House"/>
+   </properties>
+  </object>
+  <object name="helper text - dying" type="Text" x="911" y="347" width="118" height="69">
+   <properties>
+    <property name="text" value="Press '1' in the air to do a Belly Flop. You can sacrifice the leader's life to save the rest of the pack."/>
+   </properties>
+  </object>
+  <object name="helper text - land mines" type="Text" x="1908" y="364" width="133" height="74">
+   <properties>
+    <property name="text" value="Watch out for those land mines!"/>
+   </properties>
+  </object>
+  <object name="Start Point" type="StartPoint" x="124" y="427" width="79" height="14"/>
+ </objectgroup>
+ <objectgroup name="PlayerLayer" width="200" height="50" visible="0"/>
 </map>
