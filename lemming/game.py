@@ -89,29 +89,34 @@ class Game(object):
         fd.close()
         lines = animations_txt.split('\n')
         self.animations = {}
+        self.animation_offset = {}
         for full_line in lines:
             line = full_line.strip()
             if line.startswith('#') or len(line) == 0:
                 continue
             props, frames_txt = line.split('=')
 
-            name, delay, loop = props.strip().split(':')
+            name, delay, loop, off_x, off_y = props.strip().split(':')
             delay = float(delay.strip())
             loop = bool(int(loop.strip()))
 
             frame_files = frames_txt.strip().split(',')
             frame_list = [pyglet.image.AnimationFrame(pyglet.resource.image(x.strip()), delay) for x in frame_files]
+            rev_frame_list = [pyglet.image.AnimationFrame(pyglet.resource.image(x.strip(), flip_x=True), delay) for x in frame_files]
             if not loop:
                 frame_list[-1].duration = None
+                rev_frame_list[-1].duration = None
 
-            self.animations[name.strip()] = pyglet.image.Animation(frame_list)
+            animation = pyglet.image.Animation(frame_list)
+            rev_animation = pyglet.image.Animation(rev_frame_list)
+            self.animations[name.strip()] = animation
+            self.animations['-' + name.strip()] = rev_animation
+
+            self.animation_offset[animation] = Vec2d(-int(off_x), -int(off_y))
+            self.animation_offset[rev_animation] = Vec2d(int(off_x)+self.level.tilewidth, -int(off_y))
 
         self.img_bg = pyglet.resource.image("background.png")
         self.img_bg_hill = pyglet.resource.image("hill.png")
-
-        self.batch_bg2 = pyglet.graphics.Batch()
-        self.batch_bg1 = pyglet.graphics.Batch()
-        self.batch_level = pyglet.graphics.Batch()
 
         self.sprite_bg_left = pyglet.sprite.Sprite(self.img_bg, batch=self.batch_bg2)
         self.sprite_bg_right = pyglet.sprite.Sprite(self.img_bg, batch=self.batch_bg2)
@@ -137,7 +142,11 @@ class Game(object):
 
     def __init__(self):
         self.level = None
-        self.loadImages()
+
+        self.batch_bg2 = pyglet.graphics.Batch()
+        self.batch_bg1 = pyglet.graphics.Batch()
+        self.batch_level = pyglet.graphics.Batch()
+
         self.loadConfig()
 
     def getDesiredScroll(self, point):
@@ -336,8 +345,8 @@ class Game(object):
 
                     # switch sprite to running left
                     if on_ground:
-                        if obj.sprite.image != self.animations['lem_run']:
-                            obj.sprite.image = self.animations['lem_run']
+                        if obj.sprite.image != self.animations['-lem_run']:
+                            obj.sprite.image = self.animations['-lem_run']
                             obj.frame.new_image = obj.sprite.image
                 elif move_right and not move_left:
                     if obj.vel.x + acceleration * dt > max_speed:
@@ -361,8 +370,11 @@ class Game(object):
                     obj.vel.y = jump_velocity
 
                     # switch sprite to jump
-                    if obj.sprite.image != self.animations['lem_jump']:
-                        obj.sprite.image = self.animations['lem_jump']
+                    animation_name = 'lem_jump'
+                    if obj.vel.x < 0:
+                        animation_name = '-' + animation_name
+                    if obj.sprite.image != self.animations[animation_name]:
+                        obj.sprite.image = self.animations[animation_name]
                         obj.frame.new_image = obj.sprite.image
                 else:
                     self.jump_scheduled = False
@@ -387,13 +399,15 @@ class Game(object):
         # prepare sprites for drawing
         # physical objects
         for obj in self.physical_objects:
-            obj.sprite.set_position(*obj.pos)
+            pos = obj.pos + self.animation_offset[obj.sprite.image]
+            obj.sprite.set_position(*pos)
 
         # lemmings
         for lemming in self.lemmings[self.control_lemming:]:
-            lemming.sprite.set_position(lemming.frame.pos.x - 32, lemming.frame.pos.y)
             if lemming.frame.new_image is not None:
                 lemming.sprite.image = lemming.frame.new_image
+            pos = lemming.frame.pos + self.animation_offset[lemming.sprite.image]
+            lemming.sprite.set_position(*pos)
 
     def on_key_press(self, symbol, modifiers):
         try:
@@ -545,6 +559,7 @@ class Game(object):
         self.group_fg = pyglet.graphics.OrderedGroup(self.getNextGroupNum())
 
     def execute(self):
+        self.loadImages()
         self.createWindow()
         self.start()
 

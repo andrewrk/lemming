@@ -1,6 +1,4 @@
 Day 3:
- * animation offsets
- * flip x for running backwards
  * create more tiles and make level 1
  * implement level 1 in the game engine
  * belly flop death
