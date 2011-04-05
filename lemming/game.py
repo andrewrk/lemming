@@ -17,6 +17,11 @@ _data_dir = os.path.normpath(os.path.join(_this_py, '..', 'data'))
 pyglet.resource.path = [_data_dir]
 pyglet.resource.reindex()
 
+# monkey patch pyglet to fix a resource loading bug
+slash_paths = filter(lambda x: x.startswith('/'), pyglet.resource._default_loader._index.keys())
+for path in slash_paths:
+    pyglet.resource._default_loader._index[path[1:]] = pyglet.resource._default_loader._index[path]
+
 def sign(n):
     if n > 0:
         return 1
@@ -72,13 +77,28 @@ class Game(object):
         return val
 
     def loadImages(self):
-        self.lem_img = pyglet.resource.image("lem.png")
+        # load animations
+        fd = pyglet.resource.file('animations.txt')
+        animations_txt = fd.read()
+        fd.close()
+        lines = animations_txt.split('\n')
+        self.animations = {}
+        for full_line in lines:
+            line = full_line.strip()
+            if line.startswith('#') or len(line) == 0:
+                continue
+            props, frames_txt = line.split('=')
+
+            name, delay = props.strip().split(':')
+            delay = float(delay.strip())
+
+            frame_files = frames_txt.strip().split(',')
+            frame_list = [pyglet.image.AnimationFrame(pyglet.resource.image(x.strip()), delay) for x in frame_files]
+
+            self.animations[name.strip()] = pyglet.image.Animation(frame_list)
 
         self.img_bg = pyglet.resource.image("background.png")
         self.img_bg_hill = pyglet.resource.image("hill.png")
-
-        #self.animation_explosion = pyglet.resource.animation("explosion2.gif")
-        self.animation_explosion = pyglet.resource.image("explosion.png")
 
         self.batch_bg2 = pyglet.graphics.Batch()
         self.batch_bg1 = pyglet.graphics.Batch()
@@ -127,7 +147,7 @@ class Game(object):
         # resets variables based on level and begins the game
         # generate data for each lemming
         for i in range(len(self.lemmings)):
-            sprite = pyglet.sprite.Sprite(self.lem_img, batch=self.batch_level, group=self.group_char)
+            sprite = pyglet.sprite.Sprite(self.animations['lem_crazy'], batch=self.batch_level, group=self.group_char)
             if i > 0:
                 sprite.opacity = 128
             self.lemmings[i] = Game.Lemming(sprite, None)
@@ -169,9 +189,8 @@ class Game(object):
 
             old_head_lemming = self.lemmings[self.control_lemming]
             self.physical_objects.append(Game.PhysicsObject(old_head_lemming.frame.pos,
-                old_head_lemming.frame.vel, pyglet.sprite.Sprite(self.animation_explosion, batch=self.batch_level, group=self.group_fg),
-                1))
-                #self.animation_explosion.get_duration()))
+                old_head_lemming.frame.vel, pyglet.sprite.Sprite(self.animations['explosion'], batch=self.batch_level, group=self.group_fg),
+                self.animations['explosion'].get_duration()))
 
             self.detatchHeadLemming()
         elif self.spike_death_queued:
@@ -186,7 +205,7 @@ class Game(object):
                 self.lemmings[i] = self.lemmings[i+1]
             # add the missing frames
             old_last_frame = self.lemmings[-2].frame
-            last_lem = Game.Lemming(pyglet.sprite.Sprite(self.lem_img, batch=self.batch_level, group=self.group_char),
+            last_lem = Game.Lemming(pyglet.sprite.Sprite(self.animations['lem_crazy'], batch=self.batch_level, group=self.group_char),
                 Game.LemmingFrame(Vec2d(old_last_frame.pos), Vec2d(old_last_frame.vel), None))
             self.lemmings[-1] = last_lem
             last_lem.sprite.opacity = 128
@@ -236,10 +255,10 @@ class Game(object):
             if obj == char:
                 # item pickups
                 feet_block = ((obj.pos + Game.tile_size / 2) / Game.tile_size).floored()
-                head_block = feet_block + Vec2d(0, 1)
-                feet_tile = self.getTile(feet_block)
-                head_tile = self.getTile(head_block)
-                for block, tile in ((feet_block, feet_tile), (head_block, head_tile)):
+                for y in range(4): # you're 4 tiles high
+                    block = feet_block + Vec2d(0, y)
+                    tile = self.getTile(block)
+
                     # +1
                     if self.control_lemming - self.plus_ones_queued > 0:
                         if tile.id == self.tiles.enum.PlusOne:
@@ -255,9 +274,9 @@ class Game(object):
                 # spikes
                 if tile_at_feet.spike:
                     self.spike_death_queued = True
-                    self.setTile(block_at_feet, self.tiles.enum.Grass)
-                    self.setTile(block_at_feet+Vec2d(1,0), self.tiles.enum.Grass)
-                    self.setTile(block_at_feet+Vec2d(-1,0), self.tiles.enum.Grass)
+                    self.setTile(block_at_feet, self.tiles.enum.DeadBodyMiddle)
+                    self.setTile(block_at_feet+Vec2d(1,0), self.tiles.enum.DeadBodyRight)
+                    self.setTile(block_at_feet+Vec2d(-1,0), self.tiles.enum.DeadBodyLeft)
 
 
                 # scroll the level
@@ -310,7 +329,7 @@ class Game(object):
 
         # lemmings
         for lemming in self.lemmings[self.control_lemming:]:
-            lemming.sprite.set_position(*lemming.frame.pos)
+            lemming.sprite.set_position(lemming.frame.pos.x - 32, lemming.frame.pos.y)
 
     def on_key_press(self, symbol, modifiers):
         try:
