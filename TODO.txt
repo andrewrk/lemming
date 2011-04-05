@@ -1,3 +1,26 @@
+Day 3:
+ * create more tiles and make level 1
+ * implement level 1 in the game engine
+ * character animation
+ * belly flop death
+ * game over
+
+Day 4:
+
+Day 5:
+
+Day 6:
+ * sound effects
+ * bg music
+ * HUD
+ * menu system and title screen
+
+Day 7:
+ * make sure it works on windows and mac
+
+
+
+Brainstorming:
  * physics
    - impassable walls
    - freeze death
@@ -5,15 +28,12 @@
    - gun thing shooting bullets
    - a machine you have to stop by jumping in the gears
    - fire
- * game over
 
  more ways to die:
     trap which kills you but helps the next guy
     a trap that will kill you but only once
     cannonball
 
- * character animation
- * belly flop death
- * keyboard display
- * sound effects
- * bg music
+    trap that makes you suddenly drop so you have to off the first guy in
+        order to not fall off the cliff
+
