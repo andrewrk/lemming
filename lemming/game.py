@@ -30,6 +30,11 @@ def sign(n):
     else:
         return 0
 
+def abs_min(a, b):
+    if abs(a) < abs(b):
+        return a
+    return b
+
 class Game(object):
     class Control:
         MoveLeft = 0
@@ -70,7 +75,7 @@ class Game(object):
     target_fps = 60
     tile_size = None
     lemming_count = 9
-    lemming_response_time = 0.20
+    lemming_response_time = 0.40
 
     def getNextGroupNum(self):
         val = self.next_group_num
@@ -137,6 +142,7 @@ class Game(object):
 
     def start(self):
         self.scroll = Vec2d(0, 0)
+        self.last_scroll_delta = Vec2d(0, 0)
         self.lemmings = [None] * Game.lemming_count
         self.control_state = [False] * (len(dir(Game.Control)) - 2)
         self.physical_objects = []
@@ -288,10 +294,16 @@ class Game(object):
                 if desired_scroll.x < 0:
                     desired_scroll.x = 0
                 desired_scroll -= Vec2d(self.window.width, self.window.height) / 2
-                xdist1 = desired_scroll.x - self.scroll.x
-                ydist1 = desired_scroll.y - self.scroll.y
-                self.scroll.x += xdist1 * Game.target_fps * 0.15 * dt
-                self.scroll.y += ydist1 * Game.target_fps * 0.15 * dt
+                scroll_diff = desired_scroll - self.scroll
+                max_scroll_delta = scroll_diff * Game.target_fps * 0.05 * dt
+                if sign(self.last_scroll_delta.x) != sign(scroll_diff.x):
+                    self.last_scroll_delta.x = 0
+                if sign(self.last_scroll_delta.y) != sign(scroll_diff.y):
+                    self.last_scroll_delta.y = 0
+                scroll_accel = 1
+                self.last_scroll_delta.x = abs_min(self.last_scroll_delta.x + sign(scroll_diff.x) * scroll_accel, max_scroll_delta.x)
+                self.last_scroll_delta.y = abs_min(self.last_scroll_delta.y + sign(scroll_diff.y) * scroll_accel, max_scroll_delta.y)
+                self.scroll += self.last_scroll_delta
 
                 # apply input to physics
                 acceleration = 900
@@ -323,8 +335,9 @@ class Game(object):
                 else:
                     if on_ground:
                         # switch sprite to still
-                        obj.sprite.image = self.animations['lem_crazy']
-                        obj.frame.new_image = obj.sprite.image
+                        if obj.sprite.image != self.animations['lem_crazy']:
+                            obj.sprite.image = self.animations['lem_crazy']
+                            obj.frame.new_image = obj.sprite.image
                 if self.control_state[Game.Control.Jump] and on_ground:
                     jump_velocity = 350
                     obj.vel.y = jump_velocity
