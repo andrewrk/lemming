@@ -117,7 +117,7 @@
  </tileset>
  <layer name="Main" width="200" height="50">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3c22oDMQyE4VDoiVLI+z9t6N0S1lajtTW29H8wUHqg1lZDyfF2A/DeCAD6AfTQD6CNfgBt9AMeX+oDBKEf+DyJ52eO+Z5y0nj0A56/f2tvjsnQHfqBWf3wdOc/iewX/YDH1X4o+jVyTqBH3Q9PRs4J9Kh3nX5gZepdpx9YmXrX6QdWpt51+oGVqXedfmBl6l2nH1iZetc98TxmQj/god51dYAe9X6qc3cGNaj3U51fZ1CDej/V+dv1n5PQD1Ti6QdQBf0A2ugH0EY/gDbP/VdAFa1+XHl98KzXOgLRVPcffzwFWJGqHyP+B+30PjGI8db42Ev9OOTVVOqI9z0LVe912Pq9r37++LWz75k5n3q/V/lfNPI20ezbbhHJNqOXerdXyvNtIm/Uc4yIRX2+0fNkmZPExKI+3+h5ssxJYmJRn2/0PFnmJDGxqM83ep4sc5KYWNTnGz3Pq3Mivxn7lA3Xpy76YeP61EU/bFyfuuiHjetTF/2wcX3qoh82rk9dvX5Yz6FRP58qKvSjLuXjEbsH+al3bOcgP/WO7Rzkp96xnYP81Du2cx6lvhl1QJwAAA==
+   H4sIAAAAAAAAA+2c0YrCQAxFZcFVWRb2/79WlnkRMY7GNDfNnAMHRIVOSC6lts7hAABHQwAgHwDPIB8ANuQDwIZ8gIezegFJkI8enIKMOt7l04KKQD56YPXxXSOP1yE75KMHFfPhyc4rZuaLfPRgb/lQ5MsD+ejBavnYsrZX6oR9QT7IB9RBPevkAyqjnnXyAZVRzzr5gMqoZ518QGXUs04+oDLqWffouWdCPsCDetbVAjxDPZ9q/5zCGqjnU+2vU1gD9Xyq/Z/1nweSD1gJTz4AVoF8ANiQDwAb8gFg4/n9CmAVrHxE7YcR+V9HgGxUvx9/3wlQEVU+Is5Be9onBnL4Ml57Ud+H/NSVMuLds1C116F13Hffv/3s0Xe2rE8931XORZHXRFtfu2XYrUYv6tmu5P01kVd1HRHOUK8vup4udWKOM9Tri66nS52Y4wz1+qLr6VIn5jhDvb7oerrUiTnOUK8vup4udWKOMFD3AWsKA3UfsKYwUPcBawoDdR+wpjBQ9wFrCgN1H7Cms2do1M9TZanuAyIiIiIiIiLaXgEi0dtRQJwAAA==
   </data>
  </layer>
  <layer name="Ladders" width="200" height="50">
@@ -141,7 +141,7 @@
     <property name="text" value="Watch out for those land mines!"/>
    </properties>
   </object>
-  <object name="Start Point" type="StartPoint" x="124" y="427" width="79" height="14"/>
+  <object name="Start Point" type="StartPoint" x="3107" y="159" width="79" height="14"/>
  </objectgroup>
  <objectgroup name="PlayerLayer" width="200" height="50" visible="0"/>
 </map>

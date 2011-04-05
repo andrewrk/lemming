@@ -140,8 +140,20 @@ class Game(object):
         self.loadImages()
         self.loadConfig()
 
+    def getDesiredScroll(self, point):
+        scroll = Vec2d(point) - Vec2d(self.window.width, self.window.height) / 2
+        if scroll.x < 0:
+            scroll.x = 0
+        if scroll.y < 0:
+            scroll.y = 0
+        if scroll.x > self.level.width * self.level.tilewidth - self.window.width:
+            scroll.x = self.level.width * self.level.tilewidth  - self.window.width
+        if scroll.y > self.level.height * self.level.tileheight - self.window.height:
+            scroll.y = self.level.height * self.level.tileheight  - self.window.height
+        return scroll
+
     def start(self):
-        self.scroll = Vec2d(0, 0)
+        self.scroll = self.getDesiredScroll(self.start_point)
         self.scroll_vel = Vec2d(0, 0)
         self.last_scroll_delta = Vec2d(0, 0)
         self.lemmings = [None] * Game.lemming_count
@@ -293,10 +305,7 @@ class Game(object):
                 # scroll the level
                 normal_scroll_accel = 400
                 slow_scroll_accel = 400
-                desired_scroll = Vec2d(obj.pos)
-                if desired_scroll.x < 0:
-                    desired_scroll.x = 0
-                desired_scroll -= Vec2d(self.window.width, self.window.height) / 2
+                desired_scroll = self.getDesiredScroll(Vec2d(obj.pos))
                 scroll_diff = desired_scroll - self.scroll
 
                 self.scroll += self.scroll_vel * dt
