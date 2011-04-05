@@ -142,6 +142,7 @@ class Game(object):
 
     def start(self):
         self.scroll = Vec2d(0, 0)
+        self.scroll_vel = Vec2d(0, 0)
         self.last_scroll_delta = Vec2d(0, 0)
         self.lemmings = [None] * Game.lemming_count
         self.control_state = [False] * (len(dir(Game.Control)) - 2)
@@ -290,20 +291,28 @@ class Game(object):
 
 
                 # scroll the level
+                normal_scroll_accel = 400
+                slow_scroll_accel = 400
                 desired_scroll = Vec2d(obj.pos)
                 if desired_scroll.x < 0:
                     desired_scroll.x = 0
                 desired_scroll -= Vec2d(self.window.width, self.window.height) / 2
                 scroll_diff = desired_scroll - self.scroll
-                max_scroll_delta = scroll_diff * Game.target_fps * 0.05 * dt
-                if sign(self.last_scroll_delta.x) != sign(scroll_diff.x):
-                    self.last_scroll_delta.x = 0
-                if sign(self.last_scroll_delta.y) != sign(scroll_diff.y):
-                    self.last_scroll_delta.y = 0
-                scroll_accel = 1
-                self.last_scroll_delta.x = abs_min(self.last_scroll_delta.x + sign(scroll_diff.x) * scroll_accel, max_scroll_delta.x)
-                self.last_scroll_delta.y = abs_min(self.last_scroll_delta.y + sign(scroll_diff.y) * scroll_accel, max_scroll_delta.y)
-                self.scroll += self.last_scroll_delta
+
+                self.scroll += self.scroll_vel * dt
+                for i in range(2):
+                    if abs(scroll_diff[i]) < 10:
+                        proposed_new_vel = self.scroll_vel[i] - sign(self.scroll_vel[i]) * normal_scroll_accel * dt
+                        if sign(proposed_new_vel) != sign(self.scroll_vel[i]):
+                            self.scroll_vel[i] = 0
+                        else:
+                            self.scroll_vel[i] = proposed_new_vel
+                    elif abs(scroll_diff[i]) < abs(self.scroll_vel[i] * self.scroll_vel[i] / slow_scroll_accel):
+                        if sign(self.scroll_vel[i]) == sign(scroll_diff[i]) != 0:
+                            apply_scroll_accel = min(-self.scroll_vel[i] * self.scroll_vel[i] / scroll_diff[i], slow_scroll_accel)
+                            self.scroll_vel[i] += apply_scroll_accel * dt
+                    else:
+                        self.scroll_vel[i] += sign(scroll_diff[i]) * normal_scroll_accel * dt
 
                 # apply input to physics
                 acceleration = 900

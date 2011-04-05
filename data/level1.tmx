@@ -6,7 +6,7 @@
  <tileset firstgid="1" source="tiles.tsx"/>
  <layer name="Tile Layer 1" width="200" height="50">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3b0YoCMQwFUFnQ9f+/2FcZtquVdm5Tz4H74ggmkDBT1MsFAAAAAAAAAAAAAAAAAAAAgJl+0gUAUMI9XQCc6HdyoLLr5NwOgUpm74d7EJXN3o8R+TafnvFSZ8PW5/a+/nztr/e0rs3sOz37Z92DnnN85vs0s89uZ+SVdH3pZ4307Es2r6TrG91Pr3Q/svY8pesb3U+vdD+y9jyl6xvdT690P7L2PKXrG91Pr3Q/svY8pesb3Q8cmSdosx/QZj/e478a38l+mH3a7Ae02Q9o+28/0r+XWj3sL/2dROWwv/SMVQ77S89Y5bC/9IxVDvtLz1jlAAAAnOUBzA2870CcAAA=
+   H4sIAAAAAAAAA+3a0WrDMBAEQBNo0///4r4aU9VVImkldQb2JbbJHdxhh/g4AAAAAAAAAAAAAAAAAAAAAAAAYJxn58DKPjrn8xJYSe/9cA9iZb33o0X+m6/B172r9L21n5+P/XRO6VjPvtOzP+oedM71me/V9P7tNiJ30vWlnzXSsy/Z3EnX17qfWul+ZO55StfXup9a6X5k7nlK19e6n1rpfmTueUrX17qfWul+ZO55StfXuh+4Mk9QZj+gzH78zSNdABH2w+xTZj+gzH5A2W/7kX5favawv/R/EiuH/aVnbOWwv/SMrRz2l56xlcP+0jO2cgAAAEb5Boai2X5AnAAA
   </data>
  </layer>
 </map>
