@@ -1,0 +1,9 @@
+# name:delay:loop = file1, file2, etc
+
+lem_still:0.1:1 = lem/17.png
+lem_crazy:0.1:1 = lem/18.png, lem/19.png, lem/20.png, lem/21.png, lem/22.png, lem/23.png, lem/24.png
+lem_jump:0.1:0 = lem/10.png, lem/11.png
+lem_run:0.1:1 = lem/01.png, lem/02.png, lem/03.png
+lem_belly_flop:0.1:1 = lem/11.png, lem/12.png, lem/13.png, lem/14.png, lem/15.png
+lem_die:0.1:1 = lem/04.png, lem/05.png, lem/06.png, lem/07.png, lem/08.png, lem/09.png
+explosion:0.05:1 = explosion/01.png, explosion/02.png, explosion/03.png, explosion/04.png, explosion/05.png, explosion/06.png, explosion/07.png, explosion/08.png, explosion/09.png, explosion/10.png, explosion/11.png, explosion/12.png
