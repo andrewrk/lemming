@@ -341,6 +341,7 @@ class Game(object):
             far_bgpos.y = 0
         if far_bgpos.y + self.sprite_bg_left.height < self.window.height:
             far_bgpos.y = self.window.height - self.sprite_bg_left.height
+        far_bgpos.floor()
         pyglet.gl.glLoadIdentity()
         pyglet.gl.glTranslatef(far_bgpos.x, far_bgpos.y, 0.0)
         self.batch_bg2.draw()
@@ -349,13 +350,15 @@ class Game(object):
         close_bgpos = Vec2d(-((self.scroll.x * 0.5) % self.sprite_hill_left.width), -(self.scroll.y * 0.20))
         if close_bgpos.y > 0:
             close_bgpos.y = 0
+        close_bgpos.floor()
         pyglet.gl.glLoadIdentity()
         pyglet.gl.glTranslatef(close_bgpos.x, close_bgpos.y, 0.0)
         self.batch_bg1.draw()
 
         # level 
+        floored_scroll = -self.scroll.floored()
         pyglet.gl.glLoadIdentity()
-        pyglet.gl.glTranslatef(-self.scroll.x, -self.scroll.y, 0.0)
+        pyglet.gl.glTranslatef(floored_scroll.x, floored_scroll.y, 0.0)
         self.batch_level.draw()
 
         # fps display
