@@ -40,11 +40,12 @@ class Game(object):
         Explode = 5
 
     class LemmingFrame(object):
-        def __init__(self, pos, vel, next_node):
+        def __init__(self, pos, vel, next_node, new_image=None):
             self.pos = pos
             self.vel = vel
             self.next_node = next_node
             self.prev_node = None
+            self.new_image = new_image
             
             if self.next_node is not None:
                 self.next_node.prev_node = self
@@ -89,11 +90,14 @@ class Game(object):
                 continue
             props, frames_txt = line.split('=')
 
-            name, delay = props.strip().split(':')
+            name, delay, loop = props.strip().split(':')
             delay = float(delay.strip())
+            loop = bool(int(loop.strip()))
 
             frame_files = frames_txt.strip().split(',')
             frame_list = [pyglet.image.AnimationFrame(pyglet.resource.image(x.strip()), delay) for x in frame_files]
+            if not loop:
+                frame_list[-1].duration = None
 
             self.animations[name.strip()] = pyglet.image.Animation(frame_list)
 
@@ -290,21 +294,48 @@ class Game(object):
                 self.scroll.y += ydist1 * Game.target_fps * 0.15 * dt
 
                 # apply input to physics
-                acceleration = 500
+                acceleration = 900
                 max_speed = 200
-                if self.control_state[Game.Control.MoveLeft]:
+                move_left = self.control_state[Game.Control.MoveLeft]
+                move_right = self.control_state[Game.Control.MoveRight]
+                if move_left and not move_right:
                     if obj.vel.x - acceleration * dt < -max_speed:
                         obj.vel.x = -max_speed
                     else:
                         obj.vel.x -= acceleration * dt
-                if self.control_state[Game.Control.MoveRight]:
+
+                    # switch sprite to running left
+                    if on_ground:
+                        if obj.sprite.image != self.animations['lem_run']:
+                            obj.sprite.image = self.animations['lem_run']
+                            obj.frame.new_image = obj.sprite.image
+                elif move_right and not move_left:
                     if obj.vel.x + acceleration * dt > max_speed:
                         obj.vel.x = max_speed
                     else:
                         obj.vel.x += acceleration * dt
+
+                    # switch sprite to running right
+                    if on_ground:
+                        if obj.sprite.image != self.animations['lem_run']:
+                            obj.sprite.image = self.animations['lem_run']
+                            obj.frame.new_image = obj.sprite.image
+                else:
+                    if on_ground:
+                        # switch sprite to still
+                        obj.sprite.image = self.animations['lem_crazy']
+                        obj.frame.new_image = obj.sprite.image
                 if self.control_state[Game.Control.Jump] and on_ground:
                     jump_velocity = 350
                     obj.vel.y = jump_velocity
+
+                    # switch sprite to jump
+                    if obj.sprite.image != self.animations['lem_jump']:
+                        obj.sprite.image = self.animations['lem_jump']
+                        obj.frame.new_image = obj.sprite.image
+                else:
+                    self.jump_scheduled = False
+
 
             # gravity
             gravity_accel = 800
@@ -312,7 +343,7 @@ class Game(object):
                 obj.vel.y -= gravity_accel * dt
 
             # friction
-            friction_accel = 150
+            friction_accel = 380
             if on_ground:
                 if abs(obj.vel.x) < abs(friction_accel * dt):
                     obj.vel.x = 0
@@ -330,6 +361,8 @@ class Game(object):
         # lemmings
         for lemming in self.lemmings[self.control_lemming:]:
             lemming.sprite.set_position(lemming.frame.pos.x - 32, lemming.frame.pos.y)
+            if lemming.frame.new_image is not None:
+                lemming.sprite.image = lemming.frame.new_image
 
     def on_key_press(self, symbol, modifiers):
         try:
