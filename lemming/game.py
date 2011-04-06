@@ -15,7 +15,7 @@ import os
 # add data folder to pyglet resource path
 _this_py = os.path.abspath(os.path.dirname(__file__))
 _data_dir = os.path.normpath(os.path.join(_this_py, '..', 'data'))
-pyglet.resource.path = [_data_dir]
+pyglet.resource.path = [_data_dir, 'data']
 pyglet.resource.reindex()
 
 # monkey patch pyglet to fix a resource loading bug
