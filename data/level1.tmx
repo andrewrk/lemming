@@ -133,17 +133,19 @@
     <property name="text" value="Lem's House"/>
    </properties>
   </object>
-  <object name="helper text - dying" type="Text" x="911" y="667" width="118" height="69">
+  <object name="helper text - dying" type="Text" x="642" y="605" width="467" height="134">
    <properties>
+    <property name="font_size" value="18"/>
     <property name="text" value="Press '1' in the air to do a Belly Flop. You can sacrifice the leader's life to save the rest of the pack."/>
    </properties>
   </object>
-  <object name="helper text - land mines" type="Text" x="1908" y="684" width="133" height="74">
+  <object name="helper text - land mines" type="Text" x="1866" y="681" width="170" height="89">
    <properties>
+    <property name="font_size" value="18"/>
     <property name="text" value="Watch out for those land mines!"/>
    </properties>
   </object>
-  <object name="Start Point" type="StartPoint" x="144" y="768" width="80" height="16"/>
+  <object name="Start Point" type="StartPoint" x="713" y="761" width="80" height="64"/>
   <object name="Monster" type="Agent" x="1685" y="360" width="52" height="42"/>
   <object name="bridge" type="Bridge" x="1296" y="320" width="80" height="80">
    <properties>

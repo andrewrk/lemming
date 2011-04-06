@@ -593,8 +593,9 @@ class Game(object):
 
         had_player_layer = False
         had_start_point = False
-        def translate_y(y):
-            return self.level.height * self.level.tileheight - y
+        def translate_y(y, obj_height=0):
+            return self.level.height * self.level.tileheight - y - obj_height
+        self.labels = []
         for obj_group in self.level.object_groups:
             group = pyglet.graphics.OrderedGroup(self.getNextGroupNum())
             self.layer_group.append(group)
@@ -604,8 +605,16 @@ class Game(object):
 
             for obj in obj_group.objects:
                 if obj.type == 'StartPoint':
-                    self.start_point = Vec2d(obj.x, translate_y(obj.y))
+                    self.start_point = Vec2d(obj.x, translate_y(obj.y, obj.height))
                     had_start_point = True
+                elif obj.type == 'Text':
+                    try:
+                        font_size = int(obj.properties['font_size'])
+                    except KeyError:
+                        font_size = 20
+                    self.labels.append(pyglet.text.Label(obj.properties['text'], font_name="Arial", font_size=font_size, 
+                        x=obj.x, y=translate_y(obj.y, obj.height), batch=self.batch_level, group=group,
+                        color=(0, 0, 0, 255), multiline=True, width=obj.width, height=obj.height, anchor_x='left', anchor_y='bottom'))
 
         if not had_start_point:
             assert False, "Level missing start point."
