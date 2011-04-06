@@ -196,7 +196,7 @@ class Game(object):
         self.control_state = [False] * (len(dir(Game.Control)) - 2)
         self.control_lemming = 0
         self.on_ladder = False
-        self.pause_control = False
+        self.held_by = None
 
         self.explode_queued = False # true when the user presses the button until an update happens
         self.bellyflop_queued = False
@@ -231,8 +231,8 @@ class Game(object):
 
     def getGrabbedBy(self, monster):
         self.lemmings[self.control_lemming].frame.vel = Vec2d(0, 0)
-        self.pause_control = True
         self.lemmings[self.control_lemming].sprite.visible = False
+        self.held_by = monster
 
         # hide sprite until throw animation is over
         monster.sprite.image = self.animations['monster_throw']
@@ -240,7 +240,7 @@ class Game(object):
             monster.sprite.image = self.animations['monster_still']
             self.lemmings[self.control_lemming].frame.vel = Vec2d(600, 600)
             self.lemmings[self.control_lemming].sprite.visible = True
-            self.pause_control = False
+            self.held_by = None
             def not_grabbing(dt):
                 monster.grabbing = False
             pyglet.clock.schedule_once(not_grabbing, 2)
@@ -262,20 +262,29 @@ class Game(object):
         head_lemming.frame.prev_node = None
 
     def update(self, dt):
-        if not self.pause_control and self.control_lemming < len(self.lemmings):
+        if self.control_lemming < len(self.lemmings):
             if self.explode_queued:
                 self.explode_queued = False
 
-                old_head_lemming = self.lemmings[self.control_lemming]
-                self.physical_objects.append(Game.PhysicsObject(old_head_lemming.frame.pos,
-                    old_head_lemming.frame.vel, pyglet.sprite.Sprite(self.animations['explosion'], batch=self.batch_level, group=self.group_fg),
-                    Vec2d(1, 1), self.animations['explosion'].get_duration()))
+                if self.held_by is not None:
+                    self.physical_objects.append(Game.PhysicsObject(self.held_by.pos+self.held_by.size / 2 * Game.tile_size, self.held_by.vel,
+                        pyglet.sprite.Sprite(self.animations['explosion'], batch=self.batch_level, group=self.group_fg),
+                        self.held_by.size, self.animations['explosion'].get_duration()))
+                    self.held_by.gone = True
+                    self.held_by.sprite.delete()
+                    self.held_by.sprite = None
+                    self.held_by = None
+                else:
+                    old_head_lemming = self.lemmings[self.control_lemming]
+                    self.physical_objects.append(Game.PhysicsObject(old_head_lemming.frame.pos,
+                        old_head_lemming.frame.vel, pyglet.sprite.Sprite(self.animations['explosion'], batch=self.batch_level, group=self.group_fg),
+                        Vec2d(1, 1), self.animations['explosion'].get_duration()))
 
                 self.detatchHeadLemming()
-            elif self.detatch_queued:
+            elif self.detatch_queued and self.held_by is None:
                 self.detatch_queued = False
                 self.detatchHeadLemming()
-            elif self.bellyflop_queued:
+            elif self.bellyflop_queued and self.held_by is None:
                 self.bellyflop_queued = False
 
                 old_head_lemming = self.lemmings[self.control_lemming]
@@ -329,7 +338,7 @@ class Game(object):
                 continue
             obj.think(dt)
 
-            if obj == char and self.pause_control:
+            if obj == char and self.held_by is not None:
                 continue
 
             if obj.life is not None:
