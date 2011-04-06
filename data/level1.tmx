@@ -163,6 +163,12 @@
     <property name="img" value="winnar.png"/>
    </properties>
   </object>
+  <object name="helper text - movement" type="Text" x="5" y="545" width="350" height="88">
+   <properties>
+    <property name="font_size" value="18"/>
+    <property name="text" value="Use the arrow keys to move around and jump."/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup name="PlayerLayer" width="200" height="70" visible="0"/>
 </map>

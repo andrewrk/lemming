@@ -362,29 +362,31 @@ class Game(object):
                 # item pickups
                 corner_block = (obj.pos / Game.tile_size).do(int)
                 feet_block = ((obj.pos + Game.tile_size / 2) / Game.tile_size).do(int)
-                for y in range(4): # you're 4 tiles high
-                    block = feet_block + Vec2d(0, y)
-                    tile = self.getTile(block)
+                it = Vec2d(0, 0)
+                for it.y in range(obj.size.y):
+                    for it.x in range(obj.size.x):
+                        block = corner_block + it
+                        tile = self.getTile(block)
 
-                    # +1
-                    if self.control_lemming - self.plus_ones_queued > 0:
-                        if tile.id == self.tiles.enum.PlusOne:
-                            self.plus_ones_queued += 1
+                        # +1
+                        if self.control_lemming - self.plus_ones_queued > 0:
+                            if tile.id == self.tiles.enum.PlusOne:
+                                self.plus_ones_queued += 1
+                                self.setTile(block, self.tiles.enum.Air)
+                            elif tile.id == self.tiles.enum.PlusForever:
+                                self.plus_ones_queued = self.control_lemming
+                        # land mine
+                        if tile.mine:
+                            if obj == char:
+                                self.explode_queued = True
+                            else:
+                                self.physical_objects.append(Game.PhysicsObject(obj.pos, obj.vel,
+                                    pyglet.sprite.Sprite(self.animations['explosion'], batch=self.batch_level, group=self.group_fg),
+                                    Vec2d(1, 1), self.animations['explosion'].get_duration()))
+                                obj.gone = True
+                                obj.sprite.delete()
+                                obj.sprite = None
                             self.setTile(block, self.tiles.enum.Air)
-                        elif tile.id == self.tiles.enum.PlusForever:
-                            self.plus_ones_queued = self.control_lemming
-                    # land mine
-                    if tile.mine:
-                        if obj == char:
-                            self.explode_queued = True
-                        else:
-                            self.physical_objects.append(Game.PhysicsObject(obj.pos, obj.vel,
-                                pyglet.sprite.Sprite(self.animations['explosion'], batch=self.batch_level, group=self.group_fg),
-                                Vec2d(1, 1), self.animations['explosion'].get_duration()))
-                            obj.gone = True
-                            obj.sprite.delete()
-                            obj.sprite = None
-                        self.setTile(block, self.tiles.enum.Air)
 
                 # spikes
                 if tile_at_feet.spike:
