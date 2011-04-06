@@ -1,11 +1,8 @@
-Day 3:
- * create more tiles and make level 1
- * implement level 1 in the game engine
- * belly flop death
-
 Day 4:
+ * implement as many gameplay ideas as possible
 
 Day 5:
+ * make 20 levels
 
 Day 6:
  * sound effects
@@ -21,7 +18,6 @@ Day 7:
 
 Brainstorming:
  * physics
-   - impassable walls
    - freeze death
    - a bad guy you can kill by exploding
    - gun thing shooting bullets
@@ -32,7 +28,4 @@ Brainstorming:
     trap which kills you but helps the next guy
     a trap that will kill you but only once
     cannonball
-
-    trap that makes you suddenly drop so you have to off the first guy in
-        order to not fall off the cliff
 

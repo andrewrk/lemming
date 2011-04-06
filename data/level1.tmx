@@ -140,8 +140,12 @@
     <property name="text" value="Watch out for those land mines!"/>
    </properties>
   </object>
-  <object name="Start Point" type="StartPoint" x="2944" y="960" width="80" height="64"/>
-  <object name="Monster" type="Agent" x="1685" y="360" width="52" height="42"/>
+  <object name="Start Point" type="StartPoint" x="1888" y="352" width="80" height="64"/>
+  <object name="Monster" type="Agent" x="1680" y="352" width="64" height="64">
+   <properties>
+    <property name="type" value="monster"/>
+   </properties>
+  </object>
   <object name="bridge" type="Bridge" x="1296" y="320" width="80" height="80">
    <properties>
     <property name="button_id" value="0"/>
