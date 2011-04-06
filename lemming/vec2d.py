@@ -236,22 +236,12 @@ class Vec2d(object):
     def __invert__(self):
         return Vec2d(-self.x, -self.y)
 
-    # convert x and y to ints
-    def floor(self):
-        self.x = int(self.x)
-        self.y = int(self.y)
-
-    def floored(self):
-        new = Vec2d(self)
-        new.floor()
-        return new
- 
     # vectory functions
     def get_length_sqrd(self):
-        return self.x**2 + self.y**2
+        return self.x*self.x + self.y*self.y
  
     def get_length(self):
-        return math.sqrt(self.x**2 + self.y**2)
+        return math.sqrt(self.x*self.x + self.y*self.y)
     def __setlength(self, value):
         length = self.get_length()
         self.x *= value/length
@@ -340,6 +330,14 @@ class Vec2d(object):
  
     def __setstate__(self, dict):
         self.x, self.y = dict
+
+    def do(self, func):
+        self.x = func(self.x)
+        self.y = func(self.y)
+        return self
+
+    def done(self, func):
+        return Vec2d(func(self.x), func(self.y))
  
 ########################################################################
 ## Unit Testing                                                       ##
@@ -459,6 +457,22 @@ if __name__ == "__main__":
             testvec_str = pickle.dumps(testvec)
             loaded_vec = pickle.loads(testvec_str)
             self.assertEquals(testvec, loaded_vec)
+
+        def testDone(self):
+            v = Vec2d(4.5, 6.99)
+            v2 = v.done(math.floor)
+            self.assertEqual(v2.x, 4)
+            self.assertEqual(v2.y, 6)
+            self.assertEqual(v.x, 4.5)
+            self.assertEqual(v.y, 6.99)
+ 
+        def testDo(self):
+            v = Vec2d(4.5, 6.99)
+            v2 = v.do(math.floor)
+            self.assertEqual(v2.x, 4)
+            self.assertEqual(v2.y, 6)
+            self.assertEqual(v.x, 4)
+            self.assertEqual(v.y, 6)
  
     ####################################################################
     unittest.main()

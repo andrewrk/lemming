@@ -8,6 +8,7 @@ import tiledtmxloader
 import pyglet
 import sys
 import itertools
+import math
 
 import os
 
@@ -271,22 +272,65 @@ class Game(object):
 
             # collision with solid blocks
             new_pos = obj.pos + obj.vel * dt
-            block_there = (Vec2d(new_pos.x + self.level.tilewidth / 2, new_pos.y) / Game.tile_size).floored()
-            tile_there = self.getTile(block_there)
-            if tile_there.solid:
-                new_pos.y = (block_there.y+1)*self.level.tileheight
-                obj.vel.y = 0
+            def resolve_y(new_pos, vel):
+                if vel.y != 0:
+                    # resolve feet collisions
+                    new_feet_block = (new_pos / Game.tile_size).do(int)
+                    tile_there = self.getTile(new_feet_block)
+                    if tile_there.solid:
+                        new_pos.y = (new_feet_block.y+1)*self.level.tileheight
+                        vel.y = 0
+                        return
+
+                    # resolve head collisions
+                    new_head_block = new_feet_block + Vec2d(0, 3)
+                    tile_there = self.getTile(new_head_block)
+                    if tile_there.solid:
+                        new_pos.y = (new_head_block.y-1-3)*self.level.tileheight
+                        vel.y = 0
+                        return
+
+            def resolve_x(new_pos, vel):
+                if vel.x != 0:
+                    adjust_x = 0
+                    if sign(vel.x) == 1:
+                        adjust_x = self.level.tilewidth
+                    new_feet_block = (Vec2d(new_pos.x+adjust_x, new_pos.y) / Game.tile_size).do(int)
+                    for y in range(4):
+                        new_body_block = Vec2d(new_feet_block.x, new_feet_block.y + y)
+                        tile_there = self.getTile(new_body_block)
+                        if tile_there.solid:
+                            new_pos.x = (new_feet_block.x-sign(vel.x))*self.level.tilewidth
+                            vel.x = 0
+                            return
+            # try resolving the collision both ways (y then x, x then y) and choose the one that results in the most velocity
+            x_first_new_pos = Vec2d(new_pos)
+            x_first_new_vel = Vec2d(obj.vel)
+            resolve_x(x_first_new_pos, x_first_new_vel)
+            resolve_y(x_first_new_pos, x_first_new_vel)
+
+            y_first_new_pos = Vec2d(new_pos)
+            y_first_new_vel = Vec2d(obj.vel)
+            resolve_y(y_first_new_pos, y_first_new_vel)
+            resolve_x(y_first_new_pos, y_first_new_vel)
+
+            if x_first_new_vel.get_length_sqrd() > y_first_new_vel.get_length_sqrd():
+                new_pos = x_first_new_pos
+                obj.vel = x_first_new_vel
+            else:
+                new_pos = y_first_new_pos
+                obj.vel = y_first_new_vel
 
             # apply velocity to position
             obj.pos = new_pos
 
-            block_at_feet = (Vec2d(obj.pos.x + self.level.tilewidth / 2, obj.pos.y-1) / Game.tile_size).floored()
+            block_at_feet = (Vec2d(obj.pos.x + self.level.tilewidth / 2, obj.pos.y-1) / Game.tile_size).do(int)
             tile_at_feet = self.getTile(block_at_feet)
             on_ground = tile_at_feet.solid
 
             if obj == char:
                 # item pickups
-                feet_block = ((obj.pos + Game.tile_size / 2) / Game.tile_size).floored()
+                feet_block = ((obj.pos + Game.tile_size / 2) / Game.tile_size).do(int)
                 for y in range(4): # you're 4 tiles high
                     block = feet_block + Vec2d(0, y)
                     tile = self.getTile(block)
@@ -438,7 +482,7 @@ class Game(object):
             far_bgpos.y = 0
         if far_bgpos.y + self.sprite_bg_left.height < self.window.height:
             far_bgpos.y = self.window.height - self.sprite_bg_left.height
-        far_bgpos.floor()
+        far_bgpos.do(int)
         pyglet.gl.glLoadIdentity()
         pyglet.gl.glTranslatef(far_bgpos.x, far_bgpos.y, 0.0)
         self.batch_bg2.draw()
@@ -447,13 +491,13 @@ class Game(object):
         close_bgpos = Vec2d(-((self.scroll.x * 0.5) % self.sprite_hill_left.width), -(self.scroll.y * 0.20))
         if close_bgpos.y > 0:
             close_bgpos.y = 0
-        close_bgpos.floor()
+        close_bgpos.do(int)
         pyglet.gl.glLoadIdentity()
         pyglet.gl.glTranslatef(close_bgpos.x, close_bgpos.y, 0.0)
         self.batch_bg1.draw()
 
         # level 
-        floored_scroll = -self.scroll.floored()
+        floored_scroll = -self.scroll.done(int)
         pyglet.gl.glLoadIdentity()
         pyglet.gl.glTranslatef(floored_scroll.x, floored_scroll.y, 0.0)
         self.batch_level.draw()
@@ -463,7 +507,7 @@ class Game(object):
         self.fps_display.draw()
 
     def blockAt(self, abs_pt):
-        return (abs_pt / Game.tile_size).floored()
+        return (abs_pt / Game.tile_size).do(int)
 
     def getTile(self, block_pos):
         try:
