@@ -119,7 +119,7 @@
  </tileset>
  <layer name="Main" width="200" height="70">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+2di0rEMBBFfeAbwf//WpGCStlp0mkyd5KcAwfUFZxJcu1u0+3e3fXho5EAETwZ9oJ8wEiQDwAb8gFgQz4AbMgHgM2o+fiq9NkQoIZR8/FZqZUbL6+Vj5HJORg1H1bdtb4MIOhZNR8jCHpGzcfV1+/vNwTYQz7IB9isko/H3ffkA2pYJR97yAfUQD7IB9iQD/IBNrPmo7Sv7snH0d4gzMms+fBYs2f31n5IfiF/+SAff9bu21nXdJVk/3w8yMf5fLB/vg7MDYAN+QCwIR8ANuQDwIZ8ANhY+ah9/2pLPOf/1XsG1t+/N37ec//kKmfGUj3uUVw9B6l+z5z6PX6W1jG4x5gpxl+5jxqJ+hz/1ed16nrP9qKuqdX4X/nfOVJ21PNRmp/S/Q3U9ZIPn1eOcZH5Us9HaX5Kx351vWfXmromT80Z+4h47p6hT+/8ZK2/1Iu6plbjr64zYm1l7HP0+ku9qGtqNf7qOiPW1lGfAEeo1zr5gMyo1zr5gMyo1zr5gMyo1zr5gMyo1zr5gMyo17pH73VC5APOol7ragGOUK9PtbXXt/e83h3yol6fams/n2kvrIF6far9Weu37oFDPmAlPPkAWAXyAWBDPgBsyAeAjef8FcAqWPnIcp8MACWq88f7e/8DZESVjxbHoJHuEwMxPBhfe1HvQ151pYx471mouteh9XfP/vz/Y7d+p2d/6vWd5VjU8jVR79duEc7Woxf12s6k93PT9qr7aGEJdX2t+5mlT4yxhLq+1v3M0ifGWEJdX+t+ZukTYyyhrq91P7P0iTGWUNfXup9Z+sQYYUM9D5hT2FDPA+YUNtTzgDmFDfU8YE5hQz0PmFPYUM8D5rR0DY36eqoo1fOAiIiIiIiIiLbfVrOFG8DaAAA=
+   H4sIAAAAAAAAA+3d7UrsMBSF4VHxG8H7v1p/FFTKrCZN07120veBBUc9YNJkWWc6U2+3c3x2ChDhWeQs9AMjoR+ARj8AjX4AGv0AtFH78V2ZFxGgxqj9+KqM6k2rt8qv0ck5jNoPNe7avA4Q+F21HyMEfqP24+jj9487AdboB/2AdpV+PK0+ph+ocZV+rNEP1KAf9AMa/aAf0GbtR+m6eks/tq4NYk6z9qMlNdfs3vsfkl/0Lx/68Zfa63bqNV2lcP18PPRjfz+4fn4drA2g0Q9Aox+ARj8AjX4AmupH7ftXe2p5/t99zUB9/wfx+TOvnxy151i6j3uUo89But8z536Pn4o6B59xzBzH33kdNZL7Of6jv9e5x7t3Lu4x9Tr+R352jtQd93qU1qd0fwP3eOlHW46c4yL75V6P0vqUzv3u8e7da+4xtYw54zwifnfPMM/W9ck6/tJc3GPqdfzd44zYWxnnOfr4S3Nxj6nX8XePM2Jvbc0T2OLe6/QDmbn3Ov1AZu69Tj+QmXuv0w9k5t7r9AOZufd6S1pfJ0Q/sJd7r7sDbHHvT3eALe796Q6wxb0/3QFAP4At9APQ6Aeg0Q9Aox+ApvqR5T4ZgJPr+eP1vf+BjFz96HEOGuk+MYjxKP7dyn0d8miu1JHWexa67nWovu/ez///2r3/c+b83Ps7y7mo52Oisx+7RWS2ObZy7+1Maf27aeu459EjJe7x9Z7PLPMkMSlxj6/3fGaZJ4lJiXt8veczyzxJTErc4+s9n1nmSWJS4h5f7/nMMk8SEyzc60ByBgv3OpCcwcK9DiRnsHCvA8kZLNzrQHIGC/c6kJwpvYbG/XqqqLjXgRBCCCGEEEIIITo/dLO8/cDaAAA=
   </data>
  </layer>
  <layer name="Ladders" width="200" height="70">
@@ -128,11 +128,6 @@
   </data>
  </layer>
  <objectgroup name="Object Layer 1" width="200" height="70">
-  <object name="house label" type="Text" x="21" y="682" width="64" height="53">
-   <properties>
-    <property name="text" value="Lem's House"/>
-   </properties>
-  </object>
   <object name="helper text - dying" type="Text" x="642" y="605" width="467" height="134">
    <properties>
     <property name="font_size" value="18"/>
@@ -145,7 +140,7 @@
     <property name="text" value="Watch out for those land mines!"/>
    </properties>
   </object>
-  <object name="Start Point" type="StartPoint" x="2944" y="960" width="80" height="64"/>
+  <object name="Start Point" type="StartPoint" x="80" y="704" width="80" height="64"/>
   <object name="Monster" type="Agent" x="1685" y="360" width="52" height="42"/>
   <object name="bridge" type="Bridge" x="1296" y="320" width="80" height="80">
    <properties>
@@ -163,10 +158,15 @@
     <property name="img" value="winnar.png"/>
    </properties>
   </object>
-  <object name="helper text - movement" type="Text" x="5" y="545" width="350" height="88">
+  <object name="helper text - movement" type="Text" x="240" y="544" width="350" height="88">
    <properties>
     <property name="font_size" value="18"/>
     <property name="text" value="Use the arrow keys to move around and SPACE jump."/>
+   </properties>
+  </object>
+  <object name="house decoration" type="Decoration" x="0" y="528" width="224" height="240">
+   <properties>
+    <property name="animation" value="house"/>
    </properties>
   </object>
  </objectgroup>

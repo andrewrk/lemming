@@ -621,6 +621,8 @@ class Game(object):
         self.level = tiledtmxloader.TileMapParser().parse_decode(level_filename)
         self.level.load(tiledtmxloader.ImageLoaderPyglet())
 
+        self.loadImages()
+
         self.tiles = TileSet(self.level.tile_sets[0])
 
         Game.tile_size = Vec2d(self.level.tilewidth, self.level.tileheight)
@@ -664,6 +666,7 @@ class Game(object):
         def translate_y(y, obj_height=0):
             return self.level.height * self.level.tileheight - y - obj_height
         self.labels = []
+        self.obj_sprites = {}
         for obj_group in self.level.object_groups:
             group = pyglet.graphics.OrderedGroup(self.getNextGroupNum())
             self.layer_group.append(group)
@@ -683,6 +686,13 @@ class Game(object):
                     self.labels.append(pyglet.text.Label(obj.properties['text'], font_name="Arial", font_size=font_size, 
                         x=obj.x, y=translate_y(obj.y, obj.height), batch=self.batch_level, group=group,
                         color=(0, 0, 0, 255), multiline=True, width=obj.width, height=obj.height, anchor_x='left', anchor_y='bottom'))
+                elif obj.type == 'Decoration':
+                    if obj.properties.has_key('img'):
+                        img = pyglet.resource.image(obj.properties['img'])
+                    else:
+                        img = self.animations[obj.properties['animation']]
+                    self.obj_sprites[obj] = pyglet.sprite.Sprite(img,
+                        x=obj.x, y=translate_y(obj.y, obj.height), batch=self.batch_level, group=group)
 
         if not had_start_point:
             assert False, "Level missing start point."
@@ -693,7 +703,6 @@ class Game(object):
         self.group_fg = pyglet.graphics.OrderedGroup(self.getNextGroupNum())
 
     def execute(self):
-        self.loadImages()
         self.createWindow()
         self.start()
 
