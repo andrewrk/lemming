@@ -57,19 +57,23 @@ class Game(object):
                 self.next_node.prev_node = self
 
     class PhysicsObject(object):
-        def __init__(self, pos, vel, sprite, life=None):
+        def __init__(self, pos, vel, sprite, size, life=None, can_pick_up_stuff=False, is_belly_flop=False, direction=1):
             self.pos = pos
             self.vel = vel
             self.sprite = sprite
+            self.size = size # in tiles
             self.life = life
             self.gone = False
+            self.can_pick_up_stuff = can_pick_up_stuff
+            self.is_belly_flop = is_belly_flop
+            self.direction = direction
 
     class Lemming(PhysicsObject):
         def __init__(self, sprite, frame=None):
             if frame is not None:
-                super(Game.Lemming, self).__init__(frame.pos, frame.vel, sprite)
+                super(Game.Lemming, self).__init__(frame.pos, frame.vel, sprite, Vec2d(1, 4), can_pick_up_stuff=True)
             else:
-                super(Game.Lemming, self).__init__(None, None, sprite)
+                super(Game.Lemming, self).__init__(None, None, sprite, Vec2d(1, 4), can_pick_up_stuff=True)
             self.frame = frame
             self.gone = False
 
@@ -216,18 +220,32 @@ class Game(object):
         head_lemming.frame.prev_node = None
 
     def update(self, dt):
-        # detach head lemming from the rest
         if self.explode_queued:
             self.explode_queued = False
 
             old_head_lemming = self.lemmings[self.control_lemming]
             self.physical_objects.append(Game.PhysicsObject(old_head_lemming.frame.pos,
                 old_head_lemming.frame.vel, pyglet.sprite.Sprite(self.animations['explosion'], batch=self.batch_level, group=self.group_fg),
-                self.animations['explosion'].get_duration()))
+                Vec2d(1, 1), self.animations['explosion'].get_duration()))
 
             self.detatchHeadLemming()
         elif self.spike_death_queued:
             self.spike_death_queued = False
+            self.detatchHeadLemming()
+        elif self.bellyflop_queued:
+            self.bellyflop_queued = False
+
+            old_head_lemming = self.lemmings[self.control_lemming]
+            direction = sign(old_head_lemming.frame.vel.x)
+            if direction < 0:
+                animation = self.animations['-lem_belly_flop']
+            else:
+                direction = 1
+                animation = self.animations['lem_belly_flop']
+            self.physical_objects.append(Game.PhysicsObject(old_head_lemming.frame.pos,
+                old_head_lemming.frame.vel, pyglet.sprite.Sprite(animation, batch=self.batch_level, group=self.group_fg),
+                Vec2d(4, 1), can_pick_up_stuff=True, is_belly_flop=True, direction=direction))
+
             self.detatchHeadLemming()
 
         # add more lemmings
@@ -272,42 +290,43 @@ class Game(object):
 
             # collision with solid blocks
             new_pos = obj.pos + obj.vel * dt
-            def resolve_y(new_pos, vel):
+            def resolve_y(new_pos, vel, obj_size):
                 new_feet_block = (new_pos / Game.tile_size).do(int)
                 tile_there = self.getTile(new_feet_block)
 
-                # ramps
-                if tile_there.ramp == -1:
-                    new_pos.y = new_feet_block.y * self.level.tileheight + self.level.tileheight
-                    vel.y = 0
-                    return
-                elif self.getTile(Vec2d(new_feet_block.x+1, new_feet_block.y)).ramp == 1:
-                    new_pos.y = new_feet_block.y * self.level.tileheight + self.level.tileheight
-                    vel.y = 0
-                    return
-
-                if vel.y != 0:
-                    # resolve feet collisions
-                    if tile_there.solid:
-                        new_pos.y = (new_feet_block.y+1)*self.level.tileheight
+                for x in range(obj_size.x):
+                    # ramps
+                    if tile_there.ramp == -1:
+                        new_pos.y = new_feet_block.y * self.level.tileheight + self.level.tileheight
+                        vel.y = 0
+                        return
+                    elif self.getTile(Vec2d(new_feet_block.x+1, new_feet_block.y)).ramp == 1:
+                        new_pos.y = new_feet_block.y * self.level.tileheight + self.level.tileheight
                         vel.y = 0
                         return
 
-                    # resolve head collisions
-                    new_head_block = new_feet_block + Vec2d(0, 3)
-                    tile_there = self.getTile(new_head_block)
-                    if tile_there.solid:
-                        new_pos.y = (new_head_block.y-1-3)*self.level.tileheight
-                        vel.y = 0
-                        return
+                    if vel.y != 0:
+                        # resolve feet collisions
+                        if tile_there.solid:
+                            new_pos.y = (new_feet_block.y+1)*self.level.tileheight
+                            vel.y = 0
+                            return
 
-            def resolve_x(new_pos, vel):
+                        # resolve head collisions
+                        new_head_block = new_feet_block + Vec2d(0, 3)
+                        tile_there = self.getTile(new_head_block)
+                        if tile_there.solid:
+                            new_pos.y = (new_head_block.y-1-3)*self.level.tileheight
+                            vel.y = 0
+                            return
+
+            def resolve_x(new_pos, vel, obj_size):
                 if vel.x != 0:
                     adjust_x = 0
                     if sign(vel.x) == 1:
                         adjust_x = self.level.tilewidth
                     new_feet_block = (Vec2d(new_pos.x+adjust_x, new_pos.y) / Game.tile_size).do(int)
-                    for y in range(4):
+                    for y in range(obj_size.y):
                         new_body_block = Vec2d(new_feet_block.x, new_feet_block.y + y)
                         tile_there = self.getTile(new_body_block)
                         if tile_there.solid:
@@ -315,17 +334,15 @@ class Game(object):
                             vel.x = 0
                             return
             # try resolving the collision both ways (y then x, x then y) and choose the one that results in the most velocity
-            #if self.control_state[Game.Control.MoveLeft]:
-            #    import pdb; pdb.set_trace()
             x_first_new_pos = Vec2d(new_pos)
             x_first_new_vel = Vec2d(obj.vel)
-            resolve_x(x_first_new_pos, x_first_new_vel)
-            resolve_y(x_first_new_pos, x_first_new_vel)
+            resolve_x(x_first_new_pos, x_first_new_vel, obj.size)
+            resolve_y(x_first_new_pos, x_first_new_vel, obj.size)
 
             y_first_new_pos = Vec2d(new_pos)
             y_first_new_vel = Vec2d(obj.vel)
-            resolve_y(y_first_new_pos, y_first_new_vel)
-            resolve_x(y_first_new_pos, y_first_new_vel)
+            resolve_y(y_first_new_pos, y_first_new_vel, obj.size)
+            resolve_x(y_first_new_pos, y_first_new_vel, obj.size)
 
             if x_first_new_vel.get_length_sqrd() > y_first_new_vel.get_length_sqrd():
                 new_pos = x_first_new_pos
@@ -341,8 +358,9 @@ class Game(object):
             tile_at_feet = self.getTile(block_at_feet)
             on_ground = tile_at_feet.solid
 
-            if obj == char:
+            if obj.can_pick_up_stuff:
                 # item pickups
+                corner_block = (obj.pos / Game.tile_size).do(int)
                 feet_block = ((obj.pos + Game.tile_size / 2) / Game.tile_size).do(int)
                 for y in range(4): # you're 4 tiles high
                     block = feet_block + Vec2d(0, y)
@@ -357,17 +375,30 @@ class Game(object):
                             self.plus_ones_queued = self.control_lemming
                     # land mine
                     if tile.mine:
+                        if obj == char:
+                            self.explode_queued = True
+                        else:
+                            self.physical_objects.append(Game.PhysicsObject(obj.pos, obj.vel,
+                                pyglet.sprite.Sprite(self.animations['explosion'], batch=self.batch_level, group=self.group_fg),
+                                Vec2d(1, 1), self.animations['explosion'].get_duration()))
+                            obj.gone = True
+                            obj.sprite.delete()
+                            obj.sprite = None
                         self.setTile(block, self.tiles.enum.Air)
-                        self.explode_queued = True
 
                 # spikes
                 if tile_at_feet.spike:
-                    self.spike_death_queued = True
+                    if obj == char:
+                        self.spike_death_queued = True
+                    else:
+                        obj.gone = True
+                        obj.sprite.delete()
+                        obj.sprite = None
                     self.setTile(block_at_feet, self.tiles.enum.DeadBodyMiddle)
                     self.setTile(block_at_feet+Vec2d(1,0), self.tiles.enum.DeadBodyRight)
                     self.setTile(block_at_feet+Vec2d(-1,0), self.tiles.enum.DeadBodyLeft)
 
-
+            if obj == char:
                 # scroll the level
                 normal_scroll_accel = 1200
                 slow_scroll_accel = 1200
@@ -449,6 +480,16 @@ class Game(object):
                     obj.vel.x = 0
                 else:
                     obj.vel.x += friction_accel * dt * -sign(obj.vel.x)
+            
+            if (on_ground and obj.vel.get_length_sqrd() == 0) and obj.is_belly_flop:
+                # replace tiles it took up with dead body
+                self.setTile(block_at_feet+Vec2d(0, 1), self.tiles.enum.DeadBodyMiddle)
+                self.setTile(block_at_feet+Vec2d(1, 1), self.tiles.enum.DeadBodyRight)
+                self.setTile(block_at_feet+Vec2d(-1, 1), self.tiles.enum.DeadBodyLeft)
+                
+                obj.gone = True
+                obj.sprite.delete()
+                obj.sprite = None
 
         char.frame.pos = char.pos
         char.frame.vel = char.vel
@@ -456,8 +497,9 @@ class Game(object):
         # prepare sprites for drawing
         # physical objects
         for obj in self.physical_objects:
-            pos = obj.pos + self.animation_offset[obj.sprite.image]
-            obj.sprite.set_position(*pos)
+            if not obj.gone:
+                pos = obj.pos + self.animation_offset[obj.sprite.image]
+                obj.sprite.set_position(*pos)
 
         # lemmings
         for lemming in self.lemmings[self.control_lemming:]:

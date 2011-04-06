@@ -145,7 +145,7 @@
     <property name="text" value="Watch out for those land mines!"/>
    </properties>
   </object>
-  <object name="Start Point" type="StartPoint" x="713" y="761" width="80" height="64"/>
+  <object name="Start Point" type="StartPoint" x="128" y="704" width="80" height="64"/>
   <object name="Monster" type="Agent" x="1685" y="360" width="52" height="42"/>
   <object name="bridge" type="Bridge" x="1296" y="320" width="80" height="80">
    <properties>
