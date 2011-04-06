@@ -6,8 +6,10 @@ lem_jump:0.1:0:32:0         = lem/10.png, lem/11.png
 lem_run:0.1:1:32:0          = lem/01.png, lem/02.png, lem/03.png
 lem_belly_flop:0.1:0:16:32  = lem/12.png, lem/13.png, lem/14.png, lem/15.png
 lem_die:0.1:1:32:0          = lem/04.png, lem/05.png, lem/06.png, lem/07.png, lem/08.png, lem/09.png
-lem_climb:0.1:1:32:0        = lem/25.png, lem/26.png, lem/27.png, lem/28.png, lem/27.png, lem/26.png, lem/25.png
+lem_climb:0.1:1:32:0        = lem/25.png, lem/26.png, lem/27.png, lem/28.png, lem/27.png, lem/26.png
 lem_climb_still:0.1:1:32:0  = lem/27.png
 explosion:0.05:1:30:30      = explosion/01.png, explosion/02.png, explosion/03.png, explosion/04.png, explosion/05.png, explosion/06.png, explosion/07.png, explosion/08.png, explosion/09.png, explosion/10.png, explosion/11.png, explosion/12.png
 house:0.1:1:0:0             = house/01.png, house/02.png, house/03.png, house/04.png
+monster_still:0.1:1:0:0     = monster/01.png, monster/02.png, monster/03.png, monster/02.png
+monster_throw:0.1:0:0:0     = monster/04.png, monster/05.png, monster/06.png, monster/07.png, monster/08.png, monster/09.png
 
