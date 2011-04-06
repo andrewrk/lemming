@@ -145,7 +145,7 @@
     <property name="text" value="Watch out for those land mines!"/>
    </properties>
   </object>
-  <object name="Start Point" type="StartPoint" x="128" y="704" width="80" height="64"/>
+  <object name="Start Point" type="StartPoint" x="2944" y="960" width="80" height="64"/>
   <object name="Monster" type="Agent" x="1685" y="360" width="52" height="42"/>
   <object name="bridge" type="Bridge" x="1296" y="320" width="80" height="80">
    <properties>
@@ -166,7 +166,7 @@
   <object name="helper text - movement" type="Text" x="5" y="545" width="350" height="88">
    <properties>
     <property name="font_size" value="18"/>
-    <property name="text" value="Use the arrow keys to move around and jump."/>
+    <property name="text" value="Use the arrow keys to move around and SPACE jump."/>
    </properties>
   </object>
  </objectgroup>

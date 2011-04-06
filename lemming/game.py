@@ -40,10 +40,11 @@ class Game(object):
     class Control:
         MoveLeft = 0
         MoveRight = 1
-        Jump = 2
-        BellyFlop = 3
-        Freeze = 4
-        Explode = 5
+        MoveUp = 2
+        MoveDown = 3
+        BellyFlop = 4
+        Freeze = 5
+        Explode = 6
 
     class LemmingFrame(object):
         def __init__(self, pos, vel, next_node, new_image=None):
@@ -139,7 +140,8 @@ class Game(object):
         self.controls = {
             pyglet.window.key.LEFT: Game.Control.MoveLeft,
             pyglet.window.key.RIGHT: Game.Control.MoveRight,
-            pyglet.window.key.UP: Game.Control.Jump,
+            pyglet.window.key.UP: Game.Control.MoveUp,
+            pyglet.window.key.DOWN: Game.Control.MoveDown,
             pyglet.window.key._1: Game.Control.BellyFlop,
             pyglet.window.key._2: Game.Control.Freeze,
             pyglet.window.key._3: Game.Control.Explode,
@@ -174,12 +176,13 @@ class Game(object):
         self.control_state = [False] * (len(dir(Game.Control)) - 2)
         self.physical_objects = []
         self.control_lemming = 0
+        self.on_ladder = False
 
         self.explode_queued = False # true when the user presses the button until an update happens
         self.bellyflop_queued = False
         self.freeze_queued = False
         self.plus_ones_queued = 0
-        self.spike_death_queued = False
+        self.detatch_queued = False
 
         # resets variables based on level and begins the game
         # generate data for each lemming
@@ -229,8 +232,8 @@ class Game(object):
                 Vec2d(1, 1), self.animations['explosion'].get_duration()))
 
             self.detatchHeadLemming()
-        elif self.spike_death_queued:
-            self.spike_death_queued = False
+        elif self.detatch_queued:
+            self.detatch_queued = False
             self.detatchHeadLemming()
         elif self.bellyflop_queued:
             self.bellyflop_queued = False
@@ -291,6 +294,9 @@ class Game(object):
             # collision with solid blocks
             new_pos = obj.pos + obj.vel * dt
             def resolve_y(new_pos, vel, obj_size):
+                if self.on_ladder:
+                    return
+
                 new_feet_block = (new_pos / Game.tile_size).do(int)
                 tile_there = self.getTile(new_feet_block)
 
@@ -321,6 +327,9 @@ class Game(object):
                             return
 
             def resolve_x(new_pos, vel, obj_size):
+                if self.on_ladder:
+                    return
+
                 if vel.x != 0:
                     adjust_x = 0
                     if sign(vel.x) == 1:
@@ -391,7 +400,7 @@ class Game(object):
                 # spikes
                 if tile_at_feet.spike:
                     if obj == char:
-                        self.spike_death_queued = True
+                        self.detatch_queued = True
                     else:
                         obj.gone = True
                         obj.sprite.delete()
@@ -427,6 +436,10 @@ class Game(object):
                 max_speed = 200
                 move_left = self.control_state[Game.Control.MoveLeft]
                 move_right = self.control_state[Game.Control.MoveRight]
+                move_up = self.control_state[Game.Control.MoveUp]
+                move_down = self.control_state[Game.Control.MoveDown]
+                if not move_up and (move_left or move_right or move_down):
+                    self.on_ladder = False
                 if move_left and not move_right:
                     if obj.vel.x - acceleration * dt < -max_speed:
                         obj.vel.x = -max_speed
@@ -455,7 +468,18 @@ class Game(object):
                         if obj.sprite.image != self.animations['lem_crazy']:
                             obj.sprite.image = self.animations['lem_crazy']
                             obj.frame.new_image = obj.sprite.image
-                if self.control_state[Game.Control.Jump] and on_ground:
+                ladder_at_feet = self.getTile(block_at_feet, 1)
+                ladder_velocity = 400
+                if move_up and ladder_at_feet.ladder:
+                    self.on_ladder = True
+                    obj.vel.y = 0
+                    obj.vel.x = 0
+                    obj.pos.y += ladder_velocity * dt
+                elif move_down and ladder_at_feet.ladder:
+                    self.on_ladder = True
+                    obj.vel.x = 0
+                    obj.pos.y -= ladder_velocity * dt
+                elif move_up and on_ground:
                     jump_velocity = 350
                     obj.vel.y = jump_velocity
 
@@ -472,7 +496,7 @@ class Game(object):
 
             # gravity
             gravity_accel = 800
-            if not on_ground:
+            if not on_ground and not self.on_ladder:
                 obj.vel.y -= gravity_accel * dt
 
             # friction
@@ -566,9 +590,9 @@ class Game(object):
     def blockAt(self, abs_pt):
         return (abs_pt / Game.tile_size).do(int)
 
-    def getTile(self, block_pos):
+    def getTile(self, block_pos, layer_index=0):
         try:
-            return self.tiles.info[self.level.layers[0].content2D[block_pos.x][block_pos.y]]
+            return self.tiles.info[self.level.layers[layer_index].content2D[block_pos.x][block_pos.y]]
         except IndexError:
             return self.tiles.info[self.tiles.enum.Air]
 
