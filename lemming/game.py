@@ -598,7 +598,7 @@ class Game(object):
         for obj_group in self.level.object_groups:
             group = pyglet.graphics.OrderedGroup(self.getNextGroupNum())
             self.layer_group.append(group)
-            if layer.name == 'PlayerLayer':
+            if obj_group.name == 'PlayerLayer':
                 self.group_char = group
                 had_player_layer = True
 
