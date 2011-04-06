@@ -1,15 +1,13 @@
-Day 4:
- * implement as many gameplay ideas as possible
-
 Day 5:
- * make 20 levels
-
-Day 6:
  * sound effects
- * bg music
  * HUD
  * menu system and title screen
  * game over
+
+Day 6:
+ * implement as many gameplay ideas as possible
+ * create as many levels as possible exploring those concepts
+ * bg music
 
 Day 7:
  * make sure it works on windows and mac
