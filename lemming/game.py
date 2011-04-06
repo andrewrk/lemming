@@ -89,11 +89,12 @@ class Game(object):
             self.grabbing = False
 
         def think(self, dt):
-            player_pos = (self.game.lemmings[self.game.control_lemming].pos / self.game.tile_size).do(int)
-            my_pos = (self.pos / self.game.tile_size).do(int)
-            if player_pos.x >= my_pos.x + 2 and player_pos.x <= my_pos.x+5 and (player_pos.y == my_pos.y or player_pos.y == my_pos.y + 1) and not self.grabbing:
-                self.grabbing = True
-                self.game.getGrabbedBy(self)
+            if self.game.control_lemming < len(self.game.lemmings):
+                player_pos = (self.game.lemmings[self.game.control_lemming].pos / self.game.tile_size).do(int)
+                my_pos = (self.pos / self.game.tile_size).do(int)
+                if player_pos.x >= my_pos.x + 2 and player_pos.x <= my_pos.x+5 and (player_pos.y == my_pos.y or player_pos.y == my_pos.y + 1) and not self.grabbing:
+                    self.grabbing = True
+                    self.game.getGrabbedBy(self)
 
     target_fps = 60
     tile_size = None
@@ -253,13 +254,15 @@ class Game(object):
         head_lemming.sprite = None
 
         self.control_lemming += 1
+        if self.control_lemming == len(self.lemmings):
+            return
         head_lemming = self.lemmings[self.control_lemming]
 
         head_lemming.sprite.opacity = 255
         head_lemming.frame.prev_node = None
 
     def update(self, dt):
-        if not self.pause_control:
+        if not self.pause_control and self.control_lemming < len(self.lemmings):
             if self.explode_queued:
                 self.explode_queued = False
 
@@ -307,18 +310,22 @@ class Game(object):
             node.prev_node = old_last_frame
 
         # lemming trails
-        char = self.lemmings[self.control_lemming]
-        char.frame = Game.LemmingFrame(Vec2d(char.frame.pos), Vec2d(char.frame.vel), char.frame)
+        if self.control_lemming < len(self.lemmings):
+            char = self.lemmings[self.control_lemming]
+            char.frame = Game.LemmingFrame(Vec2d(char.frame.pos), Vec2d(char.frame.vel), char.frame)
 
-        for lemming in self.lemmings[self.control_lemming+1:]:
-            lemming.frame = lemming.frame.prev_node
-        self.lemmings[-1].frame.next_node = None
+            for lemming in self.lemmings[self.control_lemming+1:]:
+                lemming.frame = lemming.frame.prev_node
+            self.lemmings[-1].frame.next_node = None
+
+            char.pos = char.frame.pos
+            char.vel = char.frame.vel
+        else:
+            char = None
 
         # physics
-        char.pos = char.frame.pos
-        char.vel = char.frame.vel
         for obj in itertools.chain(self.physical_objects, [char]):
-            if obj.gone:
+            if obj is None or obj.gone:
                 continue
             obj.think(dt)
 
@@ -575,11 +582,13 @@ class Game(object):
                 self.setTile(block_at_feet+Vec2d(-1, 1), self.tiles.enum.DeadBodyLeft)
                 
                 obj.gone = True
-                obj.sprite.delete()
-                obj.sprite = None
+                if obj.sprite is not None:
+                    obj.sprite.delete()
+                    obj.sprite = None
 
-        char.frame.pos = char.pos
-        char.frame.vel = char.vel
+        if char is not None:
+            char.frame.pos = char.pos
+            char.frame.vel = char.vel
 
         # prepare sprites for drawing
         # physical objects
