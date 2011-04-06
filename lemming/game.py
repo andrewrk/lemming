@@ -94,9 +94,13 @@ class Game(object):
             self.gone = False
 
     class Monster(PhysicsObject):
-        def __init__(self, pos, size, group, batch, game):
-            super(Game.Monster, self).__init__(pos, Vec2d(0, 0), pyglet.sprite.Sprite(game.animations['monster_still'],
-                x=pos.x, y=pos.y, group=group, batch=batch), size)
+        def __init__(self, pos, size, group, batch, game, direction):
+            if direction > 0:
+                negate = ''
+            else:
+                negate = '-'
+            super(Game.Monster, self).__init__(pos, Vec2d(0, 0), pyglet.sprite.Sprite(game.animations[negate+'monster_still'],
+                x=pos.x, y=pos.y, group=group, batch=batch), size, direction=direction)
             self.game = game
             self.grabbing = False
             self.explodable = True
@@ -105,7 +109,12 @@ class Game(object):
             if self.game.control_lemming < len(self.game.lemmings):
                 player_pos = (self.game.lemmings[self.game.control_lemming].pos / self.game.tile_size).do(int)
                 my_pos = (self.pos / self.game.tile_size).do(int)
-                if player_pos.x >= my_pos.x + 2 and player_pos.x <= my_pos.x+5 and (player_pos.y == my_pos.y or player_pos.y == my_pos.y + 1) and not self.grabbing:
+                if self.direction > 0:
+                    get_him = player_pos.x >= my_pos.x + 2 and player_pos.x <= my_pos.x+5
+                else:
+                    get_him = player_pos.x <= my_pos.x + 2 and player_pos.x >= my_pos.x-3
+
+                if get_him and (player_pos.y == my_pos.y or player_pos.y == my_pos.y + 1) and not self.grabbing:
                     self.grabbing = True
                     self.game.getGrabbedBy(self)
 
@@ -309,10 +318,13 @@ class Game(object):
         self.held_by = monster
 
         # hide sprite until throw animation is over
-        monster.sprite.image = self.animations['monster_throw']
+        negate = ''
+        if monster.direction < 0:
+            negate = '-'
+        monster.sprite.image = self.animations[negate+'monster_throw']
         def reset_animation():
-            monster.sprite.image = self.animations['monster_still']
-            self.lemmings[self.control_lemming].frame.vel = Vec2d(600, 600)
+            monster.sprite.image = self.animations[negate+'monster_still']
+            self.lemmings[self.control_lemming].frame.vel = Vec2d(600*monster.direction, 600)
             self.lemmings[self.control_lemming].sprite.visible = True
             self.held_by = None
             def not_grabbing(dt):
@@ -897,9 +909,17 @@ class Game(object):
                     self.obj_sprites[obj] = pyglet.sprite.Sprite(img,
                         x=obj.x, y=translate_y(obj.y, obj.height), batch=self.batch_level, group=group)
                 elif obj.type == 'Agent':
+                    try:
+                        direction = int(obj.properties['direction'])
+                    except KeyError:
+                        direction = 1
+                    if direction > 0:
+                        x_offset = 0
+                    else:
+                        x_offset = obj.width
                     if obj.properties['type'] == 'monster':
-                        self.physical_objects.append(Game.Monster(Vec2d(obj.x, translate_y(obj.y, obj.height)),
-                            (Vec2d(obj.width, obj.height) / Game.tile_size).do(int), group, self.batch_level, self))
+                        self.physical_objects.append(Game.Monster(Vec2d(obj.x+x_offset, translate_y(obj.y, obj.height)),
+                            (Vec2d(obj.width, obj.height) / Game.tile_size).do(int), group, self.batch_level, self, direction))
                 elif obj.type == 'Bridge':
                     up_img = pyglet.resource.image(obj.properties['up_img'])
                     down_img = pyglet.resource.image(obj.properties['down_img'])
