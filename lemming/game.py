@@ -440,6 +440,9 @@ class Game(object):
                 move_down = self.control_state[Game.Control.MoveDown]
                 if not move_up and (move_left or move_right or move_down):
                     self.on_ladder = False
+                ladder_at_feet = self.getTile(block_at_feet, 1)
+                if self.on_ladder and not ladder_at_feet.ladder:
+                    self.on_ladder = False
                 if move_left and not move_right:
                     if obj.vel.x - acceleration * dt < -max_speed:
                         obj.vel.x = -max_speed
@@ -468,17 +471,26 @@ class Game(object):
                         if obj.sprite.image != self.animations['lem_crazy']:
                             obj.sprite.image = self.animations['lem_crazy']
                             obj.frame.new_image = obj.sprite.image
-                ladder_at_feet = self.getTile(block_at_feet, 1)
-                ladder_velocity = 400
+                ladder_velocity = 200
                 if move_up and ladder_at_feet.ladder:
                     self.on_ladder = True
                     obj.vel.y = 0
                     obj.vel.x = 0
                     obj.pos.y += ladder_velocity * dt
+
+                    # switch sprite to ladder
+                    if obj.sprite.image != self.animations['lem_climb']:
+                        obj.sprite.image = self.animations['lem_climb']
+                        obj.frame.new_image = obj.sprite.image
                 elif move_down and ladder_at_feet.ladder:
                     self.on_ladder = True
                     obj.vel.x = 0
                     obj.pos.y -= ladder_velocity * dt
+
+                    # switch sprite to ladder
+                    if obj.sprite.image != self.animations['lem_climb']:
+                        obj.sprite.image = self.animations['lem_climb']
+                        obj.frame.new_image = obj.sprite.image
                 elif move_up and on_ground:
                     jump_velocity = 350
                     obj.vel.y = jump_velocity
@@ -492,6 +504,13 @@ class Game(object):
                         obj.frame.new_image = obj.sprite.image
                 else:
                     self.jump_scheduled = False
+
+                if self.on_ladder and (not move_up and not move_down):
+                    # switch sprite to ladder, still
+                    if obj.sprite.image != self.animations['lem_climb_still']:
+                        obj.sprite.image = self.animations['lem_climb_still']
+                        obj.frame.new_image = obj.sprite.image
+
 
 
             # gravity
