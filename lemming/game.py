@@ -261,24 +261,42 @@ class Game(object):
         head_lemming.sprite.opacity = 255
         head_lemming.frame.prev_node = None
 
+    def handleExplosion(self, pos, vel, caused_by_self=False):
+        self.physical_objects.append(Game.PhysicsObject(pos, vel,
+            pyglet.sprite.Sprite(self.animations['explosion'], batch=self.batch_level, group=self.group_fg),
+            Vec2d(1, 1), self.animations['explosion'].get_duration()))
+
+        explosion_power = 4
+        it = Vec2d(0, 0)
+        block_pos = (pos / Game.tile_size).do(int)
+        for it.y in range(explosion_power * 2):
+            for it.x in range(explosion_power * 2):
+                pt = block_pos + it - Vec2d(explosion_power, explosion_power)
+                if pt.get_distance(block_pos) <= explosion_power:
+                    # affect block
+                    tile = self.getTile(pt)
+                    if tile.breakable:
+                        self.setTile(pt, self.tiles.enum.Air)
+
+        # see if we need to blow up any monsters
+        #for obj in self.physical_objects
+
     def update(self, dt):
         if self.control_lemming < len(self.lemmings):
             if self.explode_queued:
                 self.explode_queued = False
 
                 if self.held_by is not None:
-                    self.physical_objects.append(Game.PhysicsObject(self.held_by.pos+self.held_by.size / 2 * Game.tile_size, self.held_by.vel,
-                        pyglet.sprite.Sprite(self.animations['explosion'], batch=self.batch_level, group=self.group_fg),
-                        self.held_by.size, self.animations['explosion'].get_duration()))
+                    explosion_pos = self.held_by.pos+self.held_by.size / 2 * Game.tile_size
+                    self.handleExplosion(explosion_pos, self.held_by.vel, caused_by_self=True)
+
                     self.held_by.gone = True
                     self.held_by.sprite.delete()
                     self.held_by.sprite = None
                     self.held_by = None
                 else:
                     old_head_lemming = self.lemmings[self.control_lemming]
-                    self.physical_objects.append(Game.PhysicsObject(old_head_lemming.frame.pos,
-                        old_head_lemming.frame.vel, pyglet.sprite.Sprite(self.animations['explosion'], batch=self.batch_level, group=self.group_fg),
-                        Vec2d(1, 1), self.animations['explosion'].get_duration()))
+                    self.handleExplosion(old_head_lemming.frame.pos+Vec2d(0, 2), old_head_lemming.frame.vel, caused_by_self=True)
 
                 self.detatchHeadLemming()
             elif self.detatch_queued and self.held_by is None:
@@ -447,9 +465,7 @@ class Game(object):
                             if obj == char:
                                 self.explode_queued = True
                             else:
-                                self.physical_objects.append(Game.PhysicsObject(obj.pos, obj.vel,
-                                    pyglet.sprite.Sprite(self.animations['explosion'], batch=self.batch_level, group=self.group_fg),
-                                    Vec2d(1, 1), self.animations['explosion'].get_duration()))
+                                self.handleExplosion(block * Game.tile_size, Vec2d(0, 0))
                                 obj.gone = True
                                 obj.sprite.delete()
                                 obj.sprite = None
