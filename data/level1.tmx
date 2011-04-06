@@ -142,7 +142,7 @@
  </tileset>
  <layer name="Main" width="200" height="70">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3db0vkMBSF8XHE/wi+UL//R5WhKFJ6m/Q2vecmfX5wYNFdTJqcHd10upfLMd4aBYjwYOQo9AM9oR+AjX4ANvoB2OgHYOu1Hx+VeTQC1Oi1H++VsXrj9Vz5OTo5hl77YY27Nk8dBHq99uPrBIFedD9eg+IZBzBHP+gHbGfpx33FOLDsqh6A0Fn6UTMOTK6znBn9oB839GEZ/aAfsNGP+j+zdjaIMY3aj9J9J94zu5f2l+QP/csnuh9ZfF78Z+/WPV2lcH7en7P24+bWEfUZOefnuZ25H0AJ/QBs9AOw0Q/ARj8Am9WP2vevtuT593/1mYH19e+Mjx95frLXlmupvu5RvGcAv1G/Z079Hj8r1mvwEddMcf2V56iR9vajdXoff2ku6jG1uv57/u7sqTvq9SitT+n5Burx0g9f9rzGRfZLvR6l9Sm99qvHu3WvqcfkGXPGeUR8755hnt71yTr+0lzUY2p1/dXjjNhba/NU3G/07Rh/5nuolqjH1OqeL/VeV/cDWKPe6/QDman3Ov1AZuq9Tj+QmXqv0w9kpt7r9AOZqfe6J977hOgHtlLvdXWANer9qQ6wRr0/1QHWqM/5o0I/ABv9AGz0A7DRD8BGPwAb/QBsVj+yPCcDUFKdr8yf/Q9kpOpHi9egnp4TgxhX49deqn60ypk64n1moepZh9bX3frx/59b+j1Hzk+9v7O8FrX8mejon90iMtocvdR7O1O8/2/aPOp5tEiJenyt5zPKPElMStTjaz2fUeZJYlKiHl/r+YwyTxKTEvX4Ws9nlHmSmJSo35dx1HMh59TrQHIGE/U6kJzBRL0OJGcwUa8DyRlM1OtAcgYT9TqQnMFEvQ4kZ0r30Kjvp4qKeh0IIYQQQgghhBBi5wcGEf36wNoAAA==
+   H4sIAAAAAAAAA+3d7UorMRSF4VLR4weCP47e/6VKGRQZupN0dydrJ/M+sED0iEmTdapmOp5OfbwFBRjh0Ugv9AMzoR+AjX4ANvoB2OgHYJu1Hx+NeTICtJi1H++NsXrj9dz4MTq5hln7YY27Nf8mCPRm7cfnAQK90f14HRTPOIA9+kE/YDtKPx4axoHrzuoBCB2lHy3jwOa8y5HRD/pxQR+uox/0Azb60f45pbNBrGnVftSuO/Ge2b3EPyS/6F8+o/uRxf+T/+zduqarFs7P53PUflxcOtLr7LvWMc7P53DkfvRU6t6XcFy4Df0AbPQDsNEPwEY/AJvVj9bXr0by/P5ffWag/vqRbpnLSvMu8Z4B/ET9mjn1a/w8c1GPK+LxV56jjnRvP6Iz+/hb5qIeV8Tjf8//nTN1R70etfWp3d9APV764cs9z3Ej+6Vej9r61J771eP17DX1uDxjzjaHEd+7Z5ind32yjr9lLupxRTz+6nGO2FuleSru1+G57qLnNVS97j+iHlfENV/qva7uB1Ci3uv0A5mp9zr9QGbqvU4/kJl6r9MPZKbe6/QDman3uieeMxP6AQ/1XlcHKFHvT3WAEvX+VAcoUZ/zjwr9AGz0A7DRD8BGPwAb/QBs9AOwWf3Icp8MQEl1vrK/9z+QkaofEc9BM90nBmOcjbe9VP2IypE64r1noepeh9bXvfX9fz927d/0nJ96f2d5Lor8maj3z24jstocvdR7O1O8fzdtH/U8IlKjHl/0fFaZJxmTGvX4ouezyjzJmNSoxxc9n1XmScakRj2+6PmsMk8yJjXq12X0ui/knnodSM5go14HkjPYqNeB5Aw26nUgOYONeh1IzmCjXgeSM9io14HkTO0aGvX1VKOiXgdCCCGEEEIIIYTY+QYWAdxIwNoAAA==
   </data>
  </layer>
  <layer name="Ladders" width="200" height="70">
@@ -163,23 +163,29 @@
     <property name="text" value="Watch out for those land mines!"/>
    </properties>
   </object>
-  <object name="Start Point" type="StartPoint" x="1840" y="352" width="80" height="64"/>
+  <object name="Start Point" type="StartPoint" x="48" y="704" width="80" height="64"/>
   <object name="Monster" type="Agent" x="1680" y="352" width="64" height="64">
    <properties>
     <property name="type" value="monster"/>
    </properties>
   </object>
-  <object name="bridge" type="Bridge" x="1296" y="320" width="80" height="80">
+  <object name="bridge" type="Bridge" x="1296" y="336" width="96" height="96">
    <properties>
-    <property name="button_id" value="0"/>
+    <property name="button_id" value="bridge"/>
+    <property name="down_img" value="bridge_down.png"/>
+    <property name="state" value="up"/>
+    <property name="up_img" value="bridge_up.png"/>
    </properties>
   </object>
   <object type="Button" gid="14" x="704" y="96">
    <properties>
-    <property name="button_id" value="0"/>
+    <property name="button_id" value="bridge"/>
+    <property name="delay" value="2"/>
+    <property name="down_img" value="button_down.png"/>
+    <property name="up_img" value="button_up.png"/>
    </properties>
   </object>
-  <object name="winnar" type="Victory" x="0" y="304" width="160" height="96"/>
+  <object name="winnar" type="Victory" x="0" y="288" width="160" height="112"/>
   <object name="winnar sign" type="Decoration" x="48" y="368" width="80" height="32">
    <properties>
     <property name="img" value="winnar.png"/>
@@ -188,12 +194,24 @@
   <object name="helper text - movement" type="Text" x="240" y="544" width="350" height="88">
    <properties>
     <property name="font_size" value="18"/>
-    <property name="text" value="Use the arrow keys to move around and SPACE jump."/>
+    <property name="text" value="Use the arrow keys to move around and jump."/>
    </properties>
   </object>
   <object name="house decoration" type="Decoration" x="0" y="528" width="224" height="240">
    <properties>
     <property name="animation" value="house"/>
+   </properties>
+  </object>
+  <object name="helper text - explode" type="Text" x="1600" y="192" width="368" height="128">
+   <properties>
+    <property name="font_size" value="18"/>
+    <property name="text" value="You can press '2' to suicide bomb. This can destroy blocks and monsters."/>
+   </properties>
+  </object>
+  <object name="helper text" type="Text" x="2656" y="480" width="224" height="112">
+   <properties>
+    <property name="font_size" value="18"/>
+    <property name="text" value="hmmmmmmm... how are you going to get up there?"/>
    </properties>
   </object>
  </objectgroup>

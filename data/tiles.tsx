@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tileset name="default" tilewidth="16" tileheight="16">
- <image source="tiles.png" width="64" height="80"/>
+ <image source="tiles.png" width="64" height="96"/>
  <tile id="0">
   <properties>
    <property name="name" value="DirtRampRight"/>
    <property name="ramp" value="1"/>
+   <property name="solid" value="1"/>
   </properties>
  </tile>
  <tile id="1">
@@ -51,6 +52,7 @@
   <properties>
    <property name="name" value="DirtRampLeft"/>
    <property name="ramp" value="-1"/>
+   <property name="solid" value="1"/>
   </properties>
  </tile>
  <tile id="9">
@@ -64,6 +66,12 @@
   <properties>
    <property name="name" value="Stone"/>
    <property name="solid" value="1"/>
+  </properties>
+ </tile>
+ <tile id="11">
+  <properties>
+   <property name="ladder" value="1"/>
+   <property name="name" value="Ladder"/>
   </properties>
  </tile>
  <tile id="12">
@@ -104,6 +112,29 @@
  <tile id="18">
   <properties>
    <property name="name" value="DeadBodyRight"/>
+   <property name="solid" value="1"/>
+  </properties>
+ </tile>
+ <tile id="19">
+  <properties>
+   <property name="name" value="BottomLeftDirtCorner"/>
+  </properties>
+ </tile>
+ <tile id="20">
+  <properties>
+   <property name="name" value="DirtBottom"/>
+   <property name="solid" value="1"/>
+  </properties>
+ </tile>
+ <tile id="21">
+  <properties>
+   <property name="name" value="BottomRightDirtCorner"/>
+  </properties>
+ </tile>
+ <tile id="22">
+  <properties>
+   <property name="breakable" value="1"/>
+   <property name="name" value="BreakableDirt"/>
    <property name="solid" value="1"/>
   </properties>
  </tile>

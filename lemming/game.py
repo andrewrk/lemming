@@ -36,6 +36,11 @@ def abs_min(a, b):
         return a
     return b
 
+class mdict(dict):
+    def __setitem__(self, key, value):
+        """add the given value to the list of values for this key"""
+        self.setdefault(key, []).append(value)
+
 class Game(object):
     class Control:
         MoveLeft = 0
@@ -104,6 +109,65 @@ class Game(object):
                     self.grabbing = True
                     self.game.getGrabbedBy(self)
 
+    class Bridge(object):
+        def __init__(self, pos, size, state, up_sprite, down_sprite):
+            self.pos = pos
+            self.size = size
+            self.state = state
+            self.up_sprite = up_sprite
+            self.down_sprite = down_sprite
+
+            self.toggle()
+            self.toggle()
+
+        def toggle(self):
+            if self.state == 'up':
+                self.state = 'down'
+                self.up_sprite.visible = False
+                self.down_sprite.visible = True
+            else:
+                self.state = 'up'
+                self.up_sprite.visible = True
+                self.down_sprite.visible = False
+
+        def solidAt(self, pos):
+            rel_pos = pos - self.pos
+            if self.state == 'up':
+                return rel_pos.x == self.size.x - 1 and rel_pos.y >= 0 and rel_pos.y < self.size.y
+            else: # down
+                return rel_pos.y == 0 and rel_pos.x >= 0 and rel_pos.x < self.size.x
+            
+    class Button(object):
+        def __init__(self, pos, button_id, up_sprite, down_sprite, delay, game):
+            self.pos = pos
+            self.button_id = button_id
+            self.up_sprite = up_sprite
+            self.down_sprite = down_sprite
+            self.delay = delay
+            self.game = game
+            self.changeState(False)
+
+        def hit(self):
+            if self.state_down:
+                return
+
+            self.changeState(True)
+            self.game.hitButtonId(self.button_id)
+
+            def goBackUp(dt):
+                self.changeState(False)
+            pyglet.clock.schedule_once(goBackUp, self.delay)
+
+        def changeState(self, value):
+            self.state_down = value
+            if self.state_down:
+                self.up_sprite.visible = False
+                self.down_sprite.visible = True
+            else:
+                self.up_sprite.visible = True
+                self.down_sprite.visible = False
+
+
     target_fps = 60
     tile_size = None
     lemming_count = 9
@@ -169,14 +233,16 @@ class Game(object):
             pyglet.window.key.UP: Game.Control.MoveUp,
             pyglet.window.key.DOWN: Game.Control.MoveDown,
             pyglet.window.key._1: Game.Control.BellyFlop,
-            pyglet.window.key._2: Game.Control.Freeze,
-            pyglet.window.key._3: Game.Control.Explode,
+            pyglet.window.key._2: Game.Control.Explode,
+            pyglet.window.key._3: Game.Control.Freeze,
         }
 
     def __init__(self):
         self.level = None
         self.physical_objects = []
-
+        self.button_responders = mdict()
+        self.buttons = {}
+        self.victory = {}
 
         self.batch_bg2 = pyglet.graphics.Batch()
         self.batch_bg1 = pyglet.graphics.Batch()
@@ -330,6 +396,9 @@ class Game(object):
                     Vec2d(4, 1), can_pick_up_stuff=True, is_belly_flop=True, direction=direction))
 
                 self.detatchHeadLemming()
+        else:
+            # TODO: handle game over
+            print("Game Over")
 
         # add more lemmings
         while self.plus_ones_queued > 0 and self.control_lemming > 0:
@@ -387,31 +456,31 @@ class Game(object):
                 new_feet_block = (new_pos / Game.tile_size).do(int)
                 tile_there = self.getTile(new_feet_block)
 
-                for x in range(obj_size.x):
-                    # ramps
-                    if tile_there.ramp == -1:
-                        new_pos.y = new_feet_block.y * self.level.tileheight + self.level.tileheight
-                        vel.y = 0
-                        return
-                    elif self.getTile(Vec2d(new_feet_block.x+1, new_feet_block.y)).ramp == 1:
-                        new_pos.y = new_feet_block.y * self.level.tileheight + self.level.tileheight
+                # ramps
+                if tile_there.ramp == -1:
+                    new_pos.y = new_feet_block.y * self.level.tileheight + self.level.tileheight
+                    vel.y = 0
+                    return
+                elif self.getTile(Vec2d(new_feet_block.x+1, new_feet_block.y)).ramp == 1:
+                    new_pos.y = new_feet_block.y * self.level.tileheight + self.level.tileheight
+                    vel.y = 0
+                    return
+
+                if vel.y != 0:
+                    block_solid = self.getBlockIsSolid(new_feet_block)
+                    # resolve feet collisions
+                    if block_solid:
+                        new_pos.y = (new_feet_block.y+1)*self.level.tileheight
                         vel.y = 0
                         return
 
-                    if vel.y != 0:
-                        # resolve feet collisions
-                        if tile_there.solid:
-                            new_pos.y = (new_feet_block.y+1)*self.level.tileheight
-                            vel.y = 0
-                            return
-
-                        # resolve head collisions
-                        new_head_block = new_feet_block + Vec2d(0, 3)
-                        tile_there = self.getTile(new_head_block)
-                        if tile_there.solid:
-                            new_pos.y = (new_head_block.y-1-3)*self.level.tileheight
-                            vel.y = 0
-                            return
+                    # resolve head collisions
+                    new_head_block = new_feet_block + Vec2d(0, obj_size.y - 1)
+                    block_solid = self.getBlockIsSolid(new_head_block)
+                    if block_solid:
+                        new_pos.y = (new_head_block.y-1-3)*self.level.tileheight
+                        vel.y = 0
+                        return
 
             def resolve_x(new_pos, vel, obj_size):
                 if self.on_ladder:
@@ -424,8 +493,8 @@ class Game(object):
                     new_feet_block = (Vec2d(new_pos.x+adjust_x, new_pos.y) / Game.tile_size).do(int)
                     for y in range(obj_size.y):
                         new_body_block = Vec2d(new_feet_block.x, new_feet_block.y + y)
-                        tile_there = self.getTile(new_body_block)
-                        if tile_there.solid:
+                        block_solid = self.getBlockIsSolid(new_body_block)
+                        if block_solid:
                             new_pos.x = (new_feet_block.x-sign(vel.x))*self.level.tilewidth
                             vel.x = 0
                             return
@@ -479,6 +548,22 @@ class Game(object):
                                 self.handleExplosion(block * Game.tile_size, Vec2d(0, 0))
                                 obj.delete()
                             self.setTile(block, self.tiles.enum.Air)
+
+                        # buttons
+                        button_to_activate = None
+                        try:
+                            button_to_activate = self.buttons[tuple(block)]
+                        except KeyError:
+                            pass
+                        if button_to_activate is not None:
+                            button_to_activate.hit()
+
+                        # victory
+                        if self.isVictory(block):
+                            # TODO: handle level beaten
+                            print("beat level")
+                            pass
+
 
                 # spikes
                 if tile_at_feet.spike:
@@ -695,6 +780,17 @@ class Game(object):
         except IndexError:
             return self.tiles.info[self.tiles.enum.Air]
 
+    def getBlockIsSolid(self, block_pos):
+        tile_there = self.getTile(block_pos)
+        if tile_there.solid:
+            return True
+
+        # check if there is an object filling this role
+        for button_id, obj_list in self.button_responders.iteritems():
+            for obj in obj_list:
+                if obj.solidAt(block_pos):
+                    return True
+
     def setTile(self, block_pos, tile_id):
         self.level.layers[0].content2D[block_pos.x][block_pos.y] = tile_id
         if tile_id == 0:
@@ -709,6 +805,14 @@ class Game(object):
     def garbage_collect(self, dt):
         if self.physical_objects is not None:
             self.physical_objects = filter(lambda obj: not obj.gone, self.physical_objects)
+    
+    def hitButtonId(self, button_id):
+        try:
+            responders = self.button_responders[button_id]
+        except KeyError:
+            return
+        for responder in responders:
+            responder.toggle()
 
     def createWindow(self):
         self.window = pyglet.window.Window(width=853, height=480, vsync=False)
@@ -796,6 +900,32 @@ class Game(object):
                     if obj.properties['type'] == 'monster':
                         self.physical_objects.append(Game.Monster(Vec2d(obj.x, translate_y(obj.y, obj.height)),
                             (Vec2d(obj.width, obj.height) / Game.tile_size).do(int), group, self.batch_level, self))
+                elif obj.type == 'Bridge':
+                    up_img = pyglet.resource.image(obj.properties['up_img'])
+                    down_img = pyglet.resource.image(obj.properties['down_img'])
+                    bridge_pos = Vec2d(obj.x, translate_y(obj.y, obj.height))
+                    bridge_pos_grid = (bridge_pos / Game.tile_size).do(int)
+                    bridge_size = (Vec2d(obj.width, obj.height) / Game.tile_size).do(int)
+                    self.button_responders[obj.properties['button_id']] = Game.Bridge(bridge_pos_grid, bridge_size,
+                        obj.properties['state'],
+                        pyglet.sprite.Sprite(up_img, x=bridge_pos.x, y=bridge_pos.y, batch=self.batch_level, group=group),
+                        pyglet.sprite.Sprite(down_img, x=bridge_pos.x, y=bridge_pos.y, batch=self.batch_level, group=group))
+                elif obj.type == 'Button':
+                    up_img = pyglet.resource.image(obj.properties['up_img'])
+                    down_img = pyglet.resource.image(obj.properties['down_img'])
+                    button_pos = Vec2d(obj.x, translate_y(obj.y, obj.height))
+                    button_pos_grid = (button_pos / Game.tile_size).do(int)
+                    self.buttons[tuple(button_pos_grid)] = Game.Button(button_pos_grid, obj.properties['button_id'],
+                        pyglet.sprite.Sprite(up_img, x=button_pos.x, y=button_pos.y, batch=self.batch_level, group=group),
+                        pyglet.sprite.Sprite(down_img, x=button_pos.x, y=button_pos.y, batch=self.batch_level, group=group),
+                        float(obj.properties['delay']), self)
+                elif obj.type == 'Victory':
+                    pos = (Vec2d(obj.x, translate_y(obj.y, obj.height)) / Game.tile_size).do(int)
+                    size = (Vec2d(obj.width, obj.height) / Game.tile_size).do(int)
+                    it = Vec2d(0, 0)
+                    for it.y in range(pos.y, pos.y+size.y):
+                        for it.x in range(pos.x, pos.x+size.x):
+                            self.victory[tuple(it)] = True
 
         if not had_start_point:
             assert False, "Level missing start point."
@@ -804,6 +934,9 @@ class Game(object):
             print("Level was missing PlayerLayer")
             self.group_char = pyglet.graphics.OrderedGroup(self.getNextGroupNum())
         self.group_fg = pyglet.graphics.OrderedGroup(self.getNextGroupNum())
+
+    def isVictory(self, block):
+        return self.victory.has_key(tuple(block))
 
     def execute(self):
         self.createWindow()
