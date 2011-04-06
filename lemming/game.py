@@ -257,6 +257,8 @@ class Game(object):
         self.batch_bg1 = pyglet.graphics.Batch()
         self.batch_level = pyglet.graphics.Batch()
 
+        self.player = pyglet.media.Player()
+
         self.loadConfig()
 
     def getDesiredScroll(self, point):
@@ -954,6 +956,17 @@ class Game(object):
             print("Level was missing PlayerLayer")
             self.group_char = pyglet.graphics.OrderedGroup(self.getNextGroupNum())
         self.group_fg = pyglet.graphics.OrderedGroup(self.getNextGroupNum())
+
+        # load bg music
+        try:
+            bg_music_file = self.level.properties['bg_music']
+        except KeyError:
+            bg_music_file = None
+        if bg_music_file is not None:
+            self.bg_music = pyglet.resource.media(bg_music_file)
+            self.player.queue(self.bg_music)
+            self.player.eos_action = pyglet.media.Player.EOS_LOOP
+            self.player.play()
 
     def isVictory(self, block):
         return self.victory.has_key(tuple(block))
