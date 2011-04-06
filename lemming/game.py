@@ -273,10 +273,21 @@ class Game(object):
             # collision with solid blocks
             new_pos = obj.pos + obj.vel * dt
             def resolve_y(new_pos, vel):
+                new_feet_block = (new_pos / Game.tile_size).do(int)
+                tile_there = self.getTile(new_feet_block)
+
+                # ramps
+                if tile_there.ramp == -1:
+                    new_pos.y = new_feet_block.y * self.level.tileheight + self.level.tileheight
+                    vel.y = 0
+                    return
+                elif self.getTile(Vec2d(new_feet_block.x+1, new_feet_block.y)).ramp == 1:
+                    new_pos.y = new_feet_block.y * self.level.tileheight + self.level.tileheight
+                    vel.y = 0
+                    return
+
                 if vel.y != 0:
                     # resolve feet collisions
-                    new_feet_block = (new_pos / Game.tile_size).do(int)
-                    tile_there = self.getTile(new_feet_block)
                     if tile_there.solid:
                         new_pos.y = (new_feet_block.y+1)*self.level.tileheight
                         vel.y = 0
@@ -304,6 +315,8 @@ class Game(object):
                             vel.x = 0
                             return
             # try resolving the collision both ways (y then x, x then y) and choose the one that results in the most velocity
+            #if self.control_state[Game.Control.MoveLeft]:
+            #    import pdb; pdb.set_trace()
             x_first_new_pos = Vec2d(new_pos)
             x_first_new_vel = Vec2d(obj.vel)
             resolve_x(x_first_new_pos, x_first_new_vel)

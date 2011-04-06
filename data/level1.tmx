@@ -6,6 +6,7 @@
    <properties>
     <property name="name" value="DirtRampRight"/>
     <property name="ramp" value="1"/>
+    <property name="solid" value="1"/>
    </properties>
   </tile>
   <tile id="1">
@@ -52,6 +53,7 @@
    <properties>
     <property name="name" value="DirtRampLeft"/>
     <property name="ramp" value="-1"/>
+    <property name="solid" value="1"/>
    </properties>
   </tile>
   <tile id="9">

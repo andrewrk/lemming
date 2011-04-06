@@ -35,6 +35,7 @@ class TileSet(object):
             'solid': _bool,
             'spike': _bool,
             'mine': _bool,
+            'ramp': int,
         }
         _enum = {}
         self.info[0] = loose_obj({'id': 0, 'name': 'Air'})
