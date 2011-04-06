@@ -68,6 +68,13 @@ class Game(object):
             self.can_pick_up_stuff = can_pick_up_stuff
             self.is_belly_flop = is_belly_flop
             self.direction = direction
+            self.explodable = False
+
+        def delete(self):
+            self.gone = True
+            if self.sprite is not None:
+                self.sprite.delete()
+                self.sprite = None
 
         def think(self, dt):
             pass
@@ -87,6 +94,7 @@ class Game(object):
                 x=pos.x, y=pos.y, group=group, batch=batch), size)
             self.game = game
             self.grabbing = False
+            self.explodable = True
 
         def think(self, dt):
             if self.game.control_lemming < len(self.game.lemmings):
@@ -279,7 +287,14 @@ class Game(object):
                         self.setTile(pt, self.tiles.enum.Air)
 
         # see if we need to blow up any monsters
-        #for obj in self.physical_objects
+        for obj in self.physical_objects:
+            if obj.gone:
+                continue
+            if obj.explodable:
+                if (obj.pos + (obj.size * Game.tile_size) / 2).get_distance(pos) <= explosion_power * self.level.tilewidth:
+                    # kill monster
+                    obj.delete()
+
 
     def update(self, dt):
         if self.control_lemming < len(self.lemmings):
@@ -290,9 +305,7 @@ class Game(object):
                     explosion_pos = self.held_by.pos+self.held_by.size / 2 * Game.tile_size
                     self.handleExplosion(explosion_pos, self.held_by.vel, caused_by_self=True)
 
-                    self.held_by.gone = True
-                    self.held_by.sprite.delete()
-                    self.held_by.sprite = None
+                    self.held_by.delete()
                     self.held_by = None
                 else:
                     old_head_lemming = self.lemmings[self.control_lemming]
@@ -362,9 +375,7 @@ class Game(object):
             if obj.life is not None:
                 obj.life -= dt
                 if obj.life <= 0:
-                    obj.gone = True
-                    obj.sprite.delete()
-                    obj.sprite = None
+                    obj.delete()
                     continue
 
             # collision with solid blocks
@@ -466,9 +477,7 @@ class Game(object):
                                 self.explode_queued = True
                             else:
                                 self.handleExplosion(block * Game.tile_size, Vec2d(0, 0))
-                                obj.gone = True
-                                obj.sprite.delete()
-                                obj.sprite = None
+                                obj.delete()
                             self.setTile(block, self.tiles.enum.Air)
 
                 # spikes
@@ -476,9 +485,7 @@ class Game(object):
                     if obj == char:
                         self.detatch_queued = True
                     else:
-                        obj.gone = True
-                        obj.sprite.delete()
-                        obj.sprite = None
+                        obj.delete()
                     self.setTile(block_at_feet, self.tiles.enum.DeadBodyMiddle)
                     self.setTile(block_at_feet+Vec2d(1,0), self.tiles.enum.DeadBodyRight)
                     self.setTile(block_at_feet+Vec2d(-1,0), self.tiles.enum.DeadBodyLeft)
@@ -606,10 +613,7 @@ class Game(object):
                 self.setTile(block_at_feet+Vec2d(1, 1), self.tiles.enum.DeadBodyRight)
                 self.setTile(block_at_feet+Vec2d(-1, 1), self.tiles.enum.DeadBodyLeft)
                 
-                obj.gone = True
-                if obj.sprite is not None:
-                    obj.sprite.delete()
-                    obj.sprite = None
+                obj.delete()
 
         if char is not None:
             char.frame.pos = char.pos
