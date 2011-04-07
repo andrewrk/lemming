@@ -4,6 +4,7 @@ import pyglet
 
 import mainmenu
 import levelplayer
+import winscreen
 import os
 
 levels = [
@@ -48,16 +49,19 @@ class Game(object):
         self.clearCurrentScreen()
         self.current_level += 1
         self.save()
+        self.setScreenToCurrentLevel()
+        self.current_screen.start()
+
+    def setScreenToCurrentLevel(self):
         if self.current_level == len(levels):
-            self.current_screen = WinScreen(self)
+            self.current_screen = winscreen.WinScreen(self)
         else:
             self.current_screen = levelplayer.LevelPlayer(self, pyglet.resource.file(levels[self.current_level]))
-        self.current_screen.start()
 
     def startPlaying(self):
         self.clearCurrentScreen()
         if self.level_filename is None:
-            self.current_screen = levelplayer.LevelPlayer(self, pyglet.resource.file(levels[self.current_level]))
+            self.setScreenToCurrentLevel()
         else:
             self.current_screen = levelplayer.LevelPlayer(self, open(self.level_filename, 'rb'))
         self.current_screen.start()

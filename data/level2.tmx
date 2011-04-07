@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" width="200" height="100" tilewidth="16" tileheight="16">
+<map version="1.0" orientation="orthogonal" width="250" height="100" tilewidth="16" tileheight="16">
  <tileset firstgid="1" source="tiles.tsx"/>
- <layer name="Tile Layer 1" width="200" height="100">
+ <layer name="Tile Layer 1" width="250" height="100">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3cOQ6DMBQEUJosB8hy/5smdIkU0jAG/P2eND2MNA0GpgkAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAL5dwoFKTuFAJbd37qE8Nr52AAAAgNl1w7CN9JlHb+cfLe9/9G4rSD3P/ZUetLz/0bsFAAAAAAAAAPjknblj8V5Yxto+nn/CftL/Ehj1nwNr+1jaRsWuemIfGYlO7ON47COjxT6qdtUT+8jQVU32kaGrmvbax7lY7KOmvb9vFN+AAgAAAAAAAAAAAADMXnzSDTOAOAEA
+   H4sIAAAAAAAAA+3cSQ7CMBAEwFxYHsDy/5/CAwAJue2M4yqp7/FIfbIz2wYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAbS7hAPWcwgHqub1zD+Ux+NsBAAAAgDVcBwb+kb4zn+3+vOf5Vwq1pe7RPmUGPc+/UgAAAAAAAAAAAABm4d8KevBeP6N1Hs8fgVbpnYWr7jZsnce3jh9xVoyn5xmJmeg5veh5Ro+eH3VWjKfnGWZFZXqeYVZUtlfPzweLnlPZ3ntyxC4hAAAAAAAAAAAAAAAAAGAOL0pGMpGghgEA
   </data>
  </layer>
- <layer name="Ladders" width="200" height="100">
+ <layer name="Ladders" width="250" height="100">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3TMREAIBDAsBeAf70o6MQAxyUKunQGAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADOrNsB8DB/QPMHNH9A8wc0f0DzBzR/QPMHNH9A8wc0f0DzBzR/QPMHNH9A8wc0f0DzBzR/QPMHAAAAAAAAAAAAAAAAAAAAAMB/NvdlfJSAOAEA
+   H4sIAAAAAAAAA+3TQQ0AIBDAsBOAf72oAMLSKthnMwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABw13odABznc+jzOfT5HPp8Dn0+hz6fQ5/Poc/n0Odz6PM59Pkc+nwOfT6HPp9Dn8+hz+fQ53Po8zn0+Rz6fA4AAAAAAAAAAAAAAAAAAAAAAAAAAAB/2DHptueghgEA
   </data>
  </layer>
- <objectgroup name="Object Layer 1" width="200" height="100">
+ <objectgroup name="Object Layer 1" width="250" height="100">
   <object name="monster" type="Agent" x="400" y="1040" width="64" height="64">
    <properties>
     <property name="type" value="monster"/>
@@ -45,6 +45,12 @@
     <property name="type" value="monster"/>
    </properties>
   </object>
+  <object type="Decoration" x="3424" y="1008" width="80" height="32">
+   <properties>
+    <property name="img" value="winnar.png"/>
+   </properties>
+  </object>
+  <object type="Victory" x="3424" y="912" width="80" height="128"/>
  </objectgroup>
- <objectgroup name="PlayerLayer" width="200" height="100"/>
+ <objectgroup name="PlayerLayer" width="250" height="100"/>
 </map>
