@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="200" height="70" tilewidth="16" tileheight="16">
+ <properties>
+  <property name="bg_music" value="music/silly.mp3"/>
+ </properties>
  <tileset firstgid="1" source="tiles.tsx"/>
  <layer name="Main" width="200" height="70">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3d7UorMRSF4VLR4weCP47e/6VKGRQZupN0dydrJ/M+sED0iEmTdapmOp5OfbwFBRjh0Ugv9AMzoR+AjX4ANvoB2OgHYJu1Hx+NeTICtJi1H++NsXrj9dz4MTq5hln7YY27Nf8mCPRm7cfnAQK90f14HRTPOIA9+kE/YDtKPx4axoHrzuoBCB2lHy3jwOa8y5HRD/pxQR+uox/0Azb60f45pbNBrGnVftSuO/Ge2b3EPyS/6F8+o/uRxf+T/+zduqarFs7P53PUflxcOtLr7LvWMc7P53DkfvRU6t6XcFy4Df0AbPQDsNEPwEY/AJvVj9bXr0by/P5ffWag/vqRbpnLSvMu8Z4B/ET9mjn1a/w8c1GPK+LxV56jjnRvP6Iz+/hb5qIeV8Tjf8//nTN1R70etfWp3d9APV764cs9z3Ej+6Vej9r61J771eP17DX1uDxjzjaHEd+7Z5ind32yjr9lLupxRTz+6nGO2FuleSru1+G57qLnNVS97j+iHlfENV/qva7uB1Ci3uv0A5mp9zr9QGbqvU4/kJl6r9MPZKbe6/QDman3uieeMxP6AQ/1XlcHKFHvT3WAEvX+VAcoUZ/zjwr9AGz0A7DRD8BGPwAb/QBs9AOwWf3Icp8MQEl1vrK/9z+QkaofEc9BM90nBmOcjbe9VP2IypE64r1noepeh9bXvfX9fz927d/0nJ96f2d5Lor8maj3z24jstocvdR7O1O8fzdtH/U8IlKjHl/0fFaZJxmTGvX4ouezyjzJmNSoxxc9n1XmScakRj2+6PmsMk8yJjXq12X0ui/knnodSM5go14HkjPYqNeB5Aw26nUgOYONeh1IzmCjXgeSM9io14HkTO0aGvX1VKOiXgdCCCGEEEIIIYTY+QYWAdxIwNoAAA==
+   H4sIAAAAAAAAA+3d7UokMRSE4WHEbwR/qPd/qTI0ijR9kphOTp0k7wMFy7rrJJOUo5ue3sulj9dGATzcG+mFfmAk9AOw0Q/ARj8AG/0AbKP2470wD0aAEqP2460wVm9qPRV+jE7OYdR+WOMuzeMAgd6o/fhcINDz7seLU2rGAezRD/oB2yr9uCsYB45d1QMQWqUfJePA5rrLyugH/bihD8foB/2AjX6U/53U2SDmNGs/cted1J7ZPbd/Sn7Rv3i8+xHFx6X+7N26pisXzs/Hs2o/bnI9OHP23eJzQ2/lftxeQ6y9+RX4c8PPyv0AcugHYKMfgI1+ADarH6XvX22p5t//1WcG6sdvrXQ+s83bUnsG8BP1e+Z6PZ76vYPR37eoPEf1dLYfreM9/lGel2hrcOZr50jdUa9Fbm1y9zegH3H7kcqZ1zfPfqnXIrc2udf9XntB/TxEWoOIz4/H9+4R5lmzNi3HP8rzEm0N1GP02FupeSru11Fz3UXqOo4z1zip712iTAn1Xlf3A0hR73X6gcjUe51+IDL1XqcfiEy91+kHIlPvdfqByNR7vSY1Zyb0AzXUe10dIEW9P9UBUtT7Ux0gRX3G7xX6AdjoB2CjH4CNfgA2+gHY6Adgs/oR4R4ZgJrqfGV/738gIlU/WrwGjXSfGPi4Gr+upepHq6zUkdp7FqrudWg97n9//+/Hjv5Mz/mp93eU16KWPxP1/tnNI7PNsZZ6b0dK7f+bto96Hi2Sox5f6/nMMk/ikxz1+FrPZ5Z5Ep/kqMfXej6zzJP4JEc9vtbzmWWexCc56vdl9Lgn5BH1OpCYwUa9DiRmsFGvA4kZbNTrQGIGG/U6kJjBRr0OJGawUa8DiZncNTTq66m8ol4HQgghhBBCCCGE2PkGSp352sDaAAA=
   </data>
  </layer>
  <layer name="Ladders" width="200" height="70">
@@ -24,13 +27,13 @@
     <property name="text" value="Watch out for those land mines!"/>
    </properties>
   </object>
-  <object name="Start Point" type="StartPoint" x="48" y="704" width="80" height="64"/>
+  <object name="Start Point" type="StartPoint" x="64" y="704" width="80" height="64"/>
   <object name="Monster" type="Agent" x="1680" y="352" width="64" height="64">
    <properties>
     <property name="type" value="monster"/>
    </properties>
   </object>
-  <object name="bridge" type="Bridge" x="1296" y="336" width="96" height="96">
+  <object name="bridge" type="Bridge" x="928" y="336" width="96" height="96">
    <properties>
     <property name="button_id" value="bridge"/>
     <property name="down_img" value="bridge_down.png"/>

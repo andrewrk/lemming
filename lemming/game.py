@@ -9,6 +9,7 @@ import pyglet
 import sys
 import itertools
 import math
+import random
 
 import os
 
@@ -162,9 +163,11 @@ class Game(object):
 
             self.changeState(True)
             self.game.hitButtonId(self.button_id)
+            self.game.sfx['button_click'].play()
 
             def goBackUp(dt):
                 self.changeState(False)
+                self.game.sfx['button_unclick'].play()
             pyglet.clock.schedule_once(goBackUp, self.delay)
 
         def changeState(self, value):
@@ -186,6 +189,35 @@ class Game(object):
         val = self.next_group_num
         self.next_group_num += 1
         return val
+
+    def loadSoundEffects(self):
+        self.sfx = {
+            'blast': pyglet.resource.media('sound/blast.mp3', streaming=False),
+            'button_click': pyglet.resource.media('sound/button_click.mp3', streaming=False),
+            'button_unclick': pyglet.resource.media('sound/button_unclick.mp3', streaming=False),
+            'coin_pickup': pyglet.resource.media('sound/coin_pickup.mp3', streaming=False),
+            'game_over': pyglet.resource.media('sound/game_over.mp3', streaming=False),
+            'gunshot': pyglet.resource.media('sound/gunshot.mp3', streaming=False),
+            'jump': pyglet.resource.media('sound/jump.mp3', streaming=False),
+            'ladder': pyglet.resource.media('sound/ladder.mp3', streaming=False),
+            'level_start': pyglet.resource.media('sound/level_start.mp3', streaming=False),
+            'mine_beep': pyglet.resource.media('sound/mine_beep.mp3', streaming=False),
+            'running': pyglet.resource.media('sound/running.mp3', streaming=False),
+            'spike_death': pyglet.resource.media('sound/spike_death.mp3', streaming=False),
+            'weee': pyglet.resource.media('sound/weee.mp3', streaming=False),
+            'winnar': pyglet.resource.media('sound/winnar.mp3', streaming=False),
+            'woopee': pyglet.resource.media('sound/woopee.mp3', streaming=False),
+        }
+        self.running_sound_player = pyglet.media.Player()
+        self.running_sound_player.eos_action = pyglet.media.Player.EOS_LOOP
+
+    def setRunningSound(self, source):
+        if source is None:
+            self.running_sound_player.pause()
+        else:
+            self.running_sound_player.next()
+            self.running_sound_player.queue(source)
+            self.running_sound_player.play()
 
     def loadImages(self):
         # load animations
@@ -257,7 +289,9 @@ class Game(object):
         self.batch_bg1 = pyglet.graphics.Batch()
         self.batch_level = pyglet.graphics.Batch()
 
-        self.player = pyglet.media.Player()
+        self.bg_music_player = pyglet.media.Player()
+        self.bg_music_player.eos_action = pyglet.media.Player.EOS_LOOP
+        self.bg_music_player.volume = 0.50
 
         self.loadConfig()
 
@@ -282,6 +316,7 @@ class Game(object):
         self.control_lemming = 0
         self.on_ladder = False
         self.held_by = None
+        self.handled_victory = False
 
         self.explode_queued = False # true when the user presses the button until an update happens
         self.bellyflop_queued = False
@@ -314,6 +349,8 @@ class Game(object):
         pyglet.clock.schedule_interval(self.garbage_collect, 10)
         self.fps_display = pyglet.clock.ClockDisplay()
 
+        self.sfx['level_start'].play()
+
     def getGrabbedBy(self, monster):
         self.lemmings[self.control_lemming].frame.vel = Vec2d(0, 0)
         self.lemmings[self.control_lemming].sprite.visible = False
@@ -333,6 +370,8 @@ class Game(object):
                 monster.grabbing = False
             pyglet.clock.schedule_once(not_grabbing, 2)
             monster.sprite.remove_handler('on_animation_end', reset_animation)
+
+            self.sfx[['weee', 'woopee'][random.randint(0, 1)]].play()
         monster.sprite.set_handler('on_animation_end', reset_animation)
 
     def detatchHeadLemming(self):
@@ -343,6 +382,8 @@ class Game(object):
 
         self.control_lemming += 1
         if self.control_lemming == len(self.lemmings):
+            # game over
+            self.handleGameOver()
             return
         head_lemming = self.lemmings[self.control_lemming]
 
@@ -350,6 +391,7 @@ class Game(object):
         head_lemming.frame.prev_node = None
 
     def handleExplosion(self, pos, vel, caused_by_self=False):
+        self.sfx['blast'].play()
         self.physical_objects.append(Game.PhysicsObject(pos, vel,
             pyglet.sprite.Sprite(self.animations['explosion'], batch=self.batch_level, group=self.group_fg),
             Vec2d(1, 1), self.animations['explosion'].get_duration()))
@@ -375,6 +417,13 @@ class Game(object):
                     # kill monster
                     obj.delete()
 
+    def handleGameOver(self):
+        self.bg_music_player.pause()
+        self.sfx['game_over'].play()
+
+    def handleVictory(self):
+        self.bg_music_player.pause()
+        self.sfx['winnar'].play()
 
     def update(self, dt):
         if self.control_lemming < len(self.lemmings):
@@ -410,9 +459,8 @@ class Game(object):
                     Vec2d(4, 1), can_pick_up_stuff=True, is_belly_flop=True, direction=direction))
 
                 self.detatchHeadLemming()
-        else:
-            # TODO: handle game over
-            print("Game Over")
+
+                self.sfx[['weee', 'woopee'][random.randint(0, 1)]].play()
 
         # add more lemmings
         while self.plus_ones_queued > 0 and self.control_lemming > 0:
@@ -537,6 +585,9 @@ class Game(object):
             tile_at_feet = self.getTile(block_at_feet)
             on_ground = tile_at_feet.solid
 
+            if not on_ground and not self.on_ladder:
+                self.setRunningSound(None)
+
             if obj.can_pick_up_stuff:
                 # item pickups
                 corner_block = (obj.pos / Game.tile_size).do(int)
@@ -552,8 +603,14 @@ class Game(object):
                             if tile.id == self.tiles.enum.PlusOne:
                                 self.plus_ones_queued += 1
                                 self.setTile(block, self.tiles.enum.Air)
+
+                                sfx_player = self.sfx['coin_pickup'].play()
+                                sfx_player.pitch = 2 - (len(self.lemmings) - self.control_lemming - 1) / len(self.lemmings)
                             elif tile.id == self.tiles.enum.PlusForever:
                                 self.plus_ones_queued = self.control_lemming
+
+                                sfx_player = self.sfx['coin_pickup'].play()
+                                sfx_player.pitch = 1
                         # land mine
                         if tile.mine:
                             if obj == char:
@@ -562,6 +619,7 @@ class Game(object):
                                 self.handleExplosion(block * Game.tile_size, Vec2d(0, 0))
                                 obj.delete()
                             self.setTile(block, self.tiles.enum.Air)
+                            self.sfx['mine_beep'].play()
 
                         # buttons
                         button_to_activate = None
@@ -573,11 +631,9 @@ class Game(object):
                             button_to_activate.hit()
 
                         # victory
-                        if self.isVictory(block):
-                            # TODO: handle level beaten
-                            print("beat level")
-                            pass
-
+                        if self.isVictory(block) and not self.handled_victory:
+                            self.handled_victory = True
+                            self.handleVictory()
 
                 # spikes
                 if tile_at_feet.spike:
@@ -588,6 +644,8 @@ class Game(object):
                     self.setTile(block_at_feet, self.tiles.enum.DeadBodyMiddle)
                     self.setTile(block_at_feet+Vec2d(1,0), self.tiles.enum.DeadBodyRight)
                     self.setTile(block_at_feet+Vec2d(-1,0), self.tiles.enum.DeadBodyLeft)
+
+                    self.sfx['spike_death'].play()
 
             if obj == char:
                 # scroll the level
@@ -634,6 +692,8 @@ class Game(object):
                         if obj.sprite.image != self.animations['-lem_run']:
                             obj.sprite.image = self.animations['-lem_run']
                             obj.frame.new_image = obj.sprite.image
+
+                            self.setRunningSound(self.sfx['running'])
                 elif move_right and not move_left:
                     if obj.vel.x + acceleration * dt > max_speed:
                         obj.vel.x = max_speed
@@ -645,12 +705,16 @@ class Game(object):
                         if obj.sprite.image != self.animations['lem_run']:
                             obj.sprite.image = self.animations['lem_run']
                             obj.frame.new_image = obj.sprite.image
+
+                            self.setRunningSound(self.sfx['running'])
                 else:
                     if on_ground:
                         # switch sprite to still
                         if obj.sprite.image != self.animations['lem_crazy']:
                             obj.sprite.image = self.animations['lem_crazy']
                             obj.frame.new_image = obj.sprite.image
+
+                            self.setRunningSound(None)
                 ladder_velocity = 200
                 if move_up and ladder_at_feet.ladder:
                     self.on_ladder = True
@@ -662,6 +726,8 @@ class Game(object):
                     if obj.sprite.image != self.animations['lem_climb']:
                         obj.sprite.image = self.animations['lem_climb']
                         obj.frame.new_image = obj.sprite.image
+
+                        self.setRunningSound(self.sfx['ladder'])
                 elif move_down and ladder_at_feet.ladder:
                     self.on_ladder = True
                     obj.vel.x = 0
@@ -671,6 +737,8 @@ class Game(object):
                     if obj.sprite.image != self.animations['lem_climb']:
                         obj.sprite.image = self.animations['lem_climb']
                         obj.frame.new_image = obj.sprite.image
+
+                        self.setRunningSound(self.sfx['ladder'])
                 elif move_up and on_ground:
                     jump_velocity = 350
                     obj.vel.y = jump_velocity
@@ -682,6 +750,9 @@ class Game(object):
                     if obj.sprite.image != self.animations[animation_name]:
                         obj.sprite.image = self.animations[animation_name]
                         obj.frame.new_image = obj.sprite.image
+
+                        self.sfx['jump'].play()
+                        self.setRunningSound(None)
                 else:
                     self.jump_scheduled = False
 
@@ -690,6 +761,8 @@ class Game(object):
                     if obj.sprite.image != self.animations['lem_climb_still']:
                         obj.sprite.image = self.animations['lem_climb_still']
                         obj.frame.new_image = obj.sprite.image
+
+                        self.setRunningSound(None)
 
 
 
@@ -741,7 +814,13 @@ class Game(object):
         if control == Game.Control.Explode:
             self.explode_queued = True
         elif control == Game.Control.BellyFlop:
-            self.bellyflop_queued = True
+            char = self.lemmings[self.control_lemming]
+            block_at_feet = (Vec2d(char.frame.pos.x + self.level.tilewidth / 2, char.frame.pos.y-1) / Game.tile_size).do(int)
+            tile_at_feet = self.getTile(block_at_feet)
+            on_ground = tile_at_feet.solid
+
+            if not on_ground:
+                self.bellyflop_queued = True
         elif control == Game.Control.Freeze:
             self.freeze_queued = True
 
@@ -829,7 +908,7 @@ class Game(object):
             responder.toggle()
 
     def createWindow(self):
-        self.window = pyglet.window.Window(width=853, height=480, vsync=False)
+        self.window = pyglet.window.Window(width=853, height=480)
         self.window.set_handler('on_draw', self.on_draw)
         self.window.set_handler('on_key_press', self.on_key_press)
         self.window.set_handler('on_key_release', self.on_key_release)
@@ -839,6 +918,7 @@ class Game(object):
         self.level.load(tiledtmxloader.ImageLoaderPyglet())
 
         self.loadImages()
+        self.loadSoundEffects()
 
         self.tiles = TileSet(self.level.tile_sets[0])
 
@@ -963,10 +1043,9 @@ class Game(object):
         except KeyError:
             bg_music_file = None
         if bg_music_file is not None:
-            self.bg_music = pyglet.resource.media(bg_music_file)
-            self.player.queue(self.bg_music)
-            self.player.eos_action = pyglet.media.Player.EOS_LOOP
-            self.player.play()
+            self.bg_music = pyglet.resource.media(bg_music_file, streaming=True)
+            self.bg_music_player.queue(self.bg_music)
+            self.bg_music_player.play()
 
     def isVictory(self, block):
         return self.victory.has_key(tuple(block))
