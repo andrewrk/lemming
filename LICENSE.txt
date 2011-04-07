@@ -1,1 +1,13 @@
 Licence: BSD
+
+Spike Death Sound
+http://soundbible.com/1008-Decapitation.html
+Attribution 3.0
+
+Blast Sound
+http://soundbible.com/538-Blast.html
+Attribution 3.0
+
+Gunshot Sound
+http://soundbible.com/1547-M1-Garand-Single.html
+Attribution 3.0
