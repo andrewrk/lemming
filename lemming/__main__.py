@@ -7,6 +7,7 @@ def main():
     parser = OptionParser("see --help for options")
     parser.add_option("-l", "--level", dest="level", help="level")
     parser.add_option('-n', '--novbo', action='store_true', help='Disable the use of VBOs (buggy/slow on some drivers)', default=False)
+    parser.add_option('-f', '--fps', action='store_true', help='Display FPS counter for profiling purposes.', default=False)
 
     options, args = parser.parse_args()
 
@@ -20,9 +21,9 @@ def main():
         vertexdomain.create_attribute_usage = create_attribute_usage
     
     if options.level:
-        game = Game()
+        game = Game(show_fps=options.fps)
         game.start(options.level)
     else:
-        game = Game()
+        game = Game(show_fps=options.fps)
         game.start()
 

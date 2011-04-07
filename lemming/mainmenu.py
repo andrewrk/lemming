@@ -58,6 +58,7 @@ class MainMenu(Screen):
         self.game.window.set_handler('on_key_press', self.on_key_press)
 
         pyglet.clock.schedule_interval(self.update, 1/game.target_fps)
+
         self.fps_display = pyglet.clock.ClockDisplay()
 
     def clear(self):
@@ -77,7 +78,8 @@ class MainMenu(Screen):
     def on_draw(self):
         self.game.window.clear()
         self.batch.draw()
-        self.fps_display.draw()
+        if self.game.show_fps:
+            self.fps_display.draw()
 
     def update(self, dt):
         self.sprite_arrow.set_position(*(self.arrow_positions[self.arrow_position][0] + Vec2d(-44, 0)))

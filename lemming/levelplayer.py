@@ -895,7 +895,8 @@ class LevelPlayer(Screen):
         # hud
         pyglet.gl.glLoadIdentity()
         self.batch_static.draw()
-        self.fps_display.draw()
+        if self.game.show_fps:
+            self.fps_display.draw()
 
     def blockAt(self, abs_pt):
         return (abs_pt / tile_size).do(int)
