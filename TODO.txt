@@ -1,6 +1,5 @@
 Day 5:
  * advancing levels
- * game over, starts level over
  * save progress on quit so user can continue
 
 Day 6:
@@ -19,6 +18,7 @@ Bugs:
  * physics bug - falling into the ground
  * belly flop physics are off by one
  * win sound sucks
+ * don't call game over until the belly flop turns to dead body
  * start level sound unecessary with music
  * animate the title screen
 

@@ -313,10 +313,13 @@ class LevelPlayer(Screen):
         return scroll
 
     def clear(self):
-        self.window.remove_handlers()
+        self.game.window.remove_handlers()
 
         pyglet.clock.unschedule(self.update)
         pyglet.clock.unschedule(self.garbage_collect)
+
+        self.bg_music_player.pause()
+        self.bg_music_player = None
 
     def start(self):
         self.load()
@@ -439,6 +442,9 @@ class LevelPlayer(Screen):
     def handleGameOver(self):
         self.bg_music_player.pause()
         self.sfx['game_over'].play()
+        def restart(dt):
+            self.game.restartLevel()
+        pyglet.clock.schedule_once(restart, 4)
 
     def handleVictory(self):
         self.bg_music_player.pause()
@@ -840,6 +846,10 @@ class LevelPlayer(Screen):
             self.control_state[control] = True
         except KeyError:
             return
+
+        if self.control_lemming >= len(self.lemmings):
+            return
+
         if control == Control.Explode:
             self.explode_queued = True
         elif control == Control.BellyFlop:

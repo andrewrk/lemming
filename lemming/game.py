@@ -56,3 +56,7 @@ class Game(object):
     def clearCurrentScreen(self):
         if self.current_screen is not None:
             self.current_screen.clear()
+
+    def restartLevel(self):
+        print("restarting level")
+        self.startPlaying()
