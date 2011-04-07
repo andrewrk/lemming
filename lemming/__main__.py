@@ -1,5 +1,4 @@
-from __future__ import division, print_function, unicode_literals
-range = xrange
+from __future__ import division, print_function, unicode_literals; range = xrange
 
 from optparse import OptionParser
 from game import Game
@@ -22,8 +21,8 @@ def main():
     
     if options.level:
         game = Game()
-        game.load(options.level)
-        game.execute()
+        game.start(options.level)
     else:
-        print("must supply a level for now with -l")
+        game = Game()
+        game.start()
 
