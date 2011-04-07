@@ -220,9 +220,8 @@ class LevelPlayer(Screen):
 
     def loadImages(self):
         # load animations
-        fd = pyglet.resource.file('animations.txt')
-        animations_txt = fd.read()
-        fd.close()
+        with pyglet.resource.file('animations.txt') as fd:
+            animations_txt = fd.read()
         lines = animations_txt.split('\n')
         self.animations = {}
         self.animation_offset = {}
@@ -320,6 +319,23 @@ class LevelPlayer(Screen):
 
         self.bg_music_player.pause()
         self.bg_music_player = None
+
+        self.lemmings = None
+        self.control_state = None
+
+        self.level = None
+        self.physical_objects = None
+        self.button_responders = None
+        self.buttons = None
+        self.victory = None
+
+        self.batch_bg2 = None
+        self.batch_bg1 = None
+        self.batch_level = None
+        self.batch_static = None
+
+        self.running_sound_player.pause()
+        self.running_sound_player = None
 
     def start(self):
         self.load()
@@ -449,6 +465,9 @@ class LevelPlayer(Screen):
     def handleVictory(self):
         self.bg_music_player.pause()
         self.sfx['winnar'].play()
+        def goNext(dt):
+            self.game.gotoNextLevel()
+        pyglet.clock.schedule_once(goNext, 4)
 
     def update(self, dt):
         if self.control_lemming < len(self.lemmings):

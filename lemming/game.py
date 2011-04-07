@@ -30,6 +30,10 @@ class Game(object):
             fd.write(self.current_level)
 
     def gotoNextLevel(self):
+        if self.level_filename is not None:
+            self.startPlaying()
+            return
+
         self.clearCurrentScreen()
         self.current_level += 1
         if self.current_level == len(levels):
@@ -40,11 +44,15 @@ class Game(object):
 
     def startPlaying(self):
         self.clearCurrentScreen()
-        self.current_screen = levelplayer.LevelPlayer(self, pyglet.resource.file(levels[self.current_level]))
+        if self.level_filename is None:
+            self.current_screen = levelplayer.LevelPlayer(self, pyglet.resource.file(levels[self.current_level]))
+        else:
+            self.current_screen = levelplayer.LevelPlayer(self, open(self.level_filename, 'rb'))
         self.current_screen.start()
 
     def start(self, level_filename=None):
         self.window = pyglet.window.Window(width=853, height=480)
+        self.level_filename = level_filename
         if level_filename is None:
             self.current_screen = mainmenu.MainMenu(self)
             self.current_screen.start()
@@ -58,5 +66,5 @@ class Game(object):
             self.current_screen.clear()
 
     def restartLevel(self):
-        print("restarting level")
         self.startPlaying()
+
