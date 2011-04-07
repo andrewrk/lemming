@@ -933,8 +933,7 @@ class Game(object):
         self.window.set_handler('on_key_release', self.on_key_release)
 
     def load(self, level_filename):
-        self.level = tiledtmxloader.TileMapParser().parse_decode(level_filename)
-        self.level.load(tiledtmxloader.ImageLoaderPyglet())
+        self.level = tiledtmxloader.TileMapParser().parse_decode_load(open(level_filename, 'rb'), tiledtmxloader.ImageLoaderPyglet())
 
         self.loadImages()
         self.loadSoundEffects()
