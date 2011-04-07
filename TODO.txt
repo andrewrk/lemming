@@ -1,7 +1,7 @@
 Day 5:
- * menu system and title screen
- * game over
  * make FPS display a command line arg
+ * advancing levels
+ * game over, starts level over
  * save progress on quit so user can continue
 
 Day 6:
@@ -21,6 +21,7 @@ Bugs:
  * belly flop physics are off by one
  * win sound sucks
  * start level sound unecessary with music
+ * animate the title screen
 
 Brainstorming:
  * physics
