@@ -1,5 +1,5 @@
 Day 5:
- * save progress on quit so user can continue
+ * credits screen
 
 Day 6:
  * implement as many gameplay ideas as possible

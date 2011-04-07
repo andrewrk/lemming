@@ -4,6 +4,7 @@ import pyglet
 
 import mainmenu
 import levelplayer
+import os
 
 levels = [
     'level1.tmx',
@@ -11,6 +12,7 @@ levels = [
 ]
 
 target_fps = 60
+
 
 class Game(object):
     def __init__(self, width=853, height=480, show_fps=False):
@@ -20,14 +22,23 @@ class Game(object):
         self.width = width
         self.height = height
         self.show_fps = show_fps
+        self.save_filename = os.path.join(pyglet.resource.get_script_home(), 'save_game')
 
     def load(self):
-        with open('save_game', 'rb') as fd:
-            self.current_level = int(fd.read())
+        try:
+            with open(self.save_filename, 'r') as fd:
+                self.current_level = int(fd.read())
+        except IOError:
+            self.current_level = 0
+        except ValueError:
+            self.current_level = 0
     
     def save(self):
-        with open('save_game', 'rb') as fd:
-            fd.write(self.current_level)
+        try:
+            with open(self.save_filename, 'w') as fd:
+                fd.write(str(self.current_level))
+        except IOError:
+            print("Unable to save game, IOError")
 
     def gotoNextLevel(self):
         if self.level_filename is not None:
@@ -36,6 +47,7 @@ class Game(object):
 
         self.clearCurrentScreen()
         self.current_level += 1
+        self.save()
         if self.current_level == len(levels):
             self.current_screen = WinScreen(self)
         else:
