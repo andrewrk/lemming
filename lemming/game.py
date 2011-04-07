@@ -641,9 +641,19 @@ class Game(object):
                         self.detatch_queued = True
                     else:
                         obj.delete()
-                    self.setTile(block_at_feet, self.tiles.enum.DeadBodyMiddle)
-                    self.setTile(block_at_feet+Vec2d(1,0), self.tiles.enum.DeadBodyRight)
-                    self.setTile(block_at_feet+Vec2d(-1,0), self.tiles.enum.DeadBodyLeft)
+                    if obj.is_belly_flop:
+                        self.setTile(block_at_feet, self.tiles.enum.DeadBodyMiddle)
+                        self.setTile(block_at_feet+Vec2d(1,0), self.tiles.enum.DeadBodyRight)
+                        self.setTile(block_at_feet+Vec2d(-1,0), self.tiles.enum.DeadBodyLeft)
+                    else:
+                        self.setTile(block_at_feet, self.tiles.enum.DeadBodyMiddle)
+
+                        negate = ''
+                        if obj.vel.x < 0:
+                            negate = '-'
+                        self.physical_objects.append(Game.PhysicsObject(obj.pos, Vec2d(0,0),
+                            pyglet.sprite.Sprite(self.animations[negate+'lem_die'], batch=self.batch_level, group=self.group_fg),
+                            obj.size, self.animations['lem_die'].get_duration()))
 
                     self.sfx['spike_death'].play()
 
@@ -814,13 +824,16 @@ class Game(object):
         if control == Game.Control.Explode:
             self.explode_queued = True
         elif control == Game.Control.BellyFlop:
-            char = self.lemmings[self.control_lemming]
-            block_at_feet = (Vec2d(char.frame.pos.x + self.level.tilewidth / 2, char.frame.pos.y-1) / Game.tile_size).do(int)
-            tile_at_feet = self.getTile(block_at_feet)
-            on_ground = tile_at_feet.solid
-
-            if not on_ground:
+            if self.held_by is not None:
                 self.bellyflop_queued = True
+            else:
+                char = self.lemmings[self.control_lemming]
+                block_at_feet = (Vec2d(char.frame.pos.x + self.level.tilewidth / 2, char.frame.pos.y-1) / Game.tile_size).do(int)
+                tile_at_feet = self.getTile(block_at_feet)
+                on_ground = tile_at_feet.solid
+
+                if not on_ground:
+                    self.bellyflop_queued = True
         elif control == Game.Control.Freeze:
             self.freeze_queued = True
 

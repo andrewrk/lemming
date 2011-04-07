@@ -6,7 +6,6 @@ Day 5:
 Day 6:
  * implement as many gameplay ideas as possible
  * create as many levels as possible exploring those concepts
- * bg music
 
 Day 7:
  * make sure it works on windows and mac
@@ -14,6 +13,10 @@ Day 7:
 
 Bugs:
  * ladder bug - you can go into the ground
+ * physics bug - falling into the ground
+ * belly flop physics are off by one
+ * win sound sucks
+ * start level sound unecessary with music
 
 Brainstorming:
  * physics
