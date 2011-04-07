@@ -255,6 +255,8 @@ class Game(object):
         self.img_bg = pyglet.resource.image("background.png")
         self.img_bg_hill = pyglet.resource.image("hill.png")
 
+        self.img_hud = pyglet.resource.image('hud.png')
+
         self.sprite_bg_left = pyglet.sprite.Sprite(self.img_bg, batch=self.batch_bg2)
         self.sprite_bg_right = pyglet.sprite.Sprite(self.img_bg, batch=self.batch_bg2)
 
@@ -288,6 +290,7 @@ class Game(object):
         self.batch_bg2 = pyglet.graphics.Batch()
         self.batch_bg1 = pyglet.graphics.Batch()
         self.batch_level = pyglet.graphics.Batch()
+        self.batch_static = pyglet.graphics.Batch()
 
         self.bg_music_player = pyglet.media.Player()
         self.bg_music_player.eos_action = pyglet.media.Player.EOS_LOOP
@@ -350,6 +353,8 @@ class Game(object):
         self.fps_display = pyglet.clock.ClockDisplay()
 
         self.sfx['level_start'].play()
+
+        self.sprite_hud = pyglet.sprite.Sprite(self.img_hud, batch=self.batch_static, x=0, y=self.window.height-self.img_hud.height)
 
     def getGrabbedBy(self, monster):
         self.lemmings[self.control_lemming].frame.vel = Vec2d(0, 0)
@@ -873,8 +878,9 @@ class Game(object):
         pyglet.gl.glTranslatef(floored_scroll.x, floored_scroll.y, 0.0)
         self.batch_level.draw()
 
-        # fps display
+        # hud
         pyglet.gl.glLoadIdentity()
+        self.batch_static.draw()
         self.fps_display.draw()
 
     def blockAt(self, abs_pt):

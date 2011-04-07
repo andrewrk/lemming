@@ -1,5 +1,4 @@
 Day 5:
- * HUD
  * menu system and title screen
  * game over
 
@@ -17,6 +16,7 @@ Bugs:
  * belly flop physics are off by one
  * win sound sucks
  * start level sound unecessary with music
+ * make FPS display a command line arg
 
 Brainstorming:
  * physics
