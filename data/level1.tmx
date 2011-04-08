@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="200" height="70" tilewidth="16" tileheight="16">
  <properties>
+  <property name="bg_art" value="background.png"/>
   <property name="bg_music" value="music/silly.mp3"/>
+  <property name="fg_art" value="hill.png"/>
  </properties>
  <tileset firstgid="1" source="tiles.tsx"/>
  <layer name="Main" width="200" height="70">

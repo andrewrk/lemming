@@ -250,22 +250,32 @@ class LevelPlayer(Screen):
             self.animation_offset[animation] = Vec2d(-int(off_x), -int(off_y))
             self.animation_offset[rev_animation] = Vec2d(int(off_x)+self.level.tilewidth, -int(off_y))
 
-        self.img_bg = pyglet.resource.image("background.png")
-        self.img_bg_hill = pyglet.resource.image("hill.png")
-
+        
         self.img_hud = pyglet.resource.image('hud.png')
 
-        self.sprite_bg_left = pyglet.sprite.Sprite(self.img_bg, batch=self.batch_bg2)
-        self.sprite_bg_right = pyglet.sprite.Sprite(self.img_bg, batch=self.batch_bg2)
 
-        self.sprite_hill_left = pyglet.sprite.Sprite(self.img_bg_hill, batch=self.batch_bg1)
-        self.sprite_hill_right = pyglet.sprite.Sprite(self.img_bg_hill, batch=self.batch_bg1)
+        if self.level.properties.has_key('bg_art'):
+            img = pyglet.resource.image(self.level.properties['bg_art'])
+            self.sprite_bg_left = pyglet.sprite.Sprite(img, batch=self.batch_bg2)
+            self.sprite_bg_right = pyglet.sprite.Sprite(img, batch=self.batch_bg2)
 
-        self.sprite_bg_left.set_position(0, 0)
-        self.sprite_bg_right.set_position(self.sprite_bg_left.width, 0)
+            self.sprite_bg_left.set_position(0, 0)
+            self.sprite_bg_right.set_position(self.sprite_bg_left.width, 0)
+        else:
+            self.sprite_bg_left = None
+            self.sprite_bg_right = None
 
-        self.sprite_hill_left.set_position(0, 0)
-        self.sprite_hill_right.set_position(self.sprite_hill_left.width, 0)
+            
+        if self.level.properties.has_key('fg_art'):
+            img = pyglet.resource.image(self.level.properties['fg_art'])
+            self.sprite_bg2_left = pyglet.sprite.Sprite(img, batch=self.batch_bg1)
+            self.sprite_bg2_right = pyglet.sprite.Sprite(img, batch=self.batch_bg1)
+
+            self.sprite_bg2_left.set_position(0, 0)
+            self.sprite_bg2_right.set_position(self.sprite_bg2_left.width, 0)
+        else:
+            self.sprite_bg2_left = None
+            self.sprite_bg2_right = None
 
     def loadConfig(self):
         self.controls = {
@@ -907,7 +917,7 @@ class LevelPlayer(Screen):
         self.batch_bg2.draw()
 
         # close background
-        close_bgpos = Vec2d(-((self.scroll.x * 0.5) % self.sprite_hill_left.width), -(self.scroll.y * 0.20))
+        close_bgpos = Vec2d(-((self.scroll.x * 0.5) % self.sprite_bg2_left.width), -(self.scroll.y * 0.20))
         if close_bgpos.y > 0:
             close_bgpos.y = 0
         close_bgpos.do(int)
