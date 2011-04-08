@@ -99,7 +99,7 @@ class Lemming(PhysicsObject):
         self.gone = False
 
 class Monster(PhysicsObject):
-    def __init__(self, pos, size, group, batch, game, direction):
+    def __init__(self, pos, size, group, batch, game, direction, throw_vel=None):
         if direction > 0:
             negate = ''
         else:
@@ -109,6 +109,10 @@ class Monster(PhysicsObject):
         self.game = game
         self.grabbing = False
         self.explodable = True
+        if throw_vel is None:
+            self.throw_vel = Vec2d(600*direction, 600)
+        else:
+            self.throw_vel = throw_vel
 
     def think(self, dt):
         if self.game.control_lemming < len(self.game.lemmings):
@@ -121,7 +125,7 @@ class Monster(PhysicsObject):
 
             if get_him and (player_pos.y == my_pos.y or player_pos.y == my_pos.y + 1) and not self.grabbing:
                 self.grabbing = True
-                self.game.getGrabbedBy(self)
+                self.game.getGrabbedBy(self, self.throw_vel)
 
 class Bridge(object):
     def __init__(self, pos, size, state, up_sprite, down_sprite):
@@ -399,7 +403,7 @@ class LevelPlayer(Screen):
 
         self.sprite_hud = pyglet.sprite.Sprite(self.img_hud, batch=self.batch_static, x=0, y=self.game.window.height-self.img_hud.height)
 
-    def getGrabbedBy(self, monster):
+    def getGrabbedBy(self, monster, throw_vel):
         self.lemmings[self.control_lemming].frame.vel = Vec2d(0, 0)
         self.lemmings[self.control_lemming].sprite.visible = False
         self.held_by = monster
@@ -411,7 +415,7 @@ class LevelPlayer(Screen):
         monster.sprite.image = self.animations[negate+'monster_throw']
         def reset_animation():
             monster.sprite.image = self.animations[negate+'monster_still']
-            self.lemmings[self.control_lemming].frame.vel = Vec2d(600*monster.direction, 600)
+            self.lemmings[self.control_lemming].frame.vel = throw_vel
             self.lemmings[self.control_lemming].sprite.visible = True
             self.held_by = None
             def not_grabbing(dt):
@@ -1068,9 +1072,13 @@ class LevelPlayer(Screen):
                         x_offset = 0
                     else:
                         x_offset = obj.width
+                    try:
+                        throw_vel = Vec2d(float(obj.properties['throw_vel_x']), float(obj.properties['throw_vel_y']))
+                    except KeyError:
+                        throw_vel = None
                     if obj.properties['type'] == 'monster':
                         self.physical_objects.append(Monster(Vec2d(obj.x+x_offset, translate_y(obj.y, obj.height)),
-                            (Vec2d(obj.width, obj.height) / tile_size).do(int), group, self.batch_level, self, direction))
+                            (Vec2d(obj.width, obj.height) / tile_size).do(int), group, self.batch_level, self, direction, throw_vel))
                 elif obj.type == 'Bridge':
                     up_img = pyglet.resource.image(obj.properties['up_img'])
                     down_img = pyglet.resource.image(obj.properties['down_img'])
