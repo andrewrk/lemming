@@ -14,17 +14,6 @@ import game
 
 import os
 
-# add data folder to pyglet resource path
-_this_py = os.path.abspath(os.path.dirname(__file__))
-_data_dir = os.path.normpath(os.path.join(_this_py, '..', 'data'))
-pyglet.resource.path = [_data_dir, 'data']
-pyglet.resource.reindex()
-
-# monkey patch pyglet to fix a resource loading bug
-slash_paths = filter(lambda x: x.startswith('/'), pyglet.resource._default_loader._index.keys())
-for path in slash_paths:
-    pyglet.resource._default_loader._index[path[1:]] = pyglet.resource._default_loader._index[path]
-
 def sign(n):
     if n > 0:
         return 1
@@ -98,6 +87,99 @@ class Lemming(PhysicsObject):
         self.frame = frame
         self.gone = False
 
+class Gunner(PhysicsObject):
+    def __init__(self, pos, size, group, batch, game):
+        super(Gunner, self).__init__(pos, Vec2d(0, 0), pyglet.sprite.Sprite(game.animations['gunner_still'],
+            x=pos.x, y=pos.y, group=group, batch=batch), size, direction=0)
+        self.game = game
+        self.explodable = True
+        self.can_shoot = True
+        self.shoot_delay = 2
+
+    def think(self, dt):
+        if self.game.control_lemming >= len(self.game.lemmings):
+            return
+
+        player_pos = (self.game.lemmings[self.game.control_lemming].pos / tile_size).do(int)
+        player_size = self.game.lemmings[self.game.control_lemming].size
+        my_pos = (self.pos / tile_size).do(int)
+
+        # if we can trace a path to lem then look at him
+        if self.game.control_state[Control.Freeze]:
+            import pdb; pdb.set_trace()
+        see_distance = 30
+        can_see = False
+        look_direction = sign(player_pos.x - my_pos.x)
+        eye_y = self.size.y - 1
+        for x in range(see_distance):
+            test_pos = Vec2d(my_pos.x + x * look_direction, my_pos.y + eye_y)
+            if self.game.getBlockIsSolid(test_pos):
+                break
+            if test_pos.x >= player_pos.x and test_pos.x < player_pos.x + player_size.x and test_pos.y >= player_pos.y and test_pos.y < player_pos.y + player_size.y:
+                can_see = True
+                break
+        if can_see:
+            self.changeDirection(look_direction)
+            self.wantToShoot()
+        else:
+            self.changeDirection(0)
+
+    def wantToShoot(self):
+        if not self.can_shoot:
+            return
+        self.can_shoot = False
+        def recharge(dt):
+            self.can_shoot = True
+        pyglet.clock.schedule_once(recharge, self.shoot_delay)
+
+        gun_offset = Vec2d(64*self.direction, 16)
+        bullet_init_vel = Vec2d(1100*self.direction, 200)
+        self.game.spawnBullet(self.pos+gun_offset, self.vel+bullet_init_vel)
+
+    def changeDirection(self, new_dir):
+        if new_dir == self.direction:
+            return
+        self.direction = new_dir
+        if self.direction < 0:
+            name = '-gunner_point'
+        elif self.direction > 0:
+            name = 'gunner_point'
+        else:
+            name = 'gunner_still'
+
+        self.sprite.image = self.game.animations[name]
+
+class Bullet(PhysicsObject):
+    def __init__(self, pos, vel, sprite, game):
+        max_bullet_life = 10
+        super(Bullet, self).__init__(pos, vel, sprite, Vec2d(1, 1), life=max_bullet_life)
+        self.game = game
+
+    def think(self, dt):
+        # if we're going too slow, die
+        die_threshold = 100
+        if abs(self.vel.x) < die_threshold:
+            self.delete()
+            return
+
+        if self.game.control_lemming >= len(self.game.lemmings):
+            return
+
+        # if we hit something solid, die
+        my_block = (self.pos / tile_size).do(int)
+        if self.game.getBlockIsSolid(my_block):
+            self.delete()
+            return
+
+        # test for hitting player
+        player_pos = (self.game.lemmings[self.game.control_lemming].pos / tile_size).do(int)
+        player_size = self.game.lemmings[self.game.control_lemming].size
+        if my_block.x >= player_pos.x and my_block.x < player_pos.x + player_size.x and my_block.y >= player_pos.y and my_block.y < player_pos.y + player_size.y:
+            self.game.hitByBullet()
+            self.delete()
+            return
+
+
 class Monster(PhysicsObject):
     def __init__(self, pos, size, group, batch, game, direction, throw_vel=None):
         if direction > 0:
@@ -154,6 +236,31 @@ class Bridge(object):
             return rel_pos.x == self.size.x - 1 and rel_pos.y >= 0 and rel_pos.y < self.size.y
         else: # down
             return rel_pos.y == 0 and rel_pos.x >= 0 and rel_pos.x < self.size.x
+
+class TrapDoor(object):
+    def __init__(self, pos, size, state, sprite):
+        self.pos = pos
+        self.size = size
+        self.state = state
+        self.sprite = sprite
+
+        self.toggle()
+        self.toggle()
+
+    def toggle(self):
+        if self.state == 'closed':
+            self.state = 'open'
+            self.sprite.visible = False
+        else:
+            self.state = 'closed'
+            self.sprite.visible = True
+
+    def solidAt(self, pos):
+        rel_pos = pos - self.pos
+        if self.state == 'open':
+            return False
+        else:
+            return rel_pos.y >= 0 and rel_pos.y < self.size.y and rel_pos.x >= 0 and rel_pos.x < self.size.x
         
 class Button(object):
     def __init__(self, pos, button_id, up_sprite, down_sprite, delay, game):
@@ -235,7 +342,7 @@ class LevelPlayer(Screen):
                 continue
             props, frames_txt = line.split('=')
 
-            name, delay, loop, off_x, off_y = props.strip().split(':')
+            name, delay, loop, off_x, off_y, size_x, size_y = props.strip().split(':')
             delay = float(delay.strip())
             loop = bool(int(loop.strip()))
 
@@ -252,10 +359,11 @@ class LevelPlayer(Screen):
             self.animations['-' + name.strip()] = rev_animation
 
             self.animation_offset[animation] = Vec2d(-int(off_x), -int(off_y))
-            self.animation_offset[rev_animation] = Vec2d(int(off_x)+self.level.tilewidth, -int(off_y))
+            self.animation_offset[rev_animation] = Vec2d(int(off_x) + int(size_x), -int(off_y))
 
         
         self.img_hud = pyglet.resource.image('hud.png')
+        self.img_bullet = pyglet.resource.image('bullet.png')
 
 
         if self.level.properties.has_key('bg_art'):
@@ -864,7 +972,11 @@ class LevelPlayer(Screen):
         # physical objects
         for obj in self.physical_objects:
             if not obj.gone:
-                pos = obj.pos + self.animation_offset[obj.sprite.image]
+                try:
+                    offset = self.animation_offset[obj.sprite.image]
+                except KeyError:
+                    offset = Vec2d(0, 0)
+                pos = obj.pos + offset
                 obj.sprite.set_position(*pos)
 
         # lemmings
@@ -1068,17 +1180,18 @@ class LevelPlayer(Screen):
                         direction = int(obj.properties['direction'])
                     except KeyError:
                         direction = 1
-                    if direction > 0:
-                        x_offset = 0
-                    else:
-                        x_offset = obj.width
-                    try:
-                        throw_vel = Vec2d(float(obj.properties['throw_vel_x']), float(obj.properties['throw_vel_y']))
-                    except KeyError:
-                        throw_vel = None
+
+                    pos = Vec2d(obj.x, translate_y(obj.y, obj.height))
+                    size = (Vec2d(obj.width, obj.height) / tile_size).do(int)
                     if obj.properties['type'] == 'monster':
-                        self.physical_objects.append(Monster(Vec2d(obj.x+x_offset, translate_y(obj.y, obj.height)),
-                            (Vec2d(obj.width, obj.height) / tile_size).do(int), group, self.batch_level, self, direction, throw_vel))
+                        try:
+                            throw_vel = Vec2d(float(obj.properties['throw_vel_x']), float(obj.properties['throw_vel_y']))
+                        except KeyError:
+                            throw_vel = None
+                        self.physical_objects.append(Monster(pos, size, group, self.batch_level, self, direction, throw_vel))
+                    elif obj.properties['type'] == 'gunner':
+                        self.physical_objects.append(Gunner(pos, size, group, self.batch_level, self))
+                            
                 elif obj.type == 'Bridge':
                     up_img = pyglet.resource.image(obj.properties['up_img'])
                     down_img = pyglet.resource.image(obj.properties['down_img'])
@@ -1089,6 +1202,14 @@ class LevelPlayer(Screen):
                         obj.properties['state'],
                         pyglet.sprite.Sprite(up_img, x=bridge_pos.x, y=bridge_pos.y, batch=self.batch_level, group=group),
                         pyglet.sprite.Sprite(down_img, x=bridge_pos.x, y=bridge_pos.y, batch=self.batch_level, group=group))
+                elif obj.type == 'TrapDoor':
+                    img = pyglet.resource.image(obj.properties['img'])
+                    pos = Vec2d(obj.x, translate_y(obj.y, obj.height))
+                    pos_grid = (pos / tile_size).do(int)
+                    size = (Vec2d(obj.width, obj.height) / tile_size).do(int)
+                    self.button_responders[obj.properties['button_id']] = TrapDoor(pos_grid, size,
+                        obj.properties['state'],
+                        pyglet.sprite.Sprite(img, x=pos.x, y=pos.y, batch=self.batch_level, group=group))
                 elif obj.type == 'Button':
                     up_img = pyglet.resource.image(obj.properties['up_img'])
                     down_img = pyglet.resource.image(obj.properties['down_img'])
@@ -1133,3 +1254,11 @@ class LevelPlayer(Screen):
 
         pyglet.app.run()
 
+    def spawnBullet(self, pos, vel):
+        self.physical_objects.append(Bullet(pos, vel, pyglet.sprite.Sprite(self.img_bullet, x=pos.x, y=pos.y, batch=self.batch_level, group=self.group_fg), self))
+
+        self.sfx['gunshot'].play()
+
+    def hitByBullet(self):
+        self.explode_queued = True
+        
