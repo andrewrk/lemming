@@ -883,85 +883,95 @@ class LevelPlayer(Screen):
             apply_belt_velocity = 0
 
             # collision with solid blocks
-            new_pos = obj.pos + obj.vel * dt
-            def resolve_y(new_pos, vel, obj_size):
-                if obj.on_ladder:
+            if obj.vel.x != 0 or obj.vel.y != 0:
+                new_pos = obj.pos + obj.vel * dt
+                def resolve_y(new_pos, vel, obj_size):
+                    if obj.on_ladder:
+                        return False
+
+                    new_feet_block = (new_pos / tile_size).do(int)
+                    tile_there = self.getTile(new_feet_block)
+
+                    # ramps
+                    if tile_there.ramp == -1:
+                        new_pos.y = new_feet_block.y * self.level.tileheight + self.level.tileheight
+                    elif self.getTile(Vec2d(new_feet_block.x+1, new_feet_block.y)).ramp == 1:
+                        new_pos.y = new_feet_block.y * self.level.tileheight + self.level.tileheight
+
+                    if vel.y > 0:
+                        # resolve head collisions
+                        for x in range(obj_size.x):
+                            new_head_block = Vec2d(new_feet_block.x+x, new_feet_block.y+obj_size.y)
+                            block_solid = self.getBlockIsSolid(new_head_block)
+                            if block_solid:
+                                new_pos.y = new_feet_block.y*self.level.tileheight
+                                vel.y = 0
+                                return True
+                    elif vel.y < 0:
+                        # resolve feet collisions
+                        for x in range(obj_size.x):
+                            block_solid = self.getBlockIsSolid(new_feet_block+Vec2d(x,0))
+                            if block_solid:
+                                new_pos.y = (new_feet_block.y+1)*self.level.tileheight
+                                vel.y = 0
+                                return True
+
                     return False
 
-                new_feet_block = (new_pos / tile_size).do(int)
-                tile_there = self.getTile(new_feet_block)
+                def resolve_x(new_pos, vel, obj_size):
+                    if obj.on_ladder:
+                        return False
 
-                # ramps
-                if tile_there.ramp == -1:
-                    new_pos.y = new_feet_block.y * self.level.tileheight + self.level.tileheight
-                elif self.getTile(Vec2d(new_feet_block.x+1, new_feet_block.y)).ramp == 1:
-                    new_pos.y = new_feet_block.y * self.level.tileheight + self.level.tileheight
+                    if vel.x < 0:
+                        new_feet_block = (new_pos / tile_size).do(int)
+                        for y in range(obj_size.y):
+                            new_body_block = Vec2d(new_feet_block.x, new_feet_block.y + y)
+                            block_solid = self.getBlockIsSolid(new_body_block)
+                            if block_solid:
+                                new_pos.x = (new_feet_block.x+1)*self.level.tilewidth
+                                vel.x = 0
+                                return True
+                    elif vel.x > 0:
+                        new_feet_block = (new_pos / tile_size).do(int)
+                        for y in range(obj_size.y):
+                            new_body_block = Vec2d(new_feet_block.x+obj_size.x, new_feet_block.y + y)
+                            block_solid = self.getBlockIsSolid(new_body_block)
+                            if block_solid:
+                                new_pos.x = new_feet_block.x*self.level.tilewidth
+                                vel.x = 0
+                                return True
+                        
 
-                if vel.y > 0:
-                    # resolve head collisions
-                    for x in range(obj_size.x):
-                        new_head_block = Vec2d(new_feet_block.x+x, new_feet_block.y+obj_size.y)
-                        block_solid = self.getBlockIsSolid(new_head_block)
-                        if block_solid:
-                            new_pos.y = new_feet_block.y*self.level.tileheight
-                            vel.y = 0
-                            return True
-                elif vel.y < 0:
-                    # resolve feet collisions
-                    for x in range(obj_size.x):
-                        block_solid = self.getBlockIsSolid(new_feet_block+Vec2d(x,0))
-                        if block_solid:
-                            new_pos.y = (new_feet_block.y+1)*self.level.tileheight
-                            vel.y = 0
-                            return True
-
-                return False
-
-            def resolve_x(new_pos, vel, obj_size):
-                if obj.on_ladder:
                     return False
 
-                if vel.x < 0:
-                    new_feet_block = (new_pos / tile_size).do(int)
-                    for y in range(obj_size.y):
-                        new_body_block = Vec2d(new_feet_block.x, new_feet_block.y + y)
-                        block_solid = self.getBlockIsSolid(new_body_block)
-                        if block_solid:
-                            new_pos.x = (new_feet_block.x+1)*self.level.tilewidth
-                            vel.x = 0
-                            return True
-                elif vel.x > 0:
-                    new_feet_block = (new_pos / tile_size).do(int)
-                    for y in range(obj_size.y):
-                        new_body_block = Vec2d(new_feet_block.x+obj_size.x, new_feet_block.y + y)
-                        block_solid = self.getBlockIsSolid(new_body_block)
-                        if block_solid:
-                            new_pos.x = new_feet_block.x*self.level.tilewidth
-                            vel.x = 0
-                            return True
-                    
+                # find the blocks that we would have passed through and do collision resolution on them, in order
+                vector_it = Vec2d(obj.pos)
+                unit_vector_vel = obj.vel / obj.vel.get_length()
+                while obj.pos.get_dist_sqrd(new_pos) > obj.pos.get_dist_sqrd(vector_it):
+                    vector_it += unit_vector_vel * (tile_size * 0.5)
 
-                return False
-            # try resolving the collision both ways (y then x, x then y) and choose the one that results in the most velocity
-            x_first_new_pos = Vec2d(new_pos)
-            x_first_new_vel = Vec2d(obj.vel)
-            resolve_x(x_first_new_pos, x_first_new_vel, obj.size)
-            resolve_y(x_first_new_pos, x_first_new_vel, obj.size)
+                    # try resolving the collision both ways (y then x, x then y) and choose the one that results in the most velocity
+                    x_first_new_pos = Vec2d(vector_it)
+                    x_first_new_vel = Vec2d(obj.vel)
+                    did_x = resolve_x(x_first_new_pos, x_first_new_vel, obj.size)
+                    did_y = resolve_y(x_first_new_pos, x_first_new_vel, obj.size)
 
-            y_first_new_pos = Vec2d(new_pos)
-            y_first_new_vel = Vec2d(obj.vel)
-            resolve_y(y_first_new_pos, y_first_new_vel, obj.size)
-            resolve_x(y_first_new_pos, y_first_new_vel, obj.size)
+                    if did_x or did_y:
+                        y_first_new_pos = Vec2d(vector_it)
+                        y_first_new_vel = Vec2d(obj.vel)
+                        resolve_y(y_first_new_pos, y_first_new_vel, obj.size)
+                        resolve_x(y_first_new_pos, y_first_new_vel, obj.size)
 
-            if x_first_new_vel.get_length_sqrd() > y_first_new_vel.get_length_sqrd():
-                new_pos = x_first_new_pos
-                obj.vel = x_first_new_vel
-            else:
-                new_pos = y_first_new_pos
-                obj.vel = y_first_new_vel
+                        if x_first_new_vel.get_length_sqrd() > y_first_new_vel.get_length_sqrd():
+                            new_pos = x_first_new_pos
+                            obj.vel = x_first_new_vel
+                        else:
+                            new_pos = y_first_new_pos
+                            obj.vel = y_first_new_vel
+                        break
 
-            # apply velocity to position
-            obj.pos = new_pos
+                # apply velocity to position
+                obj.pos = new_pos
 
             block_at_feet = (Vec2d(obj.pos.x + self.level.tilewidth / 2, obj.pos.y-1) / tile_size).do(int)
             tile_at_feet = self.getTile(block_at_feet)

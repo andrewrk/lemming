@@ -15,7 +15,7 @@ class WinScreen(Screen):
         self.bg_music_player = pyglet.media.Player()
         self.bg_music_player.eos_action = pyglet.media.Player.EOS_LOOP
         self.bg_music_player.volume = 0.50
-        self.bg_music = pyglet.resource.media('music/silly.mp3', streaming=True)
+        self.bg_music = pyglet.resource.media('music/glitch.mp3', streaming=True)
         self.bg_music_player.queue(self.bg_music)
         self.bg_music_player.play()
 
