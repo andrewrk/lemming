@@ -636,7 +636,7 @@ class TileMapParser(object):
         if hasattr(tile_set, "source"):
             tile_set = self._parse_tsx(tile_set.source, tile_set, world_map)
         else:
-            tile_set = self._get_tile_set(tile_set_node, tile_set, self.map_file_name)
+            tile_set = self._get_tile_set(tile_set_node, tile_set)
         world_map.tile_sets.append(tile_set)
 
     def _parse_tsx(self, file_name, tile_set, world_map):
@@ -648,19 +648,19 @@ class TileMapParser(object):
             if file:
                 file.close()
         for node in self._get_nodes(dom.childNodes, 'tileset'):
-            tile_set = self._get_tile_set(node, tile_set, file_name)
+            tile_set = self._get_tile_set(node, tile_set)
             break;
         return tile_set
 
-    def _get_tile_set(self, tile_set_node, tile_set, base_path):
+    def _get_tile_set(self, tile_set_node, tile_set):
         for node in self._get_nodes(tile_set_node.childNodes, u'image'):
-            self._build_tile_set_image(node, tile_set, base_path)
+            self._build_tile_set_image(node, tile_set)
         for node in self._get_nodes(tile_set_node.childNodes, u'tile'):
             self._build_tile_set_tile(node, tile_set)
         self._set_attributes(tile_set_node, tile_set)
         return tile_set
 
-    def _build_tile_set_image(self, image_node, tile_set, base_path):
+    def _build_tile_set_image(self, image_node, tile_set):
         image = TileImage()
         self._set_attributes(image_node, image)
         # id of TileImage has to be set!! -> Tile.TileImage will only have id set
