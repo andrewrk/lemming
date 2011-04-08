@@ -892,7 +892,7 @@ class LevelPlayer(Screen):
             else:
                 char = self.lemmings[self.control_lemming]
                 block_at_feet = (Vec2d(char.frame.pos.x + self.level.tilewidth / 2, char.frame.pos.y-1) / tile_size).do(int)
-                on_ground = self.solidAt(block_at_feet)
+                on_ground = self.getBlockIsSolid(block_at_feet)
 
                 if not on_ground:
                     self.bellyflop_queued = True
