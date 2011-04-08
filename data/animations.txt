@@ -20,7 +20,8 @@ gunner_still:0.1:1:16:0:32:64     = gunner/01.png
 gunner_point:0.1:1:16:0:32:64     = gunner/02.png
 gunner_shoot:0.1:0:16:0:32:64     = gunner/03.png, gunner/04.png, gunner/02.png
 
-belt:0.1:1:0:0:64:16              = belt/01.png, belt/02.png, belt/03.png, belt/04.png, belt/05.png, belt/06.png, belt/07.png, belt/08.png
+belt_on:0.05:1:0:0:64:16              = belt/01.png, belt/02.png, belt/03.png, belt/04.png, belt/05.png, belt/06.png, belt/07.png, belt/08.png
+belt_off:0.1:1:0:0:64:16             = belt/01.png
 
 tank_point:0.1:1:16:0:32:32        = tank/01.png
 tank_shoot:0.1:0:16:0:32:32        = tank/02.png, tank/03.png, tank/01.png

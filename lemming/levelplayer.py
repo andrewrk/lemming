@@ -105,8 +105,6 @@ class Gunner(PhysicsObject):
         my_pos = (self.pos / tile_size).do(int)
 
         # if we can trace a path to lem then look at him
-        if self.game.control_state[Control.Freeze]:
-            import pdb; pdb.set_trace()
         see_distance = 30
         can_see = False
         look_direction = sign(player_pos.x - my_pos.x)
@@ -215,11 +213,52 @@ class Monster(PhysicsObject):
                 self.grabbing = True
                 self.game.getGrabbedBy(self, self.throw_vel)
 
-class Bridge(object):
+class ButtonResponder(object):
+    def toggle(self):
+        pass
+
+class PlatformObject(object):
+    def solidAt(self, block):
+        return False
+
+class ConveyorBelt(ButtonResponder):
+    def __init__(self, pos, size, sprite, game, state='on', direction=1):
+        self.pos = pos
+        self.size = size
+        self.sprite = sprite
+        self.game = game
+        self.state = state == 'on'
+        self.direction = sign(direction)
+        # reversed because animation is backwards
+        self.animations = {-1: self.game.animations['belt_on'], 1: self.game.animations['-belt_on']}
+
+        self.toggle()
+        self.toggle()
+
+    def toggle(self):
+        self.state = not self.state
+
+        if self.state:
+            self.sprite.image = self.animations[self.direction]
+
+            if self.direction > 0:
+                new_tile = self.game.tiles.enum.BeltRight
+            else:
+                new_tile = self.game.tiles.enum.BeltLeft
+        else:
+            self.sprite.image = self.game.animations['belt_off']
+            new_tile = self.game.tiles.enum.SolidInvisible
+
+        it = Vec2d(0, 0)
+        for it.x in range(self.size.x):
+            for it.y in range(self.size.y):
+                self.game.setTile(self.pos+it, new_tile)
+
+class Bridge(ButtonResponder, PlatformObject):
     def __init__(self, pos, size, state, up_sprite, down_sprite):
         self.pos = pos
         self.size = size
-        self.state = state
+        self.state_up = state == 'up'
         self.up_sprite = up_sprite
         self.down_sprite = down_sprite
 
@@ -227,18 +266,13 @@ class Bridge(object):
         self.toggle()
 
     def toggle(self):
-        if self.state == 'up':
-            self.state = 'down'
-            self.up_sprite.visible = False
-            self.down_sprite.visible = True
-        else:
-            self.state = 'up'
-            self.up_sprite.visible = True
-            self.down_sprite.visible = False
+        self.state_up = not self.state_up
+        self.up_sprite.visible = self.state_up
+        self.down_sprite.visible = not self.state_up
 
     def solidAt(self, pos):
         rel_pos = pos - self.pos
-        if self.state == 'up':
+        if self.state_up:
             return rel_pos.x == self.size.x - 1 and rel_pos.y >= 0 and rel_pos.y < self.size.y
         else: # down
             return rel_pos.y == 0 and rel_pos.x >= 0 and rel_pos.x < self.size.x
@@ -268,7 +302,11 @@ class TrapDoor(object):
         else:
             return rel_pos.y >= 0 and rel_pos.y < self.size.y and rel_pos.x >= 0 and rel_pos.x < self.size.x
 
-class Gear(object):
+class AbstractButton(object):
+    def hit(self, who_done_it):
+        pass
+
+class Gear(AbstractButton):
     def __init__(self, pos, size, button_id, sprite, game):
         self.pos = pos
         self.size = size
@@ -296,7 +334,7 @@ class Gear(object):
         self.sprite.image = self.game.animations['gear_bloody']
         self.game.sfx['spike_death'].play()
         
-class Button(object):
+class Button(AbstractButton):
     def __init__(self, pos, button_id, up_sprite, down_sprite, delay, game):
         self.pos = pos
         self.button_id = button_id
@@ -306,7 +344,7 @@ class Button(object):
         self.game = game
         self.changeState(False)
 
-    def hit(self):
+    def hit(self, who_done_it):
         if self.state_down:
             return
 
@@ -439,6 +477,7 @@ class LevelPlayer(Screen):
         self.level = None
         self.physical_objects = []
         self.button_responders = mdict()
+        self.platform_objects = []
         self.buttons = {}
         self.victory = {}
 
@@ -482,6 +521,7 @@ class LevelPlayer(Screen):
         self.level = None
         self.physical_objects = None
         self.button_responders = None
+        self.platform_objects = None
         self.buttons = None
         self.victory = None
 
@@ -709,6 +749,8 @@ class LevelPlayer(Screen):
                     obj.delete()
                     continue
 
+            apply_belt_velocity = 0
+
             # collision with solid blocks
             new_pos = obj.pos + obj.vel * dt
             def resolve_y(new_pos, vel, obj_size):
@@ -857,6 +899,9 @@ class LevelPlayer(Screen):
                             obj.size, self.animations['lem_die'].get_duration()))
 
                     self.sfx['spike_death'].play()
+                elif tile_at_feet.belt is not None:
+                    belt_velocity = 800
+                    apply_belt_velocity = tile_at_feet.belt * belt_velocity * dt
 
             if obj == char:
                 # scroll the level
@@ -894,7 +939,7 @@ class LevelPlayer(Screen):
                     self.on_ladder = False
                 if move_left and not move_right:
                     if obj.vel.x - acceleration * dt < -max_speed:
-                        obj.vel.x = -max_speed
+                        obj.vel.x += min(-max_speed - obj.vel.x, 0)
                     else:
                         obj.vel.x -= acceleration * dt
 
@@ -907,7 +952,7 @@ class LevelPlayer(Screen):
                             self.setRunningSound(self.sfx['running'])
                 elif move_right and not move_left:
                     if obj.vel.x + acceleration * dt > max_speed:
-                        obj.vel.x = max_speed
+                        obj.vel.x += max(max_speed - obj.vel.x, 0)
                     else:
                         obj.vel.x += acceleration * dt
 
@@ -989,6 +1034,19 @@ class LevelPlayer(Screen):
                     obj.vel.x = 0
                 else:
                     obj.vel.x += friction_accel * dt * -sign(obj.vel.x)
+
+            # conveyor belts
+            max_conveyor_speed = 700
+            if apply_belt_velocity > 0:
+                if obj.vel.x + apply_belt_velocity > max_conveyor_speed:
+                    obj.vel.x += max(max_conveyor_speed - obj.vel.x, 0)
+                else:
+                    obj.vel.x += apply_belt_velocity
+            elif apply_belt_velocity < 0:
+                if obj.vel.x + apply_belt_velocity < -max_conveyor_speed:
+                    obj.vel.x += min(-max_conveyor_speed - obj.vel.x, 0)
+                else:
+                    obj.vel.x += apply_belt_velocity
             
             if (on_ground and obj.vel.get_length_sqrd() == 0) and obj.is_belly_flop:
                 # replace tiles it took up with dead body
@@ -1104,10 +1162,9 @@ class LevelPlayer(Screen):
             return True
 
         # check if there is an object filling this role
-        for button_id, obj_list in self.button_responders.iteritems():
-            for obj in obj_list:
-                if obj.solidAt(block_pos):
-                    return True
+        for platform in self.platform_objects:
+            if platform.solidAt(block_pos):
+                return True
 
     def setTile(self, block_pos, tile_id):
         self.level.layers[0].content2D[block_pos.x][block_pos.y] = tile_id
@@ -1232,10 +1289,11 @@ class LevelPlayer(Screen):
                     bridge_pos = Vec2d(obj.x, translate_y(obj.y, obj.height))
                     bridge_pos_grid = (bridge_pos / tile_size).do(int)
                     bridge_size = (Vec2d(obj.width, obj.height) / tile_size).do(int)
-                    self.button_responders[obj.properties['button_id']] = Bridge(bridge_pos_grid, bridge_size,
-                        obj.properties['state'],
+                    bridge = Bridge(bridge_pos_grid, bridge_size, obj.properties['state'],
                         pyglet.sprite.Sprite(up_img, x=bridge_pos.x, y=bridge_pos.y, batch=self.batch_level, group=group),
                         pyglet.sprite.Sprite(down_img, x=bridge_pos.x, y=bridge_pos.y, batch=self.batch_level, group=group))
+                    self.button_responders[obj.properties['button_id']] = bridge
+                    self.platform_objects.append(bridge)
                 elif obj.type == 'TrapDoor':
                     img = pyglet.resource.image(obj.properties['img'])
                     pos = Vec2d(obj.x, translate_y(obj.y, obj.height))
@@ -1270,6 +1328,21 @@ class LevelPlayer(Screen):
                     for it.y in range(pos.y, pos.y+size.y):
                         for it.x in range(pos.x, pos.x+size.x):
                             self.victory[tuple(it)] = True
+                elif obj.type == 'ConveyorBelt':
+                    pos = Vec2d(obj.x, translate_y(obj.y, obj.height))
+                    pos_grid = (pos / tile_size).do(int)
+                    size = (Vec2d(obj.width, obj.height) / tile_size).do(int)
+                    try:
+                        state = obj.properties['state']
+                    except KeyError:
+                        state = 'on'
+                    try:
+                        direction = int(obj.properties['direction'])
+                    except KeyError:
+                        direction = 1
+                    self.button_responders[obj.properties['button_id']] = ConveyorBelt(pos_grid, size, 
+                        pyglet.sprite.Sprite(self.animations['belt_on'], x=pos.x, y=pos.y, group=group, batch=self.batch_level),
+                        self, state=state, direction=direction)
 
         if not had_start_point:
             assert False, "Level missing start point."

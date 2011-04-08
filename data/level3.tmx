@@ -26,7 +26,8 @@
   </tile>
   <tile id="3">
    <properties>
-    <property name="name" value="Bullet"/>
+    <property name="name" value="SolidInvisible"/>
+    <property name="solid" value="1"/>
    </properties>
   </tile>
   <tile id="4">
@@ -171,19 +172,33 @@
     <property name="solid" value="1"/>
    </properties>
   </tile>
+  <tile id="28">
+   <properties>
+    <property name="belt" value="-1"/>
+    <property name="name" value="BeltLeft"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="29">
+   <properties>
+    <property name="belt" value="1"/>
+    <property name="name" value="BeltRight"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
  </tileset>
  <layer name="Tile Layer 1" width="200" height="100">
   <data encoding="base64" compression="gzip">
-   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
+   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
   </data>
  </layer>
  <layer name="Ladders" width="200" height="100">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3bwQ0CQRADQQIg/3iJoB8jgQC5KoLTePt5jwcAAAAAAADAZz2//QHww/QBTR/Q9AFNH9D0AU0f0PQBTR/8I+8Wmj6g6QOaPqDpA5o+oOkDmj6g6QOaPqDpA5o+AAAAAAAAAAAAAAAAAABY4d9aaPqApo8t9r5xry32vnGvLfa+ca8t9r5xry32vnGvLfa+ca8t9r5xry32vnGvLfa+ca8t9r5xry32vnGvLfa+ca8t9r5xL2j6gKYPaPqApg8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA3uUFcd7Z24A4AQA=
+   H4sIAAAAAAAAA+3bsQ2AQBADQQqg/3qpwIGDFyDPVIDOvyHXBQAAAAAAAHDW/fYHwIfpAzJ9QKYPyPQBmT4g0wdk+oBMH/yRdwuZPiDTB2T6gEwfkOkDMn1Apg/I9AGZPiDTB2T6AAAAAAAAAAAAAAAAAABghX9rIdMHZPrYYu+Oe22xd8e9tti7415b7N1xry327rjXFnt33GuLvTvutcXeHffaYu+Oe22xd8e9tti7415b7N1xry327rjXFnt33GuLvTvutcXeHffaYu+Oe22xNwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHDSA50SfeeAOAEA
   </data>
  </layer>
  <objectgroup name="Object Layer 1" width="200" height="100">
-  <object name="StartPoint" type="StartPoint" x="400" y="1024" width="64" height="64"/>
+  <object name="StartPoint" type="StartPoint" x="1406" y="898" width="64" height="64"/>
   <object name="trap door" type="TrapDoor" x="512" y="400" width="64" height="16">
    <properties>
     <property name="button_id" value="0"/>
@@ -453,13 +468,6 @@
    </properties>
   </object>
   <object name="win!" type="Victory" x="1728" y="1408" width="256" height="128"/>
-  <object name="trap door" type="TrapDoor" x="304" y="1024" width="64" height="16">
-   <properties>
-    <property name="button_id" value="main_belt"/>
-    <property name="img" value="factory_door.png"/>
-    <property name="state" value="closed"/>
-   </properties>
-  </object>
  </objectgroup>
  <objectgroup name="PlayerLayer" width="200" height="100"/>
 </map>
