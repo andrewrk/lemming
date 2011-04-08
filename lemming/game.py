@@ -61,7 +61,7 @@ class Game(object):
         self.current_screen.start()
 
     def setScreenToCurrentLevel(self):
-        if self.current_level == len(levels):
+        if self.current_level >= len(levels):
             self.current_screen = winscreen.WinScreen(self)
         else:
             self.current_screen = levelplayer.LevelPlayer(self, pyglet.resource.file(levels[self.current_level]))
