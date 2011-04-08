@@ -1114,29 +1114,43 @@ class LevelPlayer(Screen):
                             self.setRunningSound(None)
                 ladder_velocity = 200
                 if move_up and ladder_at_feet.ladder:
-                    obj.on_ladder = True
-                    obj.vel.y = 0
-                    obj.vel.x = 0
-                    obj.pos.y += ladder_velocity * dt
+                    new_pos = Vec2d(obj.pos.x, obj.pos.y + ladder_velocity * dt)
+                    new_pos_grid = (new_pos / tile_size).do(int)
 
-                    # switch sprite to ladder
-                    if obj.sprite.image != self.animations['lem_climb']:
-                        obj.sprite.image = self.animations['lem_climb']
-                        obj.frame.new_image = obj.sprite.image
+                    if not self.getTile(new_pos_grid, 1).ladder:
+                        obj.pos.y = new_pos_grid.y * self.level.tileheight
+                        obj.on_ladder = False
+                    else:
+                        obj.on_ladder = True
+                        obj.vel.y = 0
+                        obj.vel.x = 0
+                        obj.pos.y += ladder_velocity * dt
 
-                        self.setRunningSound(self.sfx['ladder'])
+                        # switch sprite to ladder
+                        if obj.sprite.image != self.animations['lem_climb']:
+                            obj.sprite.image = self.animations['lem_climb']
+                            obj.frame.new_image = obj.sprite.image
+
+                            self.setRunningSound(self.sfx['ladder'])
                 elif move_down and ladder_at_feet.ladder:
-                    obj.on_ladder = True
-                    obj.vel.x = 0
-                    obj.pos.y -= ladder_velocity * dt
+                    new_pos = Vec2d(obj.pos.x, obj.pos.y - ladder_velocity * dt)
+                    new_pos_grid = (new_pos / tile_size).do(int)
 
-                    # switch sprite to ladder
-                    if obj.sprite.image != self.animations['lem_climb']:
-                        obj.sprite.image = self.animations['lem_climb']
-                        obj.frame.new_image = obj.sprite.image
+                    if self.getBlockIsSolid(new_pos_grid) and not self.getTile(new_pos_grid, 1).ladder:
+                        obj.pos.y = (new_pos_grid.y + 1) * self.level.tileheight
+                        obj.on_ladder = False
+                    else:
+                        obj.on_ladder = True
+                        obj.vel.x = 0
+                        obj.pos.y -= ladder_velocity * dt
 
-                        self.setRunningSound(self.sfx['ladder'])
-                elif move_up and on_ground:
+                        # switch sprite to ladder
+                        if obj.sprite.image != self.animations['lem_climb']:
+                            obj.sprite.image = self.animations['lem_climb']
+                            obj.frame.new_image = obj.sprite.image
+
+                            self.setRunningSound(self.sfx['ladder'])
+                if move_up and on_ground and not obj.on_ladder:
                     jump_velocity = 350
                     obj.vel.y = jump_velocity
 

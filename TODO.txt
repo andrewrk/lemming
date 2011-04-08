@@ -11,8 +11,6 @@ Day 7:
 
 
 Bugs:
- * ladder bug - you can go into the ground
- * belly flop physics are off by one
  * win sound sucks
  * don't call game over until the belly flop turns to dead body
  * need credits song
