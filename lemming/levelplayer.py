@@ -826,7 +826,7 @@ class LevelPlayer(Screen):
                     animation = self.animations['lem_belly_flop']
                 self.physical_objects.append(PhysicsObject(old_head_lemming.frame.pos,
                     old_head_lemming.frame.vel, pyglet.sprite.Sprite(animation, batch=self.batch_level, group=self.group_fg),
-                    Vec2d(4, 1), can_pick_up_stuff=True, is_belly_flop=True, direction=direction))
+                    Vec2d(3, 1), can_pick_up_stuff=True, is_belly_flop=True, direction=direction))
 
                 self.detatchHeadLemming()
 
@@ -886,7 +886,7 @@ class LevelPlayer(Screen):
             new_pos = obj.pos + obj.vel * dt
             def resolve_y(new_pos, vel, obj_size):
                 if obj.on_ladder:
-                    return
+                    return False
 
                 new_feet_block = (new_pos / tile_size).do(int)
                 tile_there = self.getTile(new_feet_block)
@@ -894,45 +894,53 @@ class LevelPlayer(Screen):
                 # ramps
                 if tile_there.ramp == -1:
                     new_pos.y = new_feet_block.y * self.level.tileheight + self.level.tileheight
-                    vel.y = 0
-                    return
                 elif self.getTile(Vec2d(new_feet_block.x+1, new_feet_block.y)).ramp == 1:
                     new_pos.y = new_feet_block.y * self.level.tileheight + self.level.tileheight
-                    vel.y = 0
-                    return
 
-                if vel.y != 0:
-                    block_solid = self.getBlockIsSolid(new_feet_block)
+                if vel.y > 0:
+                    # resolve head collisions
+                    for x in range(obj_size.x):
+                        new_head_block = Vec2d(new_feet_block.x+x, new_feet_block.y+obj_size.y)
+                        block_solid = self.getBlockIsSolid(new_head_block)
+                        if block_solid:
+                            new_pos.y = new_feet_block.y*self.level.tileheight
+                            vel.y = 0
+                            return True
+                elif vel.y < 0:
                     # resolve feet collisions
+                    block_solid = self.getBlockIsSolid(new_feet_block)
                     if block_solid:
                         new_pos.y = (new_feet_block.y+1)*self.level.tileheight
                         vel.y = 0
-                        return
+                        return True
 
-                    # resolve head collisions
-                    new_head_block = new_feet_block + Vec2d(0, obj_size.y - 1)
-                    block_solid = self.getBlockIsSolid(new_head_block)
-                    if block_solid:
-                        new_pos.y = (new_head_block.y-1-3)*self.level.tileheight
-                        vel.y = 0
-                        return
+                return False
 
             def resolve_x(new_pos, vel, obj_size):
                 if obj.on_ladder:
-                    return
+                    return False
 
-                if vel.x != 0:
-                    adjust_x = 0
-                    if sign(vel.x) == 1:
-                        adjust_x = self.level.tilewidth
-                    new_feet_block = (Vec2d(new_pos.x+adjust_x, new_pos.y) / tile_size).do(int)
+                if vel.x < 0:
+                    new_feet_block = (new_pos / tile_size).do(int)
                     for y in range(obj_size.y):
                         new_body_block = Vec2d(new_feet_block.x, new_feet_block.y + y)
                         block_solid = self.getBlockIsSolid(new_body_block)
                         if block_solid:
-                            new_pos.x = (new_feet_block.x-sign(vel.x))*self.level.tilewidth
+                            new_pos.x = (new_feet_block.x+1)*self.level.tilewidth
                             vel.x = 0
-                            return
+                            return True
+                elif vel.x > 0:
+                    new_feet_block = (new_pos / tile_size).do(int)
+                    for y in range(obj_size.y):
+                        new_body_block = Vec2d(new_feet_block.x+obj_size.x, new_feet_block.y + y)
+                        block_solid = self.getBlockIsSolid(new_body_block)
+                        if block_solid:
+                            new_pos.x = new_feet_block.x*self.level.tilewidth
+                            vel.x = 0
+                            return True
+                    
+
+                return False
             # try resolving the collision both ways (y then x, x then y) and choose the one that results in the most velocity
             x_first_new_pos = Vec2d(new_pos)
             x_first_new_vel = Vec2d(obj.vel)
@@ -1182,9 +1190,10 @@ class LevelPlayer(Screen):
             
             if (on_ground and obj.vel.get_length_sqrd() == 0) and obj.is_belly_flop:
                 # replace tiles it took up with dead body
-                self.setTile(block_at_feet+Vec2d(0, 1), self.tiles.enum.DeadBodyMiddle)
-                self.setTile(block_at_feet+Vec2d(1, 1), self.tiles.enum.DeadBodyRight)
-                self.setTile(block_at_feet+Vec2d(-1, 1), self.tiles.enum.DeadBodyLeft)
+                mid_block = (obj.pos / tile_size).do(round).do(int)
+                self.setTile(mid_block+Vec2d(0, 0), self.tiles.enum.DeadBodyLeft)
+                self.setTile(mid_block+Vec2d(1, 0), self.tiles.enum.DeadBodyMiddle)
+                self.setTile(mid_block+Vec2d(2, 0), self.tiles.enum.DeadBodyRight)
                 
                 obj.delete()
 
