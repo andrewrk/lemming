@@ -3,28 +3,24 @@ Day 6:
  * create as many levels as possible exploring those concepts
 
 Day 7:
+ * critical bug: if you die several times, memory keeps expanding and sound stops
+ * physics bug - falling into the ground
  * make sure it works on windows and mac
  * complete the README and make sure all files are in place
  * download the final submission and play through it
 
 
 Bugs:
- * need credits song
- * make sure I can use the explosion for art
  * ladder bug - you can go into the ground
- * physics bug - falling into the ground
  * belly flop physics are off by one
  * win sound sucks
  * don't call game over until the belly flop turns to dead body
- * start level sound unecessary with music
+ * need credits song
  * animate the title screen
 
 Brainstorming:
  * physics
    - freeze death
-   - a bad guy you can kill by exploding
-   - gun thing shooting bullets
-   - a machine you have to stop by jumping in the gears
    - fire
 
  more ways to die:

@@ -78,7 +78,8 @@ class Game(object):
         self.current_screen.start()
 
     def start(self, level_filename=None):
-        self.window = pyglet.window.Window(width=853, height=480)
+        self.window = pyglet.window.Window(width=self.width, height=self.height, caption="Lemming")
+        self.window.set_icon(pyglet.resource.image('icon.png'))
         self.level_filename = level_filename
         if level_filename is None:
             self.current_screen = mainmenu.MainMenu(self)
