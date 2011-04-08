@@ -5,7 +5,161 @@
   <property name="bg_music" value="music/silly.mp3"/>
   <property name="fg_art" value="hill.png"/>
  </properties>
- <tileset firstgid="1" source="tiles.tsx"/>
+ <tileset firstgid="1" name="default" tilewidth="16" tileheight="16">
+  <image source="tiles.png" width="64" height="192"/>
+  <tile id="0">
+   <properties>
+    <property name="name" value="DirtRampRight"/>
+    <property name="ramp" value="1"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="name" value="PlusOne"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="name" value="PlusForever"/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="name" value="Bullet"/>
+   </properties>
+  </tile>
+  <tile id="4">
+   <properties>
+    <property name="name" value="Dirt"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="5">
+   <properties>
+    <property name="name" value="Spike"/>
+    <property name="solid" value="1"/>
+    <property name="spike" value="1"/>
+   </properties>
+  </tile>
+  <tile id="6">
+   <properties>
+    <property name="name" value="Grass"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="7">
+   <properties>
+    <property name="mine" value="1"/>
+    <property name="name" value="LandMine"/>
+   </properties>
+  </tile>
+  <tile id="8">
+   <properties>
+    <property name="name" value="DirtRampLeft"/>
+    <property name="ramp" value="-1"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="9">
+   <properties>
+    <property name="breakable" value="1"/>
+    <property name="name" value="WeakStone"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="10">
+   <properties>
+    <property name="name" value="Stone"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="11">
+   <properties>
+    <property name="ladder" value="1"/>
+    <property name="name" value="Ladder"/>
+   </properties>
+  </tile>
+  <tile id="12">
+   <properties>
+    <property name="name" value="Brick"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="13">
+   <properties>
+    <property name="name" value="Button"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="14">
+   <properties>
+    <property name="name" value="ButtonPressed"/>
+   </properties>
+  </tile>
+  <tile id="15">
+   <properties>
+    <property name="name" value="BrickTop"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="16">
+   <properties>
+    <property name="name" value="DeadBodyLeft"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="17">
+   <properties>
+    <property name="name" value="DeadBodyMiddle"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="18">
+   <properties>
+    <property name="name" value="DeadBodyRight"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="19">
+   <properties>
+    <property name="name" value="BottomLeftDirtCorner"/>
+   </properties>
+  </tile>
+  <tile id="20">
+   <properties>
+    <property name="name" value="DirtBottom"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="21">
+   <properties>
+    <property name="name" value="BottomRightDirtCorner"/>
+   </properties>
+  </tile>
+  <tile id="22">
+   <properties>
+    <property name="breakable" value="1"/>
+    <property name="name" value="BreakableDirt"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="23">
+   <properties>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="26">
+   <properties>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="27">
+   <properties>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+ </tileset>
  <layer name="Main" width="200" height="70">
   <data encoding="base64" compression="gzip">
    H4sIAAAAAAAAA+3d7UokMRSE4WHEbwR/qPd/qTI0ijR9kphOTp0k7wMFy7rrJJOUo5ue3sulj9dGATzcG+mFfmAk9AOw0Q/ARj8AG/0AbKP2470wD0aAEqP2460wVm9qPRV+jE7OYdR+WOMuzeMAgd6o/fhcINDz7seLU2rGAezRD/oB2yr9uCsYB45d1QMQWqUfJePA5rrLyugH/bihD8foB/2AjX6U/53U2SDmNGs/cted1J7ZPbd/Sn7Rv3i8+xHFx6X+7N26pisXzs/Hs2o/bnI9OHP23eJzQ2/lftxeQ6y9+RX4c8PPyv0AcugHYKMfgI1+ADarH6XvX22p5t//1WcG6sdvrXQ+s83bUnsG8BP1e+Z6PZ76vYPR37eoPEf1dLYfreM9/lGel2hrcOZr50jdUa9Fbm1y9zegH3H7kcqZ1zfPfqnXIrc2udf9XntB/TxEWoOIz4/H9+4R5lmzNi3HP8rzEm0N1GP02FupeSru11Fz3UXqOo4z1zip712iTAn1Xlf3A0hR73X6gcjUe51+IDL1XqcfiEy91+kHIlPvdfqByNR7vSY1Zyb0AzXUe10dIEW9P9UBUtT7Ux0gRX3G7xX6AdjoB2CjH4CNfgA2+gHY6Adgs/oR4R4ZgJrqfGV/738gIlU/WrwGjXSfGPi4Gr+upepHq6zUkdp7FqrudWg97n9//+/Hjv5Mz/mp93eU16KWPxP1/tnNI7PNsZZ6b0dK7f+bto96Hi2Sox5f6/nMMk/ikxz1+FrPZ5Z5Ep/kqMfXej6zzJP4JEc9vtbzmWWexCc56vdl9Lgn5BH1OpCYwUa9DiRmsFGvA4kZbNTrQGIGG/U6kJjBRr0OJGawUa8DiZncNTTq66m8ol4HQgghhBBCCCGE2PkGSp352sDaAAA=

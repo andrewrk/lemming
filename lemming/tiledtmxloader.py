@@ -7,8 +7,6 @@ import StringIO
 import pyglet
 
 #-------------------------------------------------------------------------------
-# TODO: separate resource loading and containment into own class for each graphics lib
-#       by doing so, loading the map can be done in the model, loading the graphics resources in the presentation layer
 class IImageLoader(object):
     u"""
     Interface for image loading. Depending on the framework used the
@@ -77,7 +75,6 @@ class IImageLoader(object):
         """
         raise NotImplementedError(u'This should be implemented in a inherited class')
 
-#-------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------
 class ImageLoaderPyglet(IImageLoader):
     u"""
@@ -168,8 +165,6 @@ class TileMap(object):
             dict containing {name : TileSet}
 
     """
-
-
     def __init__(self):
 #        This is the top container for all data. The gid is the global id (for a image).
 #        Before calling convert most of the values are strings. Some additional
