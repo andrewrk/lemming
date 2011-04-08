@@ -4,19 +4,178 @@
   <property name="bg_art" value="factory_bg.jpg"/>
   <property name="fg_art" value="factory_fg.png"/>
  </properties>
- <tileset firstgid="1" source="tiles.tsx"/>
+ <tileset firstgid="1" name="default" tilewidth="16" tileheight="16">
+  <image source="tiles.png" width="64" height="192"/>
+  <tile id="0">
+   <properties>
+    <property name="name" value="DirtRampRight"/>
+    <property name="ramp" value="1"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="1">
+   <properties>
+    <property name="name" value="PlusOne"/>
+   </properties>
+  </tile>
+  <tile id="2">
+   <properties>
+    <property name="name" value="PlusForever"/>
+   </properties>
+  </tile>
+  <tile id="3">
+   <properties>
+    <property name="name" value="Bullet"/>
+   </properties>
+  </tile>
+  <tile id="4">
+   <properties>
+    <property name="name" value="Dirt"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="5">
+   <properties>
+    <property name="name" value="Spike"/>
+    <property name="solid" value="1"/>
+    <property name="spike" value="1"/>
+   </properties>
+  </tile>
+  <tile id="6">
+   <properties>
+    <property name="name" value="Grass"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="7">
+   <properties>
+    <property name="mine" value="1"/>
+    <property name="name" value="LandMine"/>
+   </properties>
+  </tile>
+  <tile id="8">
+   <properties>
+    <property name="name" value="DirtRampLeft"/>
+    <property name="ramp" value="-1"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="9">
+   <properties>
+    <property name="breakable" value="1"/>
+    <property name="name" value="WeakStone"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="10">
+   <properties>
+    <property name="name" value="Stone"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="11">
+   <properties>
+    <property name="ladder" value="1"/>
+    <property name="name" value="Ladder"/>
+   </properties>
+  </tile>
+  <tile id="12">
+   <properties>
+    <property name="name" value="Brick"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="13">
+   <properties>
+    <property name="name" value="Button"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="14">
+   <properties>
+    <property name="name" value="ButtonPressed"/>
+   </properties>
+  </tile>
+  <tile id="15">
+   <properties>
+    <property name="name" value="BrickTop"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="16">
+   <properties>
+    <property name="name" value="DeadBodyLeft"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="17">
+   <properties>
+    <property name="name" value="DeadBodyMiddle"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="18">
+   <properties>
+    <property name="name" value="DeadBodyRight"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="19">
+   <properties>
+    <property name="name" value="BottomLeftDirtCorner"/>
+   </properties>
+  </tile>
+  <tile id="20">
+   <properties>
+    <property name="name" value="DirtBottom"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="21">
+   <properties>
+    <property name="name" value="BottomRightDirtCorner"/>
+   </properties>
+  </tile>
+  <tile id="22">
+   <properties>
+    <property name="breakable" value="1"/>
+    <property name="name" value="BreakableDirt"/>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="23">
+   <properties>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="26">
+   <properties>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+  <tile id="27">
+   <properties>
+    <property name="solid" value="1"/>
+   </properties>
+  </tile>
+ </tileset>
  <layer name="Tile Layer 1" width="100" height="100">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3RQQkAAAgAMQvYv65fA4gibHAJLgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAANiWLW71DzkYAAAAAAAAAAAAAAB/FUP1eBJAnAAA
+   H4sIAAAAAAAAA+3RsQkAIAwAwZSOIOj+c1pY6QAx4B38BB8BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA+doVuXqR2EaR2F5/8OM0iwQAAAAAAAAAAMBfFkcrpF1AnAAA
   </data>
  </layer>
  <layer name="Ladders" width="100" height="100">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3BMQEAAADCoPVP7WULoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgBt5RKnmQJwAAA==
+   H4sIAAAAAAAAA+3RQQ0AAAjEMATgXy9vFHAhrYIlqwIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAn/o6gMWPLH5k8SOLHwAAAAAAAAAAAAAADGQNKAZAnAAA
   </data>
  </layer>
  <objectgroup name="Object Layer 1" width="100" height="100">
   <object name="StartPoint" type="StartPoint" x="528" y="960" width="64" height="64"/>
+  <object name="winnar sign" type="Decoration" x="720" y="1120" width="80" height="32">
+   <properties>
+    <property name="img" value="winnar.png"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup name="PlayerLayer" width="100" height="100"/>
 </map>

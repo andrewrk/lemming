@@ -945,6 +945,8 @@ class LevelPlayer(Screen):
             return self.tiles.info[self.level.layers[layer_index].content2D[block_pos.x][block_pos.y]]
         except IndexError:
             return self.tiles.info[self.tiles.enum.Air]
+        except KeyError:
+            return self.tiles.info[self.tiles.enum.Air]
 
     def getBlockIsSolid(self, block_pos):
         tile_there = self.getTile(block_pos)
