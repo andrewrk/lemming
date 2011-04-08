@@ -89,6 +89,61 @@ class Lemming(PhysicsObject):
         self.frame = frame
         self.gone = False
 
+class Tank(PhysicsObject):
+    def __init__(self, pos, size, sprite, game, dir_lock=False):
+        super(Tank, self).__init__(pos, Vec2d(0, 0), sprite, size)
+
+        self.game = game
+        self.explodable = True
+        self.can_shoot = True
+        self.shoot_delay = 2
+        self.dir_lock = dir_lock
+
+    def think(self, dt):
+        if self.game.control_lemming >= len(self.game.lemmings):
+            return
+
+        player_pos = (self.game.lemmings[self.game.control_lemming].pos / tile_size).do(int)
+        my_pos = (self.pos / tile_size).do(int)
+        look_direction = sign(player_pos.x - my_pos.x)
+        if self.dir_lock is not None:
+            look_direction = self.dir_lock
+        self.changeDirection(look_direction)
+        self.wantToShoot()
+
+    def changeDirection(self, new_dir):
+        if new_dir == self.direction:
+            return
+        self.direction = new_dir
+        if self.direction < 0:
+            name = '-tank_point'
+        elif self.direction > 0:
+            name = 'tank_point'
+        else:
+            return
+
+        self.sprite.image = self.game.animations[name]
+
+    def wantToShoot(self):
+        if not self.can_shoot:
+            return
+        self.can_shoot = False
+        def recharge(dt):
+            self.can_shoot = True
+        pyglet.clock.schedule_once(recharge, self.shoot_delay)
+
+        gun_offset = Vec2d(48*self.direction, 32)
+        bullet_init_vel = Vec2d(350*self.direction, 300)
+        self.game.spawnBomb(self.pos+gun_offset, self.vel+bullet_init_vel, 1)
+
+        if self.direction < 0:
+            name = '-tank_shoot'
+        elif self.direction > 0:
+            name = 'tank_shoot'
+        else:
+            return
+        self.sprite.image = self.game.animations[name]
+
 class Gunner(PhysicsObject):
     def __init__(self, pos, size, group, batch, game):
         super(Gunner, self).__init__(pos, Vec2d(0, 0), pyglet.sprite.Sprite(game.animations['gunner_still'],
@@ -1360,6 +1415,13 @@ class LevelPlayer(Screen):
                         self.physical_objects.append(Monster(pos, size, group, self.batch_level, self, direction, throw_vel))
                     elif obj.properties['type'] == 'gunner':
                         self.physical_objects.append(Gunner(pos, size, group, self.batch_level, self))
+                    elif obj.properties['type'] == 'tank':
+                        try:
+                            dir_lock = int(obj.properties['direction_lock'])
+                        except KeyError:
+                            dir_lock = None
+                        self.physical_objects.append(Tank(pos, size,
+                            pyglet.sprite.Sprite(self.animations['tank_point'], x=pos.x, y=pos.y, group=group, batch=self.batch_level), self, dir_lock=dir_lock))
                             
                 elif obj.type == 'Bridge':
                     up_img = pyglet.resource.image(obj.properties['up_img'])
