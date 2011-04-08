@@ -908,11 +908,12 @@ class LevelPlayer(Screen):
                             return True
                 elif vel.y < 0:
                     # resolve feet collisions
-                    block_solid = self.getBlockIsSolid(new_feet_block)
-                    if block_solid:
-                        new_pos.y = (new_feet_block.y+1)*self.level.tileheight
-                        vel.y = 0
-                        return True
+                    for x in range(obj_size.x):
+                        block_solid = self.getBlockIsSolid(new_feet_block+Vec2d(x,0))
+                        if block_solid:
+                            new_pos.y = (new_feet_block.y+1)*self.level.tileheight
+                            vel.y = 0
+                            return True
 
                 return False
 
