@@ -183,7 +183,7 @@
   </data>
  </layer>
  <objectgroup name="Object Layer 1" width="200" height="100">
-  <object name="StartPoint" type="StartPoint" x="1216" y="320" width="64" height="64"/>
+  <object name="StartPoint" type="StartPoint" x="400" y="1024" width="64" height="64"/>
   <object name="trap door" type="TrapDoor" x="512" y="400" width="64" height="16">
    <properties>
     <property name="button_id" value="0"/>
@@ -453,6 +453,13 @@
    </properties>
   </object>
   <object name="win!" type="Victory" x="1728" y="1408" width="256" height="128"/>
+  <object name="trap door" type="TrapDoor" x="304" y="1024" width="64" height="16">
+   <properties>
+    <property name="button_id" value="main_belt"/>
+    <property name="img" value="factory_door.png"/>
+    <property name="state" value="closed"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup name="PlayerLayer" width="200" height="100"/>
 </map>

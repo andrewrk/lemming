@@ -267,6 +267,34 @@ class TrapDoor(object):
             return False
         else:
             return rel_pos.y >= 0 and rel_pos.y < self.size.y and rel_pos.x >= 0 and rel_pos.x < self.size.x
+
+class Gear(object):
+    def __init__(self, pos, size, button_id, sprite, game):
+        self.pos = pos
+        self.size = size
+        self.button_id = button_id
+        self.sprite = sprite
+        self.game = game
+        self.turning = True
+
+    def hit(self, who_done_it):
+        if not self.turning:
+            return
+        self.turning = False
+
+        if self.game.control_lemming >= len(self.game.lemmings):
+            is_char = False
+        else:
+            is_char = self.game.lemmings[self.game.control_lemming] == who_done_it
+        
+        if is_char:
+            self.game.detatch_queued = True
+        else:
+            who_done_it.delete()
+
+        self.game.hitButtonId(self.button_id)
+        self.sprite.image = self.game.animations['gear_bloody']
+        self.game.sfx['spike_death'].play()
         
 class Button(object):
     def __init__(self, pos, button_id, up_sprite, down_sprite, delay, game):
@@ -801,7 +829,7 @@ class LevelPlayer(Screen):
                         except KeyError:
                             pass
                         if button_to_activate is not None:
-                            button_to_activate.hit()
+                            button_to_activate.hit(obj)
 
                         # victory
                         if self.isVictory(block) and not self.handled_victory:
@@ -1225,6 +1253,16 @@ class LevelPlayer(Screen):
                         pyglet.sprite.Sprite(up_img, x=button_pos.x, y=button_pos.y, batch=self.batch_level, group=group),
                         pyglet.sprite.Sprite(down_img, x=button_pos.x, y=button_pos.y, batch=self.batch_level, group=group),
                         float(obj.properties['delay']), self)
+                elif obj.type == 'GearButton':
+                    pos = Vec2d(obj.x, translate_y(obj.y, obj.height))
+                    size = (Vec2d(obj.width, obj.height) / tile_size).do(int)
+                    pos_grid = (pos / tile_size).do(int)
+                    gear = Gear(pos, size, obj.properties['button_id'], pyglet.sprite.Sprite(self.animations['gear_turning'],
+                        x=pos.x, y=pos.y, batch=self.batch_level, group=group), self)
+                    it = Vec2d(0, 0)
+                    for it.x in range(pos_grid.x, pos_grid.x+size.x):
+                        for it.y in range(pos_grid.y, pos_grid.y+size.y):
+                            self.buttons[tuple(it)] = gear
                 elif obj.type == 'Victory':
                     pos = (Vec2d(obj.x, translate_y(obj.y, obj.height)) / tile_size).do(int)
                     size = (Vec2d(obj.width, obj.height) / tile_size).do(int)
