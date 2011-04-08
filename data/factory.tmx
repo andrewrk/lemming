@@ -17,7 +17,7 @@
   </data>
  </layer>
  <objectgroup name="Object Layer 1" width="200" height="100">
-  <object name="StartPoint" type="StartPoint" x="1088" y="320" width="64" height="64"/>
+  <object name="StartPoint" type="StartPoint" x="592" y="416" width="64" height="64"/>
   <object name="trap door" type="TrapDoor" x="512" y="400" width="64" height="16">
    <properties>
     <property name="button_id" value="0"/>

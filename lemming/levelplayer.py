@@ -718,6 +718,7 @@ class LevelPlayer(Screen):
         def reset_animation():
             monster.sprite.image = self.animations[negate+'monster_still']
             self.lemmings[self.control_lemming].frame.vel = Vec2d(throw_vel)
+            self.lemmings[self.control_lemming].frame.pos = Vec2d(monster.pos.x+(1+monster.direction)*self.level.tilewidth, monster.pos.y)
             self.lemmings[self.control_lemming].sprite.visible = True
             self.held_by = None
             def not_grabbing(dt):

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="200" height="100" tilewidth="16" tileheight="16">
+ <properties>
+  <property name="bg_art" value="background.png"/>
+  <property name="bg_music" value="music/silly.mp3"/>
+  <property name="fg_art" value="hill.png"/>
+ </properties>
+ <tileset firstgid="1" source="tiles.tsx"/>
+ <layer name="Tiles" width="200" height="100">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3TMQ3AQAzAwF+qInj+VIvA6pgMd5Ih+BwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADY4x0ONnuGg838Ac0f0PwBzR/Q/AHNH9D8Ac0f0PwBzR/Q/AHNH9D8Ac0f0PwBzR/Q/AHtDgcAAAAAAAAAAAAAAAAAAAAAAAAA8OcD/Z2t9YA4AQA=
+  </data>
+ </layer>
+ <layer name="Ladders" width="200" height="100">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3BgQAAAADDoPlTH+AKVQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwBtmAymRgDgBAA==
+  </data>
+ </layer>
+ <objectgroup name="Objects" width="200" height="100">
+  <object name="house decoration" type="Decoration" x="7" y="415" width="224" height="240">
+   <properties>
+    <property name="animation" value="house"/>
+   </properties>
+  </object>
+  <object name="helper text" type="Text" x="247" y="415" width="226" height="135">
+   <properties>
+    <property name="font_size" value="18"/>
+    <property name="text" value="Use the arrow keys to move around and jump."/>
+   </properties>
+  </object>
+  <object name="start" type="StartPoint" x="240" y="816" width="32" height="64"/>
+  <object type="Button" gid="14" x="32" y="240"/>
+  <object name="bridge" type="Bridge" x="288" y="288" width="96" height="96">
+   <properties>
+    <property name="state" value="up"/>
+   </properties>
+  </object>
+  <object name="sign post" type="Decoration" x="0" y="352" width="80" height="32">
+   <properties>
+    <property name="img" value="winnar.png"/>
+   </properties>
+  </object>
+  <object name="victory" type="Victory" x="0" y="288" width="224" height="96"/>
+  <object name="monster" type="Agent" x="432" y="336" width="48" height="48">
+   <properties>
+    <property name="type" value="monster"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup name="PlayerLayer" width="200" height="100"/>
+</map>
