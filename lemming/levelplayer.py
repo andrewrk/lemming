@@ -293,11 +293,12 @@ class Bridge(ButtonResponder, PlatformObject):
             return rel_pos.y == 0 and rel_pos.x >= 0 and rel_pos.x < self.size.x
 
 class TrapDoor(object):
-    def __init__(self, pos, size, state, sprite):
+    def __init__(self, pos, size, state, sprite, game):
         self.pos = pos
         self.size = size
         self.state = state
         self.sprite = sprite
+        self.game = game
 
         self.toggle()
         self.toggle()
@@ -306,9 +307,16 @@ class TrapDoor(object):
         if self.state == 'closed':
             self.state = 'open'
             self.sprite.visible = False
+            new_tile = self.game.tiles.enum.Air
         else:
             self.state = 'closed'
             self.sprite.visible = True
+            new_tile = self.game.tiles.enum.SolidInvisible
+
+        it = Vec2d(0, 0)
+        for it.x in range(self.size.x):
+            for it.y in range(self.size.y):
+                self.game.setTile(self.pos+it, new_tile)
 
     def solidAt(self, pos):
         rel_pos = pos - self.pos
@@ -339,15 +347,15 @@ class Gear(AbstractButton):
             is_char = False
         else:
             is_char = self.game.lemmings[self.game.control_lemming] == who_done_it
-        
+
+        self.game.hitButtonId(self.button_id)
+        self.sprite.image = self.game.animations['gear_bloody']
+        self.game.playSoundAt('spike_death', who_done_it.pos)
+
         if is_char:
             self.game.detatch_queued = True
         else:
             who_done_it.delete()
-
-        self.game.hitButtonId(self.button_id)
-        self.sprite.image = self.game.animations['gear_bloody']
-        self.game.sfx['spike_death'].play()
         
 class Button(AbstractButton):
     def __init__(self, pos, button_id, up_sprite, down_sprite, delay, game):
@@ -365,11 +373,11 @@ class Button(AbstractButton):
 
         self.changeState(True)
         self.game.hitButtonId(self.button_id)
-        self.game.sfx['button_click'].play()
+        self.game.playSoundAt('button_click', who_done_it.pos)
 
         def goBackUp(dt):
             self.changeState(False)
-            self.game.sfx['button_unclick'].play()
+            self.game.playSoundAt('button_unclick', who_done_it.pos)
         pyglet.clock.schedule_once(goBackUp, self.delay)
 
     def changeState(self, value):
@@ -382,12 +390,14 @@ class Button(AbstractButton):
             self.down_sprite.visible = False
 
 class BombSpawner(ButtonResponder):
-    def __init__(self, pos, size, game, delay, state='on'):
+    def __init__(self, pos, size, game, delay, state='on', fuse_min=1, fuse_max=4):
         self.pos = pos
         self.size = size
         self.game = game
         self.delay = delay
         self.state = state == 'on'
+        self.fuse_min = fuse_min
+        self.fuse_max = fuse_max
 
         self.game.intervals.append(self.spawn)
         self.toggle()
@@ -406,7 +416,7 @@ class BombSpawner(ButtonResponder):
         pos = self.pos + Vec2d(random.random() * self.size.x, random.random() * self.size.y)
 
         # pick random fuse length
-        fuse = 1 + random.random() * 3
+        fuse = self.fuse_min + random.random() * (self.fuse_min-self.fuse_max)
 
         # vary the velocity by tiny amounts
         vel = Vec2d(random.random() * 100 - 50, random.random() * 100 - 50)
@@ -678,12 +688,14 @@ class LevelPlayer(Screen):
         head_lemming.frame.prev_node = None
 
     def handleExplosion(self, pos, vel, caused_by_self=False):
-        self.sfx['blast'].play()
+        self.playSoundAt('blast', pos)
         self.physical_objects.append(PhysicsObject(pos, vel,
             pyglet.sprite.Sprite(self.animations['explosion'], batch=self.batch_level, group=self.group_fg),
             Vec2d(1, 1), self.animations['explosion'].get_duration()))
 
         explosion_power = 4
+
+        # break blocks
         it = Vec2d(0, 0)
         block_pos = (pos / tile_size).do(int)
         for it.y in range(explosion_power * 2):
@@ -696,13 +708,23 @@ class LevelPlayer(Screen):
                         self.setTile(pt, self.tiles.enum.Air)
 
         # see if we need to blow up any monsters
-        for obj in self.physical_objects:
+        if self.control_lemming < len(self.lemmings) and not caused_by_self:
+            it = itertools.chain(self.physical_objects, [self.lemmings[self.control_lemming]])
+        else:
+            it = self.physical_objects
+        for obj in it:
             if obj.gone:
                 continue
-            if obj.explodable:
-                if (obj.pos + (obj.size * tile_size) / 2).get_distance(pos) <= explosion_power * self.level.tilewidth:
+            obj_center = (obj.pos + (obj.size * tile_size) / 2)
+            distance = obj_center.get_distance(pos)
+            if distance < explosion_power * self.level.tilewidth:
+                if obj.explodable:
                     # kill monster
                     obj.delete()
+                else: # propel object by the explosion
+                    direction = obj_center - pos
+                    propel_factor = 20
+                    obj.vel += propel_factor * direction
 
     def handleGameOver(self):
         self.bg_music_player.pause()
@@ -901,12 +923,12 @@ class LevelPlayer(Screen):
                                 self.plus_ones_queued += 1
                                 self.setTile(block, self.tiles.enum.Air)
 
-                                sfx_player = self.sfx['coin_pickup'].play()
+                                sfx_player = self.playSoundAt('coin_pickup', block * tile_size)
                                 sfx_player.pitch = 2 - (len(self.lemmings) - self.control_lemming - 1) / len(self.lemmings)
                             elif tile.id == self.tiles.enum.PlusForever:
                                 self.plus_ones_queued = self.control_lemming
 
-                                sfx_player = self.sfx['coin_pickup'].play()
+                                sfx_player = self.playSoundAt('coin_pickup', block * tile_size)
                                 sfx_player.pitch = 1
                         # land mine
                         if tile.mine:
@@ -916,7 +938,7 @@ class LevelPlayer(Screen):
                                 self.handleExplosion(block * tile_size, Vec2d(0, 0))
                                 obj.delete()
                             self.setTile(block, self.tiles.enum.Air)
-                            self.sfx['mine_beep'].play()
+                            self.playSoundAt('mine_beep', block * tile_size)
 
                         # buttons
                         button_to_activate = None
@@ -952,7 +974,7 @@ class LevelPlayer(Screen):
                             pyglet.sprite.Sprite(self.animations[negate+'lem_die'], batch=self.batch_level, group=self.group_fg),
                             obj.size, self.animations['lem_die'].get_duration()))
 
-                    self.sfx['spike_death'].play()
+                    self.playSoundAt('spike_death', block_at_feet * tile_size)
 
             if tile_at_feet.belt is not None:
                 belt_velocity = 800
@@ -1062,7 +1084,7 @@ class LevelPlayer(Screen):
                         obj.sprite.image = self.animations[animation_name]
                         obj.frame.new_image = obj.sprite.image
 
-                        self.sfx['jump'].play()
+                        self.playSoundAt('jump', obj.pos)
                         self.setRunningSound(None)
                 else:
                     self.jump_scheduled = False
@@ -1356,8 +1378,7 @@ class LevelPlayer(Screen):
                     pos_grid = (pos / tile_size).do(int)
                     size = (Vec2d(obj.width, obj.height) / tile_size).do(int)
                     self.button_responders[obj.properties['button_id']] = TrapDoor(pos_grid, size,
-                        obj.properties['state'],
-                        pyglet.sprite.Sprite(img, x=pos.x, y=pos.y, batch=self.batch_level, group=group))
+                        obj.properties['state'], pyglet.sprite.Sprite(img, x=pos.x, y=pos.y, batch=self.batch_level, group=group), self)
                 elif obj.type == 'Button':
                     up_img = pyglet.resource.image(obj.properties['up_img'])
                     down_img = pyglet.resource.image(obj.properties['down_img'])
@@ -1410,7 +1431,13 @@ class LevelPlayer(Screen):
                         delay = float(obj.properties['delay'])
                     except KeyError:
                         delay = 1
-                    spawner = BombSpawner(pos, size, self, delay, state=state)
+                    try:
+                        fuse_min = float(obj.properties['fuse_min'])
+                        fuse_max = float(obj.properties['fuse_max'])
+                    except KeyError:
+                        fuse_min = 1
+                        fuse_max = 3
+                    spawner = BombSpawner(pos, size, self, delay, state=state, fuse_min=fuse_min, fuse_max=fuse_max)
                     self.button_responders[obj.properties['button_id']] = spawner
                     
 
@@ -1445,7 +1472,7 @@ class LevelPlayer(Screen):
         self.physical_objects.append(Bullet(pos, vel, pyglet.sprite.Sprite(self.img_bullet,
             x=pos.x, y=pos.y, batch=self.batch_level, group=self.group_fg), self))
 
-        self.sfx['gunshot'].play()
+        self.playSoundAt('gunshot', pos)
 
     def hitByBullet(self):
         self.explode_queued = True
@@ -1453,3 +1480,9 @@ class LevelPlayer(Screen):
     def spawnBomb(self, pos, vel, fuse):
         self.physical_objects.append(Bomb(pos, vel, fuse, pyglet.sprite.Sprite(self.img_bomb,
             x=pos.x, y=pos.y, batch=self.batch_level, group=self.group_fg), self))
+
+    def playSoundAt(self, sfx_name, pos):
+        player = self.sfx[sfx_name].play()
+        zero_volume_distance_sqrd = 640000
+        player.volume = 1 - pos.get_dist_sqrd(self.scroll + Vec2d(self.game.window.width / 2, self.game.window.height / 2)) / zero_volume_distance_sqrd
+        return player

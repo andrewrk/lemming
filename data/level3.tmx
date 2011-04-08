@@ -198,7 +198,7 @@
   </data>
  </layer>
  <objectgroup name="Object Layer 1" width="200" height="100">
-  <object name="StartPoint" type="StartPoint" x="1406" y="898" width="64" height="64"/>
+  <object name="StartPoint" type="StartPoint" x="960" y="320" width="64" height="64"/>
   <object name="trap door" type="TrapDoor" x="512" y="400" width="64" height="16">
    <properties>
     <property name="button_id" value="0"/>
@@ -441,10 +441,12 @@
     <property name="type" value="gunner"/>
    </properties>
   </object>
-  <object name="bomb spawner" type="BombSpawner" x="2112" y="944" width="112" height="16">
+  <object name="bomb spawner" type="BombSpawner" x="2112" y="928" width="102" height="15">
    <properties>
     <property name="button_id" value="main_belt"/>
     <property name="delay" value="0.2"/>
+    <property name="fuse_max" value="2"/>
+    <property name="fuse_min" value="2"/>
     <property name="state" value="on"/>
    </properties>
   </object>
@@ -470,6 +472,18 @@
    </properties>
   </object>
   <object name="win!" type="Victory" x="1728" y="1408" width="256" height="128"/>
+  <object type="ConveyorBelt" x="2160" y="992" width="64" height="16">
+   <properties>
+    <property name="button_id" value="main_belt"/>
+    <property name="direction" value="-1"/>
+   </properties>
+  </object>
+  <object type="ConveyorBelt" x="2096" y="992" width="64" height="16">
+   <properties>
+    <property name="button_id" value="main_belt"/>
+    <property name="direction" value="-1"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup name="PlayerLayer" width="200" height="100"/>
 </map>
