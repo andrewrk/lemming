@@ -136,6 +136,12 @@ class Gunner(PhysicsObject):
         bullet_init_vel = Vec2d(1100*self.direction, 200)
         self.game.spawnBullet(self.pos+gun_offset, self.vel+bullet_init_vel)
 
+        if self.direction < 0:
+            name = '-gunner_shoot'
+        elif self.direction > 0:
+            name = 'gunner_shoot'
+        self.sprite.image = self.game.animations[name]
+
     def changeDirection(self, new_dir):
         if new_dir == self.direction:
             return
