@@ -46,9 +46,10 @@ class Control:
     Explode = 6
 
 class LemmingFrame(object):
-    def __init__(self, pos, vel, next_node, new_image=None):
+    def __init__(self, pos, vel, next_node, new_image=None, on_ladder=False):
         self.pos = pos
         self.vel = vel
+        self.on_ladder = on_ladder
         self.next_node = next_node
         self.prev_node = None
         self.new_image = new_image
@@ -68,6 +69,7 @@ class PhysicsObject(object):
         self.is_belly_flop = is_belly_flop
         self.direction = direction
         self.explodable = False
+        self.on_ladder = False
 
     def delete(self):
         self.gone = True
@@ -152,6 +154,19 @@ class Gunner(PhysicsObject):
             name = 'gunner_still'
 
         self.sprite.image = self.game.animations[name]
+
+class Bomb(PhysicsObject):
+    def __init__(self, pos, vel, fuse, sprite, game):
+        super(Bomb, self).__init__(pos, vel, sprite, Vec2d(1, 1))
+        self.game = game
+        self.fuse = fuse
+    
+    def think(self, dt):
+        self.fuse -= dt
+
+        if self.fuse <= 0:
+            self.game.handleExplosion(self.pos, self.vel)
+            self.delete()
 
 class Bullet(PhysicsObject):
     def __init__(self, pos, vel, sprite, game):
@@ -366,6 +381,39 @@ class Button(AbstractButton):
             self.up_sprite.visible = True
             self.down_sprite.visible = False
 
+class BombSpawner(ButtonResponder):
+    def __init__(self, pos, size, game, delay, state='on'):
+        self.pos = pos
+        self.size = size
+        self.game = game
+        self.delay = delay
+        self.state = state == 'on'
+
+        self.game.intervals.append(self.spawn)
+        self.toggle()
+        self.toggle()
+
+    def toggle(self):
+        self.state = not self.state
+
+        if self.state:
+            pyglet.clock.schedule_interval(self.spawn, self.delay)
+        else:
+            pyglet.clock.unschedule(self.spawn)
+
+    def spawn(self, dt):
+        # pick random location within my size
+        pos = self.pos + Vec2d(random.random() * self.size.x, random.random() * self.size.y)
+
+        # pick random fuse length
+        fuse = 1 + random.random() * 3
+
+        # vary the velocity by tiny amounts
+        vel = Vec2d(random.random() * 100 - 50, random.random() * 100 - 50)
+
+        self.game.spawnBomb(pos, vel, fuse)
+        
+
 class LevelPlayer(Screen):
     def getNextGroupNum(self):
         val = self.next_group_num
@@ -436,6 +484,7 @@ class LevelPlayer(Screen):
         
         self.img_hud = pyglet.resource.image('hud.png')
         self.img_bullet = pyglet.resource.image('bullet.png')
+        self.img_bomb = pyglet.resource.image('bomb.png')
 
 
         if self.level.properties.has_key('bg_art'):
@@ -480,6 +529,7 @@ class LevelPlayer(Screen):
         self.platform_objects = []
         self.buttons = {}
         self.victory = {}
+        self.intervals = []
 
         self.batch_bg2 = pyglet.graphics.Batch()
         self.batch_bg1 = pyglet.graphics.Batch()
@@ -509,8 +559,9 @@ class LevelPlayer(Screen):
     def clear(self):
         self.game.window.remove_handlers()
 
-        pyglet.clock.unschedule(self.update)
-        pyglet.clock.unschedule(self.garbage_collect)
+        for interval in self.intervals:
+            pyglet.clock.unschedule(interval)
+        self.intervals = None
 
         self.bg_music_player.pause()
         self.bg_music_player = None
@@ -533,6 +584,7 @@ class LevelPlayer(Screen):
         self.running_sound_player.pause()
         self.running_sound_player = None
 
+
     def start(self):
         self.load()
         
@@ -546,7 +598,6 @@ class LevelPlayer(Screen):
         self.lemmings = [None] * lemming_count
         self.control_state = [False] * (len(dir(Control)) - 2)
         self.control_lemming = 0
-        self.on_ladder = False
         self.held_by = None
         self.handled_victory = False
 
@@ -565,20 +616,22 @@ class LevelPlayer(Screen):
             self.lemmings[i] = Lemming(sprite, None)
 
         # generate frames for trails
-        head_frame = LemmingFrame(Vec2d(self.start_point), Vec2d(0, 0), None)
+        head_frame = LemmingFrame(Vec2d(self.start_point), Vec2d(0, 0), None, on_ladder=False)
         lemming_index = len(self.lemmings) - 1
         self.lemmings[lemming_index].frame = head_frame
         lemming_index -= 1
         lemming_frame_count = 1
         while game.target_fps * lemming_response_time * (len(self.lemmings)-1) > lemming_frame_count:
-            head_frame = LemmingFrame(Vec2d(head_frame.pos), Vec2d(head_frame.vel), head_frame)
+            head_frame = LemmingFrame(Vec2d(head_frame.pos), Vec2d(head_frame.vel), head_frame, on_ladder=False)
             lemming_frame_count += 1
             if int((len(self.lemmings) - 1 - lemming_index) * game.target_fps * lemming_response_time) == lemming_frame_count:
                 self.lemmings[lemming_index].frame = head_frame
                 lemming_index -= 1
 
         pyglet.clock.schedule_interval(self.update, 1/game.target_fps)
+        self.intervals.append(self.update)
         pyglet.clock.schedule_interval(self.garbage_collect, 10)
+        self.intervals.append(self.garbage_collect)
         self.fps_display = pyglet.clock.ClockDisplay()
 
         self.sfx['level_start'].play()
@@ -711,19 +764,19 @@ class LevelPlayer(Screen):
             # add the missing frames
             old_last_frame = self.lemmings[-2].frame
             last_lem = Lemming(pyglet.sprite.Sprite(self.animations['lem_crazy'], batch=self.batch_level, group=self.group_char),
-                LemmingFrame(Vec2d(old_last_frame.pos), Vec2d(old_last_frame.vel), None))
+                LemmingFrame(Vec2d(old_last_frame.pos), Vec2d(old_last_frame.vel), None, on_ladder=old_last_frame.on_ladder))
             self.lemmings[-1] = last_lem
             last_lem.sprite.opacity = 128
             node = last_lem.frame
             for i in range(int(game.target_fps * lemming_response_time)):
-                node = LemmingFrame(Vec2d(old_last_frame.pos), Vec2d(old_last_frame.vel), node)
+                node = LemmingFrame(Vec2d(old_last_frame.pos), Vec2d(old_last_frame.vel), node, on_ladder=old_last_frame.on_ladder)
             old_last_frame.next_node = node
             node.prev_node = old_last_frame
 
         # lemming trails
         if self.control_lemming < len(self.lemmings):
             char = self.lemmings[self.control_lemming]
-            char.frame = LemmingFrame(Vec2d(char.frame.pos), Vec2d(char.frame.vel), char.frame)
+            char.frame = LemmingFrame(Vec2d(char.frame.pos), Vec2d(char.frame.vel), char.frame, on_ladder=char.frame.on_ladder)
 
             for lemming in self.lemmings[self.control_lemming+1:]:
                 lemming.frame = lemming.frame.prev_node
@@ -731,6 +784,7 @@ class LevelPlayer(Screen):
 
             char.pos = char.frame.pos
             char.vel = char.frame.vel
+            char.on_ladder = char.frame.on_ladder
         else:
             char = None
 
@@ -754,7 +808,7 @@ class LevelPlayer(Screen):
             # collision with solid blocks
             new_pos = obj.pos + obj.vel * dt
             def resolve_y(new_pos, vel, obj_size):
-                if self.on_ladder:
+                if obj.on_ladder:
                     return
 
                 new_feet_block = (new_pos / tile_size).do(int)
@@ -787,7 +841,7 @@ class LevelPlayer(Screen):
                         return
 
             def resolve_x(new_pos, vel, obj_size):
-                if self.on_ladder:
+                if obj.on_ladder:
                     return
 
                 if vel.x != 0:
@@ -828,7 +882,7 @@ class LevelPlayer(Screen):
             block_at_feet_solid = self.getBlockIsSolid(block_at_feet)
             on_ground = block_at_feet_solid
 
-            if not on_ground and not self.on_ladder:
+            if not on_ground and not obj.on_ladder:
                 self.setRunningSound(None)
 
             if obj.can_pick_up_stuff:
@@ -899,9 +953,10 @@ class LevelPlayer(Screen):
                             obj.size, self.animations['lem_die'].get_duration()))
 
                     self.sfx['spike_death'].play()
-                elif tile_at_feet.belt is not None:
-                    belt_velocity = 800
-                    apply_belt_velocity = tile_at_feet.belt * belt_velocity * dt
+
+            if tile_at_feet.belt is not None:
+                belt_velocity = 800
+                apply_belt_velocity = tile_at_feet.belt * belt_velocity * dt
 
             if obj == char:
                 # scroll the level
@@ -933,10 +988,10 @@ class LevelPlayer(Screen):
                 move_up = self.control_state[Control.MoveUp]
                 move_down = self.control_state[Control.MoveDown]
                 if not move_up and (move_left or move_right or move_down):
-                    self.on_ladder = False
+                    obj.on_ladder = False
                 ladder_at_feet = self.getTile(block_at_feet, 1)
-                if self.on_ladder and not ladder_at_feet.ladder:
-                    self.on_ladder = False
+                if obj.on_ladder and not ladder_at_feet.ladder:
+                    obj.on_ladder = False
                 if move_left and not move_right:
                     if obj.vel.x - acceleration * dt < -max_speed:
                         obj.vel.x += min(-max_speed - obj.vel.x, 0)
@@ -973,7 +1028,7 @@ class LevelPlayer(Screen):
                             self.setRunningSound(None)
                 ladder_velocity = 200
                 if move_up and ladder_at_feet.ladder:
-                    self.on_ladder = True
+                    obj.on_ladder = True
                     obj.vel.y = 0
                     obj.vel.x = 0
                     obj.pos.y += ladder_velocity * dt
@@ -985,7 +1040,7 @@ class LevelPlayer(Screen):
 
                         self.setRunningSound(self.sfx['ladder'])
                 elif move_down and ladder_at_feet.ladder:
-                    self.on_ladder = True
+                    obj.on_ladder = True
                     obj.vel.x = 0
                     obj.pos.y -= ladder_velocity * dt
 
@@ -1012,7 +1067,7 @@ class LevelPlayer(Screen):
                 else:
                     self.jump_scheduled = False
 
-                if self.on_ladder and (not move_up and not move_down):
+                if obj.on_ladder and (not move_up and not move_down):
                     # switch sprite to ladder, still
                     if obj.sprite.image != self.animations['lem_climb_still']:
                         obj.sprite.image = self.animations['lem_climb_still']
@@ -1024,7 +1079,7 @@ class LevelPlayer(Screen):
 
             # gravity
             gravity_accel = 800
-            if not on_ground and not self.on_ladder:
+            if not on_ground and not obj.on_ladder:
                 obj.vel.y -= gravity_accel * dt
 
             # friction
@@ -1059,6 +1114,7 @@ class LevelPlayer(Screen):
         if char is not None:
             char.frame.pos = char.pos
             char.frame.vel = char.vel
+            char.frame.on_ladder = char.on_ladder
 
         # prepare sprites for drawing
         # physical objects
@@ -1343,6 +1399,20 @@ class LevelPlayer(Screen):
                     self.button_responders[obj.properties['button_id']] = ConveyorBelt(pos_grid, size, 
                         pyglet.sprite.Sprite(self.animations['belt_on'], x=pos.x, y=pos.y, group=group, batch=self.batch_level),
                         self, state=state, direction=direction)
+                elif obj.type == 'BombSpawner':
+                    pos = Vec2d(obj.x, translate_y(obj.y, obj.height))
+                    size = Vec2d(obj.width, obj.height)
+                    try:
+                        state = obj.properties['state']
+                    except KeyError:
+                        state = 'on'
+                    try:
+                        delay = float(obj.properties['delay'])
+                    except KeyError:
+                        delay = 1
+                    spawner = BombSpawner(pos, size, self, delay, state=state)
+                    self.button_responders[obj.properties['button_id']] = spawner
+                    
 
         if not had_start_point:
             assert False, "Level missing start point."
@@ -1372,10 +1442,14 @@ class LevelPlayer(Screen):
         pyglet.app.run()
 
     def spawnBullet(self, pos, vel):
-        self.physical_objects.append(Bullet(pos, vel, pyglet.sprite.Sprite(self.img_bullet, x=pos.x, y=pos.y, batch=self.batch_level, group=self.group_fg), self))
+        self.physical_objects.append(Bullet(pos, vel, pyglet.sprite.Sprite(self.img_bullet,
+            x=pos.x, y=pos.y, batch=self.batch_level, group=self.group_fg), self))
 
         self.sfx['gunshot'].play()
 
     def hitByBullet(self):
         self.explode_queued = True
         
+    def spawnBomb(self, pos, vel, fuse):
+        self.physical_objects.append(Bomb(pos, vel, fuse, pyglet.sprite.Sprite(self.img_bomb,
+            x=pos.x, y=pos.y, batch=self.batch_level, group=self.group_fg), self))

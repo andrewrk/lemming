@@ -443,7 +443,9 @@
   </object>
   <object name="bomb spawner" type="BombSpawner" x="2112" y="944" width="112" height="16">
    <properties>
-    <property name="rate" value="10"/>
+    <property name="button_id" value="main_belt"/>
+    <property name="delay" value="0.2"/>
+    <property name="state" value="on"/>
    </properties>
   </object>
   <object type="Decoration" x="2112" y="864" width="112" height="80">

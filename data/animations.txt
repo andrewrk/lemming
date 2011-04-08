@@ -9,7 +9,7 @@ lem_die:0.1:1:32:0:16:64    = lem/04.png, lem/05.png, lem/06.png, lem/07.png, le
 lem_climb:0.1:1:32:0:16:64  = lem/25.png, lem/26.png, lem/27.png, lem/28.png, lem/27.png, lem/26.png
 lem_climb_still:0.1:1:32:0:16:64 = lem/27.png
 
-explosion:0.05:1:0:0:63:83  = explosion/01.png, explosion/02.png, explosion/03.png, explosion/04.png, explosion/05.png, explosion/06.png, explosion/07.png, explosion/08.png, explosion/09.png, explosion/10.png, explosion/11.png, explosion/12.png
+explosion:0.05:1:30:40:1:1  = explosion/01.png, explosion/02.png, explosion/03.png, explosion/04.png, explosion/05.png, explosion/06.png, explosion/07.png, explosion/08.png, explosion/09.png, explosion/10.png, explosion/11.png, explosion/12.png
 
 house:0.1:1:0:0:224:240     = house/01.png, house/02.png, house/03.png, house/04.png
 
