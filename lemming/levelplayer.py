@@ -560,6 +560,7 @@ class LevelPlayer(Screen):
             self.sprite_bg_left.set_position(0, 0)
             self.sprite_bg_right.set_position(self.sprite_bg_left.width, 0)
         else:
+            print("map is issing 'bg_art' property")
             self.sprite_bg_left = None
             self.sprite_bg_right = None
 
@@ -572,6 +573,7 @@ class LevelPlayer(Screen):
             self.sprite_bg2_left.set_position(0, 0)
             self.sprite_bg2_right.set_position(self.sprite_bg2_left.width, 0)
         else:
+            print("map is issing 'fg_art' property")
             self.sprite_bg2_left = None
             self.sprite_bg2_right = None
 
@@ -715,7 +717,7 @@ class LevelPlayer(Screen):
         monster.sprite.image = self.animations[negate+'monster_throw']
         def reset_animation():
             monster.sprite.image = self.animations[negate+'monster_still']
-            self.lemmings[self.control_lemming].frame.vel = throw_vel
+            self.lemmings[self.control_lemming].frame.vel = Vec2d(throw_vel)
             self.lemmings[self.control_lemming].sprite.visible = True
             self.held_by = None
             def not_grabbing(dt):
@@ -1458,15 +1460,27 @@ class LevelPlayer(Screen):
                             pyglet.sprite.Sprite(self.animations['tank_point'], x=pos.x, y=pos.y, group=group, batch=self.batch_level), self, dir_lock=dir_lock))
                             
                 elif obj.type == 'Bridge':
-                    up_img = pyglet.resource.image(obj.properties['up_img'])
-                    down_img = pyglet.resource.image(obj.properties['down_img'])
+                    try:
+                        up_img = pyglet.resource.image(obj.properties['up_img'])
+                        down_img = pyglet.resource.image(obj.properties['down_img'])
+                    except KeyError:
+                        up_img = pyglet.resource.image('bridge_up.png')
+                        down_img = pyglet.resource.image('bridge_down.png')
+                    try:
+                        state = obj.properties['state']
+                    except KeyError:
+                        state = 'up'
+                    try:
+                        button_id = obj.properties['button_id']
+                    except KeyError:
+                        button_id = '0'
                     bridge_pos = Vec2d(obj.x, translate_y(obj.y, obj.height))
                     bridge_pos_grid = (bridge_pos / tile_size).do(int)
                     bridge_size = (Vec2d(obj.width, obj.height) / tile_size).do(int)
-                    bridge = Bridge(bridge_pos_grid, bridge_size, obj.properties['state'],
+                    bridge = Bridge(bridge_pos_grid, bridge_size, state,
                         pyglet.sprite.Sprite(up_img, x=bridge_pos.x, y=bridge_pos.y, batch=self.batch_level, group=group),
                         pyglet.sprite.Sprite(down_img, x=bridge_pos.x, y=bridge_pos.y, batch=self.batch_level, group=group))
-                    self.button_responders[obj.properties['button_id']] = bridge
+                    self.button_responders[button_id] = bridge
                     self.platform_objects.append(bridge)
                 elif obj.type == 'TrapDoor':
                     img = pyglet.resource.image(obj.properties['img'])
@@ -1476,14 +1490,26 @@ class LevelPlayer(Screen):
                     self.button_responders[obj.properties['button_id']] = TrapDoor(pos_grid, size,
                         obj.properties['state'], pyglet.sprite.Sprite(img, x=pos.x, y=pos.y, batch=self.batch_level, group=group), self)
                 elif obj.type == 'Button':
-                    up_img = pyglet.resource.image(obj.properties['up_img'])
-                    down_img = pyglet.resource.image(obj.properties['down_img'])
+                    try:
+                        up_img = pyglet.resource.image(obj.properties['up_img'])
+                        down_img = pyglet.resource.image(obj.properties['down_img'])
+                    except KeyError:
+                        up_img = pyglet.resource.image('button_up.png')
+                        down_img = pyglet.resource.image('button_down.png')
+                    try:
+                        button_id = obj.properties['button_id']
+                    except KeyError:
+                        button_id = '0'
+                    try:
+                        delay = float(obj.properties['delay'])
+                    except:
+                        delay = 2
                     button_pos = Vec2d(obj.x, translate_y(obj.y, obj.height))
                     button_pos_grid = (button_pos / tile_size).do(int)
-                    self.buttons[tuple(button_pos_grid)] = Button(button_pos_grid, obj.properties['button_id'],
+                    self.buttons[tuple(button_pos_grid)] = Button(button_pos_grid, button_id,
                         pyglet.sprite.Sprite(up_img, x=button_pos.x, y=button_pos.y, batch=self.batch_level, group=group),
                         pyglet.sprite.Sprite(down_img, x=button_pos.x, y=button_pos.y, batch=self.batch_level, group=group),
-                        float(obj.properties['delay']), self)
+                        delay, self)
                 elif obj.type == 'GearButton':
                     pos = Vec2d(obj.x, translate_y(obj.y, obj.height))
                     size = (Vec2d(obj.width, obj.height) / tile_size).do(int)

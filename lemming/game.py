@@ -7,10 +7,7 @@ import levelplayer
 import winscreen
 import os
 
-levels = [
-    'level1.tmx',
-    'level2.tmx',
-]
+levels = ['level{0}.tmx'.format(i) for i in range(5)]
 
 target_fps = 60
 

@@ -8,27 +8,16 @@
  <tileset firstgid="1" source="tiles.tsx"/>
  <layer name="Tiles" width="200" height="100">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3czU7CUBSF0TIA48DEgQ58/xdVIiQE7ukPXHoOsFbyjTRQaHcUJA4DAAAAAAAAAAAAAAAAAABc2h4CLtkHxOwDYvYBMfuAmH1AzD4gZh8Qsw+I2QfE7ANi9gEx+4CYfUDMPiBmHxCzD4jZB8TsA2L2ATH7gJh9QMw+IGYfELMPiNkHxOwDYvYBMfuAmH3w6j5POmcfVPSz0v3sN/Fx0vlG7IMKNn+9jXSLsdudyj7Itt/GdqJbfDeaur+e9w/XmrONe1yfX8OyzZDj+HvFe/aBJJi7jbWuz7HN0N/U787n10fVjcx9rbzkNfWSbWRen8fNPJtbXpP16nhup76+nfG9c16nZj/ea56b6vt4Vkuf/0fpFR+zffSXfT7twz4qyz6f92o3Uvax2cfjyD6fso/Kss+n+jb2c3M39LHpdDunrvmczBqfrck+n+rbWu+ptWS/11fh/UNpX0v2MUlVask+JqlKLdnHJFWpJfuYpCq1ZB+TVKVX+7urJEmSJEmSVLHW/3SR9B8AAAAAAAAAAAAAAAAAAAAAAAAANfwCLfpEO4A4AQA=
+   H4sIAAAAAAAAA+3TwQkAIAwEwXzECuy/VSs48BUMzMCWsFUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwj90QTLUagqn8AZk/IPMHZP6AzB+Q+QMyf0DmD8hOQwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAC8uOgtY3IA4AQA=
   </data>
  </layer>
  <layer name="Ladders" width="200" height="100">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3TMQ0AMAzAsAIYf7z7K+XeDhtBnswAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACwndcB8DF/QPMHNH9A8wc0f0DzBzR/QPMHNH9A8wcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAXdXdxg4A4AQA=
+   H4sIAAAAAAAAA+3BgQAAAADDoPlTH+AKVQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwBtmAymRgDgBAA==
   </data>
  </layer>
  <objectgroup name="Objects" width="200" height="100">
-  <object type="Decoration" x="0" y="640" width="224" height="240">
-   <properties>
-    <property name="animation" value="house"/>
-   </properties>
-  </object>
-  <object name="movement text" type="Text" x="240" y="640" width="336" height="80">
-   <properties>
-    <property name="font_size" value="18"/>
-    <property name="text" value="Use the arrow keys to move around and jump."/>
-   </properties>
-  </object>
-  <object name="start" type="StartPoint" x="240" y="816" width="32" height="64"/>
+  <object name="start" type="StartPoint" x="64" y="816" width="32" height="64"/>
   <object name="mines text" type="Text" x="1584" y="624" width="208" height="112">
    <properties>
     <property name="font_size" value="18"/>

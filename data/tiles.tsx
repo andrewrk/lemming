@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tileset name="default" tilewidth="16" tileheight="16">
- <image source="tiles.png" width="64" height="96"/>
+ <image source="tiles.png" width="64" height="192"/>
  <tile id="0">
   <properties>
    <property name="name" value="DirtRampRight"/>
@@ -20,7 +20,8 @@
  </tile>
  <tile id="3">
   <properties>
-   <property name="name" value="Bullet"/>
+   <property name="name" value="SolidInvisible"/>
+   <property name="solid" value="1"/>
   </properties>
  </tile>
  <tile id="4">
@@ -135,6 +136,46 @@
   <properties>
    <property name="breakable" value="1"/>
    <property name="name" value="BreakableDirt"/>
+   <property name="solid" value="1"/>
+  </properties>
+ </tile>
+ <tile id="23">
+  <properties>
+   <property name="solid" value="1"/>
+  </properties>
+ </tile>
+ <tile id="24">
+  <properties>
+   <property name="mine" value="1"/>
+  </properties>
+ </tile>
+ <tile id="25">
+  <properties>
+   <property name="breakable" value="1"/>
+   <property name="solid" value="1"/>
+  </properties>
+ </tile>
+ <tile id="26">
+  <properties>
+   <property name="solid" value="1"/>
+  </properties>
+ </tile>
+ <tile id="27">
+  <properties>
+   <property name="solid" value="1"/>
+  </properties>
+ </tile>
+ <tile id="28">
+  <properties>
+   <property name="belt" value="-1"/>
+   <property name="name" value="BeltLeft"/>
+   <property name="solid" value="1"/>
+  </properties>
+ </tile>
+ <tile id="29">
+  <properties>
+   <property name="belt" value="1"/>
+   <property name="name" value="BeltRight"/>
    <property name="solid" value="1"/>
   </properties>
  </tile>
