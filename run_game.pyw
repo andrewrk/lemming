@@ -1,3 +1,5 @@
-import yourgameshortname.main
+#!/usr/bin/env python
+
+import lemming.__main__
 if __name__ == "__main__":
-    yourgameshortname.main.main()
+    lemming.__main__.main()
