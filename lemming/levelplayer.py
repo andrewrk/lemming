@@ -408,6 +408,7 @@ class Gear(AbstractButton):
         self.game.hitButtonId(self.button_id)
         self.sprite.image = self.game.animations['gear_bloody']
         self.game.playSoundAt('spike_death', who_done_it.pos)
+        self.spawnGoreExplosion(who_done_it.pos, who_done_it.vel, who_done_it.size)
 
         if is_char:
             self.game.detatch_queued = True
@@ -552,7 +553,7 @@ class LevelPlayer(Screen):
         self.img_hud = pyglet.resource.image('hud.png')
         self.img_bullet = pyglet.resource.image('bullet.png')
         self.img_bomb = pyglet.resource.image('bomb.png')
-
+        self.img_gore = [pyglet.resource.image('gore1.png'), pyglet.resource.image('gore2.png'), pyglet.resource.image('gore3.png')]
 
         if self.level.properties.has_key('bg_art'):
             img = pyglet.resource.image(self.level.properties['bg_art'])
@@ -1057,6 +1058,7 @@ class LevelPlayer(Screen):
                             obj.size, self.animations['lem_die'].get_duration()))
 
                     self.playSoundAt('spike_death', block_at_feet * tile_size)
+                    self.spawnGoreExplosion(obj.pos, obj.vel, obj.size)
 
             if tile_at_feet.belt is not None:
                 belt_velocity = 800
@@ -1616,3 +1618,24 @@ class LevelPlayer(Screen):
         zero_volume_distance_sqrd = 640000
         player.volume = 1 - pos.get_dist_sqrd(self.scroll + Vec2d(self.game.window.width / 2, self.game.window.height / 2)) / zero_volume_distance_sqrd
         return player
+
+    def spawnGoreExplosion(self, pos, vel, size):
+        # how many to spawn
+        amt = random.randint(10, 30)
+
+        vel_variability = Vec2d(300, 200)
+        center_vel = Vec2d(0, 300)
+        for i in range(amt):
+            # pick a random position
+            this_pos = pos + Vec2d(random.random() * size.x * self.level.tilewidth, random.random() * size.y * self.level.tileheight)
+
+            # pick velocity
+            this_vel = center_vel + Vec2d(random.random() * vel_variability.x - vel_variability.x / 2,
+                random.random() * vel_variability.y - vel_variability.y / 2)
+
+            # pick graphic
+            this_graphic = self.img_gore[random.randint(0, len(self.img_gore) - 1)]
+
+            self.physical_objects.append(PhysicsObject(this_pos, this_vel,
+                pyglet.sprite.Sprite(this_graphic, x=this_pos.x, y=this_pos.y, group=self.group_fg, batch=self.batch_level),
+                Vec2d(1, 1), life=10))

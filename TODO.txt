@@ -1,7 +1,6 @@
 Day 7:
- * belly flop physics glitch
+ * make bullets not miss
  * create as many levels as possible exploring those concepts
- * gory explosion of bloody organs when you die on spikes
  * critical bug: if you die several times, memory keeps expanding and sound stops
  * don't call game over until the belly flop turns to dead body
  * make sure it works on windows and mac
