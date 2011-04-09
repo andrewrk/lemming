@@ -909,6 +909,16 @@ class LevelPlayer(Screen):
         else:
             char = None
 
+        # scroll the level
+        if char is not None:
+            if self.held_by is None:
+                desired_scroll = self.getDesiredScroll(Vec2d(char.pos))
+            else:
+                desired_scroll = self.getDesiredScroll(Vec2d(self.held_by.pos))
+
+            scroll_diff = desired_scroll - self.scroll
+            self.scroll += scroll_diff * 0.20
+
         # physics
         for obj in itertools.chain(self.physical_objects, [char]):
             if obj is None or obj.gone:
@@ -1112,15 +1122,6 @@ class LevelPlayer(Screen):
                     apply_belt_velocity += tile.belt * belt_velocity * dt
 
             if obj == char:
-                # scroll the level
-                if self.held_by is None:
-                    desired_scroll = self.getDesiredScroll(Vec2d(obj.pos))
-                else:
-                    desired_scroll = self.getDesiredScroll(Vec2d(self.held_by.pos))
-
-                scroll_diff = desired_scroll - self.scroll
-                self.scroll += scroll_diff * 0.20
-
                 # apply input to physics
                 acceleration = 900
                 max_speed = 200
