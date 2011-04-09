@@ -7,12 +7,12 @@
  <tileset firstgid="1" source="tiles.tsx"/>
  <layer name="Tile Layer 1" width="100" height="100">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3VvQqAIBiGUbfmpu7/Thta4oN+DIqXPAdcUht8BFsDAAAAAAAAAAAAAAAA4Ikl5B9s9MiiRxY9suiRRY8semTRI4seWfTIokcWPbLokSWtx1xG/f53X/a4c55na0brMXXs26+906Pe+6P7fjY/Qo/pxVH1nueIPdJcvR+aAAAAAAAAAAAAAAAAAAAAAAAA8Ccr4CIRX0CcAAA=
+   H4sIAAAAAAAAA+3XsQqDMABFUSedO/X//1SKSwg1NSrlYc6BgGhwyDUEpwkAAAAAAAAAAAAAAACAM94h72CjRxY9suiRRY8semT5rOVycehxH/sjix5Z9MjSWstl57rnHfSxP7LokSWtx6sa9f2n+2ePI+vZmjNaj/LMnr/MLe+Vc4/0qL/7ve+99XyEHlf/zVuj1rueI/ZI8+v80AQAAAAAAAAAAAAAAAAAAAAAAIAnWQH6u+zOQJwAAA==
   </data>
  </layer>
  <layer name="ladders" width="100" height="100">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3BMQEAAADCoPVP7WULoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgBt5RKnmQJwAAA==
+   H4sIAAAAAAAAA+3VoQ0AIAxFQRQY9p+XBWhCQPDFnaqp6RNtDQAAAAAAAAAAAAAAAAAAADLMT7vsVTcdxXyyyz09suiRxf/IokcWPbLokUWPLNVNezGf7AIAAAAAAAAAAAAAAAAAAAAAAADAiwWan1xbQJwAAA==
   </data>
  </layer>
  <objectgroup name="Object Layer 1" width="100" height="100">

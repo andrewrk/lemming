@@ -1092,7 +1092,7 @@ class LevelPlayer(Screen):
                         self.setTile(corner_foot_block+Vec2d(1,0), self.tiles.enum.DeadBodyMiddle)
                         self.setTile(corner_foot_block+Vec2d(2,0), self.tiles.enum.DeadBodyRight)
                     else:
-                        self.setTile(corner_foot_block, self.tiles.enum.DeadBodyMiddle)
+                        self.setTile(corner_foot_block+Vec2d(1,0), self.tiles.enum.DeadBodyMiddle)
 
                         negate = ''
                         if obj.vel.x < 0:
@@ -1107,7 +1107,7 @@ class LevelPlayer(Screen):
             belt_velocity = 800
             for tile in tiles_at_feet:
                 if tile.belt is not None:
-                    apply_belt_velocity += tile_at_feet.belt * belt_velocity * dt
+                    apply_belt_velocity += tile.belt * belt_velocity * dt
 
             if obj == char:
                 # scroll the level
