@@ -7,16 +7,16 @@
  <tileset firstgid="1" source="tiles.tsx"/>
  <layer name="Tile Layer 1" width="100" height="100">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3XsQqDMABFUSedO/X//1SKSwg1NSrlYc6BgGhwyDUEpwkAAAAAAAAAAAAAAACAM94h72CjRxY9suiRRY8semT5rOVycehxH/sjix5Z9MjSWstl57rnHfSxP7LokSWtx6sa9f2n+2ePI+vZmjNaj/LMnr/MLe+Vc4/0qL/7ve+99XyEHlf/zVuj1rueI/ZI8+v80AQAAAAAAAAAAAAAAAAAAAAAAIAnWQH6u+zOQJwAAA==
+   H4sIAAAAAAAAA+3Xyw6CMBBAUTbC2pX//6eG6KJpMrVVNFM8J2niA1jMJWKXBQAAAAAAAAAAAAAAAIB33JJcgwc9ctEjFz1y0SMXPXLZZ7kFqxYdp8dxWrPcgtcj12CMHrnokYvneS569Ls01lH0+NyZe1yrVX+e0aw9eubZOmbWHiO/beUsy/9Q63NF78tje3rU9310v7e+n7lHr2jPPbI/7z1/dJ7/2CObV8+PjE3O3GNG+7zXxtLjt1r7km/sUQAAAAAAAAAAAAAAAAAAAAAAYDZ3ioEP1ECcAAA=
   </data>
  </layer>
  <layer name="ladders" width="100" height="100">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3VoQ0AIAxFQRQY9p+XBWhCQPDFnaqp6RNtDQAAAAAAAAAAAAAAAAAAADLMT7vsVTcdxXyyyz09suiRxf/IokcWPbLokUWPLNVNezGf7AIAAAAAAAAAAAAAAAAAAAAAAADAiwWan1xbQJwAAA==
+   H4sIAAAAAAAAA+3RIQEAMAzAsAmYf70zcP6ChBd1BgAAAAAAAAAAAAAAAAAAABr2U8ubHy1+tPjR4keLHy1+tPjR4keLHwAAAAAAAAAAAAAAAAAAAAAAAADUHEJ9ZqBAnAAA
   </data>
  </layer>
  <objectgroup name="Object Layer 1" width="100" height="100">
-  <object name="start" type="StartPoint" x="557" y="720" width="32" height="64"/>
+  <object name="start" type="StartPoint" x="304" y="800" width="32" height="64"/>
  </objectgroup>
  <objectgroup name="PlayerLayer" width="100" height="100"/>
 </map>

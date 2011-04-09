@@ -132,7 +132,7 @@ class Tank(PhysicsObject):
             self.can_shoot = True
         pyglet.clock.schedule_once(recharge, self.shoot_delay)
 
-        gun_offset = Vec2d(48*self.direction, 32)
+        gun_offset = Vec2d(28*self.direction, 32)
         bullet_init_vel = Vec2d(350*self.direction, 300)
         self.game.spawnBomb(self.pos+gun_offset, self.vel+bullet_init_vel, 1)
 
@@ -1092,7 +1092,9 @@ class LevelPlayer(Screen):
                         self.setTile(corner_foot_block+Vec2d(1,0), self.tiles.enum.DeadBodyMiddle)
                         self.setTile(corner_foot_block+Vec2d(2,0), self.tiles.enum.DeadBodyRight)
                     else:
-                        self.setTile(corner_foot_block+Vec2d(1,0), self.tiles.enum.DeadBodyMiddle)
+                        self.setTile(corner_foot_block, self.tiles.enum.DeadBodyMiddle)
+                        if len(blocks_at_feet) > obj.size.x:
+                            self.setTile(corner_foot_block+Vec2d(1,0), self.tiles.enum.DeadBodyMiddle)
 
                         negate = ''
                         if obj.vel.x < 0:
@@ -1654,7 +1656,13 @@ class LevelPlayer(Screen):
         self.playSoundAt('gunshot', pos)
 
     def hitByBullet(self):
-        self.explode_queued = True
+        try:
+            char = self.lemmings[self.control_lemming]
+        except IndexError:
+            return
+
+        self.detatch_queued = True
+        self.spawnGoreExplosion(char.pos, char.vel, char.size)
         
     def spawnBomb(self, pos, vel, fuse):
         self.physical_objects.append(Bomb(pos, vel, fuse, pyglet.sprite.Sprite(self.img_bomb,
