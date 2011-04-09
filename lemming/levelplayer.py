@@ -806,6 +806,7 @@ class LevelPlayer(Screen):
                     direction = obj_center - pos
                     propel_factor = 20
                     obj.vel += propel_factor * direction
+                    obj.on_ladder = False
 
     def handleGameOver(self):
         self.bg_music_player.pause()
@@ -858,6 +859,8 @@ class LevelPlayer(Screen):
                 if self.getBlockIsSolid(block+size-Vec2d(1,1)):
                     shift -= self.level.tilewidth
                 if self.getBlockIsSolid(block+size-Vec2d(2,1)):
+                    shift -= self.level.tilewidth
+                if self.getBlockIsSolid(block+size-Vec2d(3,1)):
                     shift -= self.level.tilewidth
                 self.physical_objects.append(PhysicsObject(Vec2d(old_head_lemming.frame.pos.x+shift, old_head_lemming.frame.pos.y),
                     old_head_lemming.frame.vel, pyglet.sprite.Sprite(animation, batch=self.batch_level, group=self.group_fg),
