@@ -844,9 +844,18 @@ class LevelPlayer(Screen):
                 else:
                     direction = 1
                     animation = self.animations['lem_belly_flop']
-                self.physical_objects.append(PhysicsObject(old_head_lemming.frame.pos,
+
+                # if it would be in the wall, move it out
+                size = Vec2d(3, 1)
+                shift = 0
+                block = (old_head_lemming.frame.pos / tile_size).do(int)
+                if self.getBlockIsSolid(block+size-Vec2d(1,1)):
+                    shift -= self.level.tilewidth
+                if self.getBlockIsSolid(block+size-Vec2d(2,1)):
+                    shift -= self.level.tilewidth
+                self.physical_objects.append(PhysicsObject(Vec2d(old_head_lemming.frame.pos.x+shift, old_head_lemming.frame.pos.y),
                     old_head_lemming.frame.vel, pyglet.sprite.Sprite(animation, batch=self.batch_level, group=self.group_fg),
-                    Vec2d(3, 1), can_pick_up_stuff=True, is_belly_flop=True, direction=direction))
+                    size, can_pick_up_stuff=True, is_belly_flop=True, direction=direction))
 
                 self.detatchHeadLemming()
 
