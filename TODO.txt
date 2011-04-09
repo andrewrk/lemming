@@ -1,7 +1,7 @@
 Day 7:
+ * belly flop glitch
  * create as many levels as possible exploring those concepts
  * don't call game over until the belly flop turns to dead body
- * make sure it works on windows and mac
  * download the final submission and play through it
 
 

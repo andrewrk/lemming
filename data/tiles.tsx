@@ -100,18 +100,21 @@
  </tile>
  <tile id="16">
   <properties>
+   <property name="explodable" value="1"/>
    <property name="name" value="DeadBodyLeft"/>
    <property name="solid" value="1"/>
   </properties>
  </tile>
  <tile id="17">
   <properties>
+   <property name="explodable" value="1"/>
    <property name="name" value="DeadBodyMiddle"/>
    <property name="solid" value="1"/>
   </properties>
  </tile>
  <tile id="18">
   <properties>
+   <property name="explodable" value="1"/>
    <property name="name" value="DeadBodyRight"/>
    <property name="solid" value="1"/>
   </properties>
