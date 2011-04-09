@@ -600,6 +600,10 @@ class LevelPlayer(Screen):
             self.sprite_bg2_left = None
             self.sprite_bg2_right = None
 
+        self.label_mans = pyglet.text.Label('9', font_name="Arial", font_size=18, 
+            x=150, y=self.game.window.height - 30, batch=self.batch_static, 
+            color=(0, 0, 0, 255), multiline=False, anchor_x='left', anchor_y='bottom')
+
     def loadConfig(self):
         self.controls = {
             pyglet.window.key.LEFT: Control.MoveLeft,
@@ -823,6 +827,7 @@ class LevelPlayer(Screen):
         pyglet.clock.schedule_once(goNext, 4)
 
     def update(self, dt):
+        self.label_mans.text = str(len(self.lemmings) - self.control_lemming)
         if self.control_lemming < len(self.lemmings):
             if self.explode_queued:
                 self.explode_queued = False
