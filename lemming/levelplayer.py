@@ -1021,8 +1021,8 @@ class LevelPlayer(Screen):
 
             if obj.can_pick_up_stuff:
                 # item pickups
-                corner_block = (obj.pos / tile_size).do(int)
-                feet_block = ((obj.pos + tile_size / 2) / tile_size).do(int)
+                corner_block = (obj.pos / tile_size).do(round).do(int)
+                feet_block = ((obj.pos + tile_size / 2) / tile_size).do(round).do(int)
                 it = Vec2d(0, 0)
                 for it.y in range(obj.size.y):
                     for it.x in range(obj.size.x):
