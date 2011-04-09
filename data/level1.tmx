@@ -8,7 +8,7 @@
  <tileset firstgid="1" source="tiles.tsx"/>
  <layer name="Tiles" width="200" height="100">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3czU7CQBiGUViAcWHiQmO8/xtVoiQEZvr3TTvT4ZzkXWmg0D5RkHg4AAAAAAAAAAAAAAAAAADAo9P/gEf6gDx9QJ4+IE8fkKcPyNMH5OkD8vQBefqAPH1Anj4gTx+Qpw/I0wfk6QPy9BHzVfsAWJU+YvTRN33E6KNv+ojRR9/0EaOPvukjRh9900eMPvqmjxh99E0fMfromz5i9NE3fcToo2/6iNFH3/QRo4++6SNGH/v3frN7+ojRxzq+N7qfSxNvN7tvRB8x+ijj+LuXgUUM3e7Y9BGjj7hLG6eRRXwmNnZ/Je//mekjZkoba1yfH4d5zbBMtI/r7xWvBY5lb6a2sdX1OdQMywz1Mfa78/310WojU18rz3lNPaeNmtfntZneRF6Tldr13I59/TThe6e8Tq39eJc8N6330au5z/9e9oyPWR/l1T6f+tBHy2qfz7V2HljtY9PHftQ+n6aPltU+n1Z2Qz83z4cyjoVu59aSz8ls8dma2ufTym6r99RSar/X18L7h2aXpdQ+JrNWllL7mMxaWUrtYzJrZSm1j8mslaXUPiazVvZsf3c1MzMzMzMzMzNrcan/6WJmfwMAAAAAAAAAAAAAAAAAAAAAAACgDT9lpMUtgDgBAA==
+   H4sIAAAAAAAAA+3czU7CUBSF0TIA48DEgQ58/xdVIiQE7ukPXHoOsFbyjTRQaHcUJA4DAAAAAAAAAAAAAAAAAABc2h4CLtkHxOwDYvYBMfuAmH1AzD4gZh8Qsw+I2QfE7ANi9gEx+4CYfUDMPiBmHxCzD4jZB8TsA2L2ATH7gJh9QMw+IGYfELMPiNkHxOwDYvYBMfuAmH3w6j5POmcfVPSz0v3sN/Fx0vlG7IMKNn+9jXSLsdudyj7Itt/GdqJbfDeaur+e9w/XmrONe1yfX8OyzZDj+HvFe/aBJJi7jbWuz7HN0N/U787n10fVjcx9rbzkNfWSbWRen8fNPJtbXpP16nhup76+nfG9c16nZj/ea56b6vt4Vkuf/0fpFR+zffSXfT7twz4qyz6f92o3Uvax2cfjyD6fso/Kss+n+jb2c3M39LHpdDunrvmczBqfrck+n+rbWu+ptWS/11fh/UNpX0v2MUlVask+JqlKLdnHJFWpJfuYpCq1ZB+TVKVX+7urJEmSJEmSVLHW/3SR9B8AAAAAAAAAAAAAAAAAAAAAAAAANfwCLfpEO4A4AQA=
   </data>
  </layer>
  <layer name="Ladders" width="200" height="100">
