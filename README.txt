@@ -6,6 +6,7 @@ URL: http://pyweek.org/e/lemming
 Team: Superjoe Software
 Members: Andrew Kelley
 License: see LICENSE.txt
+Special Thanks: Tyler Heald for the Factory bg music and credits song.
 
 
 Running the Game
@@ -21,12 +22,12 @@ Othewise open a terminal / console and "cd" to the game directory and run:
 How to Play the Game
 --------------------
 
+Use the in-game text to help you learn.
+Arrow keys: move
+1:          belly flop
+2:          explode
 
-
-Move the cursor around the screen with the mouse.
-
-Press the left mouse button to fire the ducks.
-
+This is explained in-game.
 
 Development notes 
 -----------------

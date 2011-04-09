@@ -1,17 +1,15 @@
-Day 6:
+Day 7:
+ * bad physics glitch when you jump against a vertical wall
+ * belly flop physics glitch
  * create as many levels as possible exploring those concepts
+ * gory explosion of bloody organs when you die on spikes
  * critical bug: if you die several times, memory keeps expanding and sound stops
  * don't call game over until the belly flop turns to dead body
-
-Day 7:
  * make sure it works on windows and mac
- * complete the README and make sure all files are in place
  * download the final submission and play through it
 
 
 Bugs:
- * gory explosion of bloody organs when you die on spikes
- * bad physics glitch when you jump against a vertical wall
  * look for spikes under all of the spots not just one
  * death shouldn't interupt the music flow
  * win sound sucks
