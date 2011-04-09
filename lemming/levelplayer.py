@@ -180,6 +180,8 @@ class Gunner(PhysicsObject):
             self.changeDirection(0)
 
     def wantToShoot(self):
+        if self.direction == 0:
+            return
         if not self.can_shoot:
             return
         self.can_shoot = False
@@ -1335,6 +1337,8 @@ class LevelPlayer(Screen):
         for platform in self.platform_objects:
             if platform.solidAt(block_pos):
                 return True
+
+        return False
 
     def setTile(self, block_pos, tile_id):
         self.level.layers[0].content2D[block_pos.x][block_pos.y] = tile_id
