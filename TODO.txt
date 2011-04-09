@@ -1,5 +1,4 @@
 Day 7:
- * bad physics glitch when you jump against a vertical wall
  * belly flop physics glitch
  * create as many levels as possible exploring those concepts
  * gory explosion of bloody organs when you die on spikes

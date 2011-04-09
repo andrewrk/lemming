@@ -945,15 +945,18 @@ class LevelPlayer(Screen):
                                 new_pos.x = new_feet_block.x*self.level.tilewidth
                                 vel.x = 0
                                 return True
-                        
 
                     return False
 
                 # find the blocks that we would have passed through and do collision resolution on them, in order
                 vector_it = Vec2d(obj.pos)
                 unit_vector_vel = obj.vel / obj.vel.get_length()
-                while obj.pos.get_dist_sqrd(new_pos) > obj.pos.get_dist_sqrd(vector_it):
-                    vector_it += unit_vector_vel * (tile_size * 0.5)
+                last_one = False
+                while not last_one:
+                    vector_it += unit_vector_vel * tile_size
+                    if obj.pos.get_dist_sqrd(new_pos) < obj.pos.get_dist_sqrd(vector_it):
+                        last_one = True
+                        vector_it = new_pos
 
                     # try resolving the collision both ways (y then x, x then y) and choose the one that results in the most velocity
                     x_first_new_pos = Vec2d(vector_it)
