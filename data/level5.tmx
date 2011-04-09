@@ -7,7 +7,7 @@
  <tileset firstgid="1" source="tiles.tsx"/>
  <layer name="Tile Layer 1" width="250" height="100">
   <data encoding="base64" compression="gzip">
-   H4sIAAAAAAAAA+3cTWvCQBiFUTdVNwU30v//T4vgKuSTZHzHm3PgInQhTJkHWoheLgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAWr+NB9TTOeRr1aLOoR86h3w6h3w6h3w6h3w6h3w6h3w6h3w6h3w6h3w6h3yvFq/vPd6vR72vzqEPrxYfgx31vjqHPox9xuyI1nUO/Zj6POne1nUO/Zj77PhY6/eN7wvUW/qeiOH/7munc+iH75OBfDqHfJ6TgXw6h3w6h3w6h3w6h3w6h3xbW/Q8HHyfPc+8eR4OvoPnZCCfziGfFiGfziGfziGfziGfziGfzqlys49N51T5sY9N5+2tfVb4bKrv/plW9XdEirkz/s2M+rtv7Zdi7oxTjSedf4/qO2jtl2LpnDqfVn0Hrf1SLJ1zrPGk8+9RfQet/VKc/fx7VN9Ba78UZz//lPvgdexn1XfQ2u8asm89f/VzG7cdvzvbvqeZxQ8AAAAAAAAAAAAAAAAAjvAPSpyNbaCGAQA=
+   H4sIAAAAAAAAA+3cy2rCUBiFUSlUnRScSN//TYvgoIRcSY5/srMWbIQOhFPOBy1ELxcAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYK6fxgPq6RzytWpR57AfOod8Ood8Ood8Ood8Ood8Ood8Ood8Ood8Ood8Ood8rxav7z3er1u9r85hH14tPjrb6n11DvvQ9xmzLVrXOezH0OdJ17auc9iPsc+O97V+X/i+QL2p74no/u8+dzqH/fB9MpBP55DPczKQT+eQT+eQT+eQT+eQT+eQb2mLnoeD41nzzJvn4eAYPCcD+XQO+bQI+XQO+XR+HF//BkvoHPLpHPLpnCo3+9h0TpVv+9h03t7cZ4XPpvrun2lVf0ekGDvj78iov/vWfinGzjjUeNL516i+g9Z+KabOqfNh1XfQ2i/F1Dn7Gk86/xrVd9DaL8XZz79G9R209ktx9vMPuXde+35WfQet/a4hO+r5q5/buK343dnyPc0sfgAAAAAAAAAAAAAAAACwhT+v0xTcoIYBAA==
   </data>
  </layer>
  <layer name="Ladders" width="250" height="100">

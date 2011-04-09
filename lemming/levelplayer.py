@@ -326,6 +326,7 @@ class ConveyorBelt(ButtonResponder):
 
         if self.state:
             self.sprite.image = self.animations[self.direction]
+            self.setCorrectPosition()
 
             if self.direction > 0:
                 new_tile = self.game.tiles.enum.BeltRight
@@ -333,12 +334,17 @@ class ConveyorBelt(ButtonResponder):
                 new_tile = self.game.tiles.enum.BeltLeft
         else:
             self.sprite.image = self.game.animations['belt_off']
+            self.setCorrectPosition()
             new_tile = self.game.tiles.enum.SolidInvisible
 
         it = Vec2d(0, 0)
         for it.x in range(self.size.x):
             for it.y in range(self.size.y):
                 self.game.setTile(self.pos+it, new_tile)
+
+    def setCorrectPosition(self):
+        pos = self.pos * tile_size + self.game.animation_offset[self.sprite.image]
+        self.sprite.set_position(*pos)
 
 class Bridge(ButtonResponder, PlatformObject):
     def __init__(self, pos, size, state, up_sprite, down_sprite):
@@ -422,7 +428,7 @@ class Gear(AbstractButton):
         self.game.hitButtonId(self.button_id)
         self.sprite.image = self.game.animations['gear_bloody']
         self.game.playSoundAt('spike_death', who_done_it.pos)
-        self.spawnGoreExplosion(who_done_it.pos, who_done_it.vel, who_done_it.size)
+        self.game.spawnGoreExplosion(who_done_it.pos, who_done_it.vel, who_done_it.size)
 
         if is_char:
             self.game.detatch_queued = True

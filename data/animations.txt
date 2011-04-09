@@ -1,4 +1,4 @@
-# name:delay:loop:off_x:off_y = file1, file2, etc
+# name:delay:loop:off_x:off_y:size_x:size_y = file1, file2, etc
 
 lem_still:0.1:1:32:0:16:64  = lem/17.png
 lem_crazy:0.1:1:32:0:16:64  = lem/18.png, lem/19.png, lem/20.png, lem/21.png, lem/22.png, lem/23.png, lem/24.png
