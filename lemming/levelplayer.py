@@ -855,16 +855,22 @@ class LevelPlayer(Screen):
                 # if it would be in the wall, move it out
                 size = Vec2d(3, 1)
                 shift = 0
-                block = (old_head_lemming.frame.pos / tile_size).do(int)
-                if self.getBlockIsSolid(block+size-Vec2d(1,1)):
-                    shift -= self.level.tilewidth
-                if self.getBlockIsSolid(block+size-Vec2d(2,1)):
-                    shift -= self.level.tilewidth
-                if self.getBlockIsSolid(block+size-Vec2d(3,1)):
-                    shift -= self.level.tilewidth
-                self.physical_objects.append(PhysicsObject(Vec2d(old_head_lemming.frame.pos.x+shift, old_head_lemming.frame.pos.y),
+                obj = PhysicsObject(Vec2d(old_head_lemming.frame.pos.x, old_head_lemming.frame.pos.y),
                     old_head_lemming.frame.vel, pyglet.sprite.Sprite(animation, batch=self.batch_level, group=self.group_fg),
-                    size, can_pick_up_stuff=True, is_belly_flop=True, direction=direction))
+                    size, can_pick_up_stuff=True, is_belly_flop=True, direction=direction)
+                # shift it left until not in wall
+                def inWall():
+                    it = Vec2d(0, 0)
+                    for it.x in range(size.x):
+                        for it.y in range(size.y):
+                            block = (obj.pos / tile_size).do(round).do(int) + it
+                            if self.getBlockIsSolid(block):
+                                return True
+                    return False
+                while inWall():
+                    obj.pos.x -= self.level.tilewidth
+
+                self.physical_objects.append(obj)
 
                 self.detatchHeadLemming()
 
@@ -947,12 +953,14 @@ class LevelPlayer(Screen):
                                 return True
                     elif vel.y < 0:
                         # resolve feet collisions
-                        for x in range(obj_size.x):
-                            block_solid = self.getBlockIsSolid(new_feet_block+Vec2d(x,0))
-                            if block_solid:
-                                new_pos.y = (new_feet_block.y+1)*self.level.tileheight
-                                vel.y = 0
-                                return True
+                        new_blocks_at_feet = [Vec2d(new_feet_block.x+x, new_feet_block.y) for x in range(obj.size.x)]
+                        if int(new_pos.x / self.level.tilewidth) != int(round(new_pos.x / self.level.tilewidth)):
+                            new_blocks_at_feet.append(Vec2d(new_blocks_at_feet[-1].x+1, new_blocks_at_feet[-1].y))
+                        new_blocks_at_feet_solid = [self.getBlockIsSolid(block) for block in new_blocks_at_feet]
+                        if any(new_blocks_at_feet_solid):
+                            new_pos.y = (new_feet_block.y+1)*self.level.tileheight
+                            vel.y = 0
+                            return True
 
                     return False
 
@@ -1014,10 +1022,14 @@ class LevelPlayer(Screen):
                 # apply velocity to position
                 obj.pos = new_pos
 
-            block_at_feet = (Vec2d(obj.pos.x + self.level.tilewidth / 2, obj.pos.y-1) / tile_size).do(int)
-            tile_at_feet = self.getTile(block_at_feet)
-            block_at_feet_solid = self.getBlockIsSolid(block_at_feet)
-            on_ground = block_at_feet_solid
+            corner_foot_block = (Vec2d(obj.pos.x, obj.pos.y-1) / tile_size).do(int)
+            blocks_at_feet = [Vec2d(corner_foot_block.x+x, corner_foot_block.y) for x in range(obj.size.x)]
+            if int(obj.pos.x / self.level.tilewidth) != int(round(obj.pos.x / self.level.tilewidth)):
+                blocks_at_feet.append(Vec2d(blocks_at_feet[-1].x+1, blocks_at_feet[-1].y))
+
+            tiles_at_feet = [self.getTile(block) for block in blocks_at_feet]
+            blocks_at_feet_solid = [self.getBlockIsSolid(block) for block in blocks_at_feet]
+            on_ground = any(blocks_at_feet_solid)
 
             if not on_ground and not obj.on_ladder:
                 self.setRunningSound(None)
@@ -1070,17 +1082,17 @@ class LevelPlayer(Screen):
                             self.handleVictory()
 
                 # spikes
-                if tile_at_feet.spike:
+                if any([tile.spike for tile in tiles_at_feet]):
                     if obj == char:
                         self.detatch_queued = True
                     else:
                         obj.delete()
                     if obj.is_belly_flop:
-                        self.setTile(block_at_feet, self.tiles.enum.DeadBodyMiddle)
-                        self.setTile(block_at_feet+Vec2d(1,0), self.tiles.enum.DeadBodyRight)
-                        self.setTile(block_at_feet+Vec2d(-1,0), self.tiles.enum.DeadBodyLeft)
+                        self.setTile(corner_foot_block, self.tiles.enum.DeadBodyLeft)
+                        self.setTile(corner_foot_block+Vec2d(1,0), self.tiles.enum.DeadBodyMiddle)
+                        self.setTile(corner_foot_block+Vec2d(2,0), self.tiles.enum.DeadBodyRight)
                     else:
-                        self.setTile(block_at_feet, self.tiles.enum.DeadBodyMiddle)
+                        self.setTile(corner_foot_block, self.tiles.enum.DeadBodyMiddle)
 
                         negate = ''
                         if obj.vel.x < 0:
@@ -1089,12 +1101,13 @@ class LevelPlayer(Screen):
                             pyglet.sprite.Sprite(self.animations[negate+'lem_die'], batch=self.batch_level, group=self.group_fg),
                             obj.size, self.animations['lem_die'].get_duration()))
 
-                    self.playSoundAt('spike_death', block_at_feet * tile_size)
+                    self.playSoundAt('spike_death', corner_foot_block * tile_size)
                     self.spawnGoreExplosion(obj.pos, obj.vel, obj.size)
 
-            if tile_at_feet.belt is not None:
-                belt_velocity = 800
-                apply_belt_velocity = tile_at_feet.belt * belt_velocity * dt
+            belt_velocity = 800
+            for tile in tiles_at_feet:
+                if tile.belt is not None:
+                    apply_belt_velocity += tile_at_feet.belt * belt_velocity * dt
 
             if obj == char:
                 # scroll the level
@@ -1127,7 +1140,7 @@ class LevelPlayer(Screen):
                 move_down = self.control_state[Control.MoveDown]
                 if not move_up and (move_left or move_right or move_down):
                     obj.on_ladder = False
-                ladder_at_feet = self.getTile(block_at_feet, 1)
+                ladder_at_feet = self.getTile(corner_foot_block, 1)
                 if obj.on_ladder and not ladder_at_feet.ladder:
                     obj.on_ladder = False
                 if move_left and not move_right:
@@ -1244,6 +1257,8 @@ class LevelPlayer(Screen):
 
             # conveyor belts
             max_conveyor_speed = 700
+            apply_belt_velocity = max(-belt_velocity * dt, apply_belt_velocity)
+            apply_belt_velocity = min(belt_velocity * dt, apply_belt_velocity)
             if apply_belt_velocity > 0:
                 if obj.vel.x + apply_belt_velocity > max_conveyor_speed:
                     obj.vel.x += max(max_conveyor_speed - obj.vel.x, 0)

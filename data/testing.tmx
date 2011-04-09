@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="100" height="100" tilewidth="16" tileheight="16">
+ <properties>
+  <property name="bg_art" value="background.png"/>
+  <property name="fg_art" value="hill.png"/>
+ </properties>
+ <tileset firstgid="1" source="tiles.tsx"/>
+ <layer name="Tile Layer 1" width="100" height="100">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3VvQqAIBiGUbfmpu7/Thta4oN+DIqXPAdcUht8BFsDAAAAAAAAAAAAAAAA4Ikl5B9s9MiiRxY9suiRRY8semTRI4seWfTIokcWPbLokSWtx1xG/f53X/a4c55na0brMXXs26+906Pe+6P7fjY/Qo/pxVH1nueIPdJcvR+aAAAAAAAAAAAAAAAAAAAAAAAA8Ccr4CIRX0CcAAA=
+  </data>
+ </layer>
+ <layer name="ladders" width="100" height="100">
+  <data encoding="base64" compression="gzip">
+   H4sIAAAAAAAAA+3BMQEAAADCoPVP7WULoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgBt5RKnmQJwAAA==
+  </data>
+ </layer>
+ <objectgroup name="Object Layer 1" width="100" height="100">
+  <object name="start" type="StartPoint" x="557" y="720" width="32" height="64"/>
+ </objectgroup>
+ <objectgroup name="PlayerLayer" width="100" height="100"/>
+</map>
