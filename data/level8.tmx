@@ -17,7 +17,7 @@
   </data>
  </layer>
  <objectgroup name="Object Layer 1" width="200" height="100">
-  <object name="start" type="StartPoint" x="512" y="576" width="32" height="64"/>
+  <object name="start" type="StartPoint" x="464" y="576" width="32" height="64"/>
   <object name="gun man" type="Agent" x="1319" y="558" width="32" height="64">
    <properties>
     <property name="type" value="gunner"/>
