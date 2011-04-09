@@ -55,6 +55,8 @@
   </object>
   <object name="monster" type="Agent" x="608" y="432" width="48" height="48">
    <properties>
+    <property name="throw_vel_x" value="600"/>
+    <property name="throw_vel_y" value="1800"/>
     <property name="type" value="monster"/>
    </properties>
   </object>
@@ -139,6 +141,14 @@
    <properties>
     <property name="throw_vel_x" value="600"/>
     <property name="throw_vel_y" value="700"/>
+    <property name="type" value="monster"/>
+   </properties>
+  </object>
+  <object name="monster" type="Agent" x="1488" y="1056" width="48" height="48">
+   <properties>
+    <property name="direction" value="-1"/>
+    <property name="throw_vel_x" value="-1200"/>
+    <property name="throw_vel_y" value="300"/>
     <property name="type" value="monster"/>
    </properties>
   </object>
