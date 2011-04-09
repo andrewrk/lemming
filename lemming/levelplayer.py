@@ -1113,25 +1113,13 @@ class LevelPlayer(Screen):
 
             if obj == char:
                 # scroll the level
-                normal_scroll_accel = 1200
-                slow_scroll_accel = 1200
-                desired_scroll = self.getDesiredScroll(Vec2d(obj.pos))
-                scroll_diff = desired_scroll - self.scroll
+                if self.held_by is None:
+                    desired_scroll = self.getDesiredScroll(Vec2d(obj.pos))
+                else:
+                    desired_scroll = self.getDesiredScroll(Vec2d(self.held_by.pos))
 
-                self.scroll += self.scroll_vel * dt
-                for i in range(2):
-                    if abs(scroll_diff[i]) < 10:
-                        proposed_new_vel = self.scroll_vel[i] - sign(self.scroll_vel[i]) * normal_scroll_accel * dt
-                        if sign(proposed_new_vel) != sign(self.scroll_vel[i]):
-                            self.scroll_vel[i] = 0
-                        else:
-                            self.scroll_vel[i] = proposed_new_vel
-                    elif abs(scroll_diff[i]) < abs(self.scroll_vel[i] * self.scroll_vel[i] / slow_scroll_accel):
-                        if sign(self.scroll_vel[i]) == sign(scroll_diff[i]) != 0:
-                            apply_scroll_accel = min(-self.scroll_vel[i] * self.scroll_vel[i] / scroll_diff[i], slow_scroll_accel)
-                            self.scroll_vel[i] += apply_scroll_accel * dt
-                    else:
-                        self.scroll_vel[i] += sign(scroll_diff[i]) * normal_scroll_accel * dt
+                scroll_diff = desired_scroll - self.scroll
+                self.scroll += scroll_diff * 0.20
 
                 # apply input to physics
                 acceleration = 900
