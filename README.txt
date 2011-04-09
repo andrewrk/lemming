@@ -1,5 +1,5 @@
 Your Game Title
-===============
+
 
 Entry in PyWeek #12  <http://www.pyweek.org/12/>
 URL: http://pyweek.org/e/lemming
@@ -28,6 +28,8 @@ Arrow keys: move
 2:          explode
 
 This is explained in-game.
+
+IF THE GAME CRASHES or becomes slow, restart the program and hit continue.
 
 Development notes 
 -----------------
