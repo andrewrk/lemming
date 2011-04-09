@@ -1,5 +1,4 @@
 Day 7:
- * make bullets not miss
  * create as many levels as possible exploring those concepts
  * critical bug: if you die several times, memory keeps expanding and sound stops
  * don't call game over until the belly flop turns to dead body

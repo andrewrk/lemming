@@ -231,7 +231,12 @@ class Bullet(PhysicsObject):
         super(Bullet, self).__init__(pos, vel, sprite, Vec2d(1, 1), life=max_bullet_life)
         self.game = game
 
+        self.prev_pos = Vec2d(self.pos)
+
     def think(self, dt):
+        old_prev_pos = self.prev_pos
+        self.prev_pos = Vec2d(self.pos)
+
         # if we're going too slow, die
         die_threshold = 100
         if abs(self.vel.x) < die_threshold:
@@ -241,19 +246,28 @@ class Bullet(PhysicsObject):
         if self.game.control_lemming >= len(self.game.lemmings):
             return
 
-        # if we hit something solid, die
-        my_block = (self.pos / tile_size).do(int)
-        if self.game.getBlockIsSolid(my_block):
-            self.delete()
-            return
-
-        # test for hitting player
         player_pos = (self.game.lemmings[self.game.control_lemming].pos / tile_size).do(int)
         player_size = self.game.lemmings[self.game.control_lemming].size
-        if my_block.x >= player_pos.x and my_block.x < player_pos.x + player_size.x and my_block.y >= player_pos.y and my_block.y < player_pos.y + player_size.y:
-            self.game.hitByBullet()
-            self.delete()
-            return
+        vector_it = Vec2d(old_prev_pos)
+        unit_vector_vel = self.vel / self.vel.get_length()
+        last_one = False
+        while not last_one:
+            vector_it += unit_vector_vel * tile_size
+            # if we hit something solid, die
+            if old_prev_pos.get_dist_sqrd(self.pos) < old_prev_pos.get_dist_sqrd(vector_it):
+                last_one = True
+                vector_it = self.pos
+
+            my_block = (vector_it / tile_size).do(int)
+            if self.game.getBlockIsSolid(my_block):
+                self.delete()
+                return
+
+            # test for hitting player
+            if my_block.x >= player_pos.x and my_block.x < player_pos.x + player_size.x and my_block.y >= player_pos.y and my_block.y < player_pos.y + player_size.y:
+                self.game.hitByBullet()
+                self.delete()
+                return
 
 
 class Monster(PhysicsObject):
