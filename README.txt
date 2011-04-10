@@ -12,9 +12,7 @@ Special Thanks: Tyler Heald for the Factory bg music and credits song.
 Running the Game
 ----------------
 
-On Windows or Mac OS X, locate the "run_game.pyw" file and double-click it.
-
-Othewise open a terminal / console and "cd" to the game directory and run:
+Make sure you have python 2.6.5 or later installed, pyglet, and avbin
 
   python run_game.py
 
