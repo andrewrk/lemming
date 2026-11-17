@@ -1140,6 +1140,7 @@ class LevelPlayer(Screen):
                 if obj.on_ladder and not ladder_at_feet.ladder:
                     obj.on_ladder = False
                 if move_left and not move_right:
+                    obj.direction = -1
                     if obj.vel.x - acceleration * dt < -max_speed:
                         obj.vel.x += min(-max_speed - obj.vel.x, 0)
                     else:
@@ -1153,6 +1154,7 @@ class LevelPlayer(Screen):
 
                             self.setRunningSound(self.sfx['running'])
                 elif move_right and not move_left:
+                    obj.direction = 1
                     if obj.vel.x + acceleration * dt > max_speed:
                         obj.vel.x += max(max_speed - obj.vel.x, 0)
                     else:
@@ -1167,12 +1169,23 @@ class LevelPlayer(Screen):
                             self.setRunningSound(self.sfx['running'])
                 else:
                     if on_ground:
-                        # switch sprite to still
-                        if obj.sprite.image != self.animations['lem_crazy']:
-                            obj.sprite.image = self.animations['lem_crazy']
+                        # switch sprite to still, facing the last direction moved
+                        animation_name = 'lem_crazy'
+                        if obj.direction < 0:
+                            animation_name = '-' + animation_name
+                        if obj.sprite.image != self.animations[animation_name]:
+                            obj.sprite.image = self.animations[animation_name]
                             obj.frame.new_image = obj.sprite.image
 
                             self.setRunningSound(None)
+                if not on_ground and not obj.on_ladder:
+                    # turn around in mid-air
+                    for name in ('lem_jump', 'lem_run'):
+                        current, turned = (name, '-' + name) if obj.direction < 0 else ('-' + name, name)
+                        if obj.sprite.image == self.animations[current]:
+                            obj.sprite.image = self.animations[turned]
+                            obj.frame.new_image = obj.sprite.image
+                            break
                 ladder_velocity = 200
                 if move_up and ladder_at_feet.ladder:
                     new_pos = Vec2d(obj.pos.x, obj.pos.y + ladder_velocity * dt)
@@ -1217,7 +1230,7 @@ class LevelPlayer(Screen):
 
                     # switch sprite to jump
                     animation_name = 'lem_jump'
-                    if obj.vel.x < 0:
+                    if obj.direction < 0:
                         animation_name = '-' + animation_name
                     if obj.sprite.image != self.animations[animation_name]:
                         obj.sprite.image = self.animations[animation_name]
